@@ -11,9 +11,9 @@
 namespace Tacit\Controller\Exception;
 
 
-class BadRequestException extends RestfulException
+class LengthRequiredException extends RestfulException
 {
-    protected $status = 400;
-    protected $message = "Bad Request";
-    protected $description = "The request could not be understood by the server due to malformed syntax. DO NOT repeat the request without modifications.";
+    protected $code = 411;
+    protected $message = "Length Required";
+    protected $description = "The server needs to know the size of the entity body and it should be specified in the Content Length header.";
 }

@@ -11,9 +11,9 @@
 namespace Tacit\Controller\Exception;
 
 
-class BadRequestException extends RestfulException
+class ServiceUnavailableException extends RestfulException
 {
-    protected $status = 400;
-    protected $message = "Bad Request";
-    protected $description = "The request could not be understood by the server due to malformed syntax. DO NOT repeat the request without modifications.";
+    protected $code = 503;
+    protected $message = "Service Unavailable";
+    protected $description = "The server is currently unable to handle the request due to a temporary overloading or maintenance of the server.";
 }

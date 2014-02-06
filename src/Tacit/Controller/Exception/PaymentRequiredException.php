@@ -11,9 +11,9 @@
 namespace Tacit\Controller\Exception;
 
 
-class BadRequestException extends RestfulException
+class PaymentRequiredException extends RestfulException
 {
-    protected $status = 400;
-    protected $message = "Bad Request";
-    protected $description = "The request could not be understood by the server due to malformed syntax. DO NOT repeat the request without modifications.";
+    protected $status = 402;
+    protected $message = "Payment Required";
+    protected $description = "Payment is required in order to complete this operation.";
 }

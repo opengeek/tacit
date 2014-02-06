@@ -11,9 +11,9 @@
 namespace Tacit\Controller\Exception;
 
 
-class BadRequestException extends RestfulException
+class FailedDependencyException extends RestfulException
 {
-    protected $status = 400;
-    protected $message = "Bad Request";
-    protected $description = "The request could not be understood by the server due to malformed syntax. DO NOT repeat the request without modifications.";
+    protected $code = 424;
+    protected $message = "Failed Dependency";
+    protected $description = "The operation failed because a dependent operation failed.";
 }

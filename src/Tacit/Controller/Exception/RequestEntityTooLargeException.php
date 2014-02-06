@@ -11,9 +11,9 @@
 namespace Tacit\Controller\Exception;
 
 
-class BadRequestException extends RestfulException
+class RequestEntityTooLargeException extends RestfulException
 {
-    protected $status = 400;
-    protected $message = "Bad Request";
-    protected $description = "The request could not be understood by the server due to malformed syntax. DO NOT repeat the request without modifications.";
+    protected $code = 413;
+    protected $message = "Request Entity Too Large";
+    protected $description = "The representation was too large for the server to handle.";
 }
