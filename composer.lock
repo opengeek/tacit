@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6de3f7017db4547daff540163831ed9c",
+    "hash": "ab7634d34accfbb5e4f0202b397a810c",
     "packages": [
         {
             "name": "league/fractal",
@@ -55,6 +55,49 @@
                 "league"
             ],
             "time": "2013-12-27 13:03:10"
+        },
+        {
+            "name": "php-loep/monga",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/monga.git",
+                "reference": "f0c5bc5b169c1198cebd3e1dd7ee129177dc73e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/monga/zipball/f0c5bc5b169c1198cebd3e1dd7ee129177dc73e8",
+                "reference": "f0c5bc5b169c1198cebd3e1dd7ee129177dc73e8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "League\\Monga": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Frank de Jonge",
+                    "email": "frank@ku.nl"
+                }
+            ],
+            "description": "MongoDB Abstraction Layer",
+            "homepage": "https://github.com/php-loep/monga",
+            "keywords": [
+                "mongodb"
+            ],
+            "time": "2013-11-22 11:02:39"
         },
         {
             "name": "slim/slim",
