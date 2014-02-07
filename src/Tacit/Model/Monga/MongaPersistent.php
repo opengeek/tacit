@@ -11,7 +11,7 @@
 namespace Tacit\Model\Monga;
 
 
-use Tacit\Model\ModelValidationException;
+use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Persistent;
 
 trait MongaPersistent
@@ -33,9 +33,9 @@ trait MongaPersistent
     public $_id;
 
     /**
-     * Insert this model into the database.
+     * Insert this model into the repository.
      *
-     * @throws \Tacit\Model\ModelValidationException
+     * @throws ModelValidationException
      * @return bool
      */
     protected function insert()
@@ -54,9 +54,9 @@ trait MongaPersistent
     }
 
     /**
-     * Patch this model in the database, updating only dirty fields.
+     * Patch this model in the repository, updating only dirty fields.
      *
-     * @throws \Tacit\Model\ModelValidationException If the patch fails.
+     * @throws ModelValidationException If the patch fails.
      * @return bool Returns true if successful; false otherwise.
      */
     protected function patch()

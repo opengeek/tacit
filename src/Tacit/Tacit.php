@@ -13,6 +13,11 @@ namespace Tacit;
 
 use Slim\Slim;
 
+/**
+ * An extension of Slim to hide the RESTful RAD server features.
+ *
+ * @package Tacit
+ */
 class Tacit extends Slim
 {
     /**
@@ -33,10 +38,10 @@ class Tacit extends Slim
                     'startTime' => microtime(true)
                 ],
                 'connection' => [
-                    'class' => 'Tacit\\Model\\Monga\\MongaDatabase',
+                    'class' => 'Tacit\\Model\\Monga\\MongaRepository',
                     'server' => 'mongodb://localhost',
                     'options' => array('connect' => false),
-                    'database' => 'test'
+                    'repository' => 'test'
                 ]
             ];
         }
@@ -51,10 +56,10 @@ class Tacit extends Slim
 
         if (!isset($configuration['connection']) || !is_array($configuration['connection'])) {
             $configuration['connection'] = [
-                'class' => 'Tacit\\Model\\Monga\\MongaDatabase',
+                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
                 'server' => 'mongodb://localhost',
                 'options' => array('connect' => false),
-                'database' => 'test'
+                'repository' => 'test'
             ];
         }
 
@@ -71,7 +76,7 @@ class Tacit extends Slim
             ]);
         });
 
-        $this->container->singleton('database', function () use ($configuration) {
+        $this->container->singleton('repository', function () use ($configuration) {
             $dbClass = $configuration['connection']['class'];
             return new $dbClass($configuration['connection']);
         });

@@ -11,7 +11,7 @@
 namespace Tacit\Model\Exception;
 
 
-class ModelCreateException extends ModelException
+class ModelPatchException extends ModelException
 {
 
 } 

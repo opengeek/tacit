@@ -18,14 +18,18 @@ namespace Tacit\Model;
 trait Collection
 {
     /**
-     * @var string The name of the collection.
+     * The name of the collection.
+     *
+     * @var string
      */
     public $name;
 
     /**
-     * @var Database The database instance containing the collection.
+     * A native connection for the Repository instance containing the collection.
+     *
+     * @var object
      */
-    protected $database;
+    protected $connection;
 
     /**
      * Get the public fields of an object as an array.
@@ -59,16 +63,16 @@ trait Collection
      * Create a new instance of the Collection.
      *
      * @param string $name The name of the collection.
-     * @param Database $database The database containing the collection.
+     * @param object $connection A native connection to the Repository containing the collection.
      */
-    public function __construct($name, $database)
+    public function __construct($name, $connection)
     {
         $this->name = $name;
-        $this->database = $database;
+        $this->connection = $connection;
     }
 
     /**
-     * Cast database-specific data types to PHP-friendly data types.
+     * Cast repository-specific data types to PHP-friendly data types.
      *
      * @param mixed $var
      *
@@ -116,7 +120,7 @@ trait Collection
     abstract public function insert($data, $options = []);
 
     /**
-     * Remove one or more items from a database collection.
+     * Remove one or more items from a repository collection.
      *
      * @param null|array|\Closure $query The query to use to select the items for removal.
      *

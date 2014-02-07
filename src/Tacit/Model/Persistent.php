@@ -11,6 +11,9 @@
 namespace Tacit\Model;
 
 
+use Tacit\Model\Exception\ModelException;
+use Tacit\Model\Exception\ModelInsertException;
+use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Tacit;
 use Tacit\Validate\Validator;
 
@@ -24,12 +27,12 @@ trait Persistent
     use Routable;
 
     /**
-     * @var Collection The Collection represents a collection/table in a Database
+     * @var Collection The Collection represents a collection/table in a Repository
      */
     protected static $collection;
 
     /**
-     * @var string The name of the collection/table within it's Database
+     * @var string The name of the collection/table within it's Repository
      */
     protected static $collectionName;
 
@@ -60,20 +63,20 @@ trait Persistent
     protected $_validator;
 
     /**
-     * Get the Collection from the Database.
+     * Get the Collection from the Repository.
      *
      * @return Collection
      */
     public static function collection()
     {
-        /** @var Database $database */
-        $database = Tacit::getInstance()->container->get('database');
-        static::$collection = $database->collection(static::$collectionName);
+        /** @var Repository $repository */
+        $repository = Tacit::getInstance()->container->get('repository');
+        static::$collection = $repository->collection(static::$collectionName);
         return static::$collection;
     }
 
     /**
-     * Get the name of the Collection in the Database.
+     * Get the name of the Collection in the Repository.
      *
      * @return string
      */
@@ -87,7 +90,7 @@ trait Persistent
      *
      * @param array $data
      *
-     * @throws ModelCreateException
+     * @throws ModelInsertException
      * @throws ModelValidationException
      * @return Persistent|null
      */
@@ -99,10 +102,10 @@ trait Persistent
         } catch (ModelValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new ModelCreateException("Error creating item in collection " . static::$collectionName, $e->getCode(), $e);
+            throw new ModelInsertException("Error creating item in collection " . static::$collectionName, $e->getCode(), $e);
         }
         if (false === $result) {
-            throw new ModelCreateException("Error creating item in collection " . static::$collectionName);
+            throw new ModelInsertException("Error creating item in collection " . static::$collectionName);
         }
         return $instance;
     }
@@ -286,7 +289,7 @@ trait Persistent
     }
 
     /**
-     * Remove this model from the Database.
+     * Remove this model from the Repository.
      *
      * @return bool
      */
@@ -296,17 +299,25 @@ trait Persistent
     }
 
     /**
-     * Save this model to the Database.
+     * Save this model to the Repository.
      *
-     * @throws ModelValidationException
+     * @throws Exception\ModelException
      * @return bool
      */
     public function save()
     {
         if ($this->isNew()) {
-            return $this->insert();
+            try {
+                return $this->insert();
+            } catch (ModelException $e) {
+                throw $e;
+            } catch (\Exception $e) {}
         } elseif (!empty($this->_dirty)) {
-            return $this->patch();
+            try {
+                return $this->patch();
+            } catch (ModelException $e) {
+                throw $e;
+            } catch (\Exception $e) {}
         }
         return false;
     }
@@ -377,17 +388,17 @@ trait Persistent
     }
 
     /**
-     * Insert this model into the database.
+     * Insert this model into the repository.
      *
-     * @throws \Tacit\Model\ModelValidationException If the insert fails.
+     * @throws ModelValidationException If the insert fails.
      * @return bool Returns true if successful; false otherwise.
      */
     abstract protected function insert();
 
     /**
-     * Patch this model in the database, updating only dirty fields.
+     * Patch this model in the repository, updating only dirty fields.
      *
-     * @throws \Tacit\Model\ModelValidationException If the patch fails.
+     * @throws ModelValidationException If the patch fails.
      * @return bool Returns true if successful; false otherwise.
      */
     abstract protected function patch();
