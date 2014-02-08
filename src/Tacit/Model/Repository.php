@@ -30,6 +30,13 @@ abstract class Repository
     protected $connection;
 
     /**
+     * A native collection object for a repository.
+     *
+     * @var array|\ArrayAccess|\ArrayIterator
+     */
+    protected $collection;
+
+    /**
      * Get a Repository instance (singleton).
      *
      * @param array $configuration An array containing the configuration necessary to
