@@ -10,6 +10,8 @@
 
 namespace Tacit\Test\Model;
 
+use Tacit\Model\Collection;
+
 /**
  * Tests of the Tacit\Model\Persistent trait.
  *
@@ -77,5 +79,15 @@ class PersistentTest extends ModelTestCase
             'int'   => 144,
             'float' => 3.14
         ]));
+    }
+
+    /**
+     * Test the MockPersistent::collection() method.
+     */
+    public function testCollection()
+    {
+        $collection = MockPersistent::collection();
+        $this->assertTrue($collection instanceof Collection);
+        $this->assertInstanceOf('Tacit\\Test\\Model\\MockCollection', MockPersistent::collection());
     }
 }

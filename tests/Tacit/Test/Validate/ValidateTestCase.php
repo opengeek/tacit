@@ -18,7 +18,7 @@ use Tacit\TestCase;
  *
  * @package Tacit\Test\Validate
  */
-class ValidateTestCase extends TestCase
+abstract class ValidateTestCase extends TestCase
 {
 
 } 

@@ -15,7 +15,7 @@ namespace Tacit\Model;
  *
  * @package Tacit\Model
  */
-trait Collection
+abstract class Collection
 {
     /**
      * The name of the collection.

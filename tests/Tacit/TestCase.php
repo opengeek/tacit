@@ -15,7 +15,7 @@ namespace Tacit;
  *
  * @package Tacit
  */
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * Get a clean instance of Tacit for use in tests.
@@ -23,6 +23,17 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        new Tacit();
+        new Tacit([
+            'app' => [
+                'mode' => 'development',
+                'startTime' => microtime(true)
+            ],
+            'connection' => [
+                'class' => 'Tacit\\Test\\Model\\MockRepository',
+                'server' => 'localhost',
+                'options' => array('connect' => false),
+                'repository' => 'tacit_test'
+            ]
+        ]);
     }
 }

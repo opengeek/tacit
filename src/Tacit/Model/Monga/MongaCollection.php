@@ -14,10 +14,8 @@ namespace Tacit\Model\Monga;
 use League\Monga\Database;
 use Tacit\Model\Collection;
 
-class MongaCollection
+class MongaCollection extends Collection
 {
-    use Collection;
-
     /**
      * A native connection for the Repository instance containing the collection.
      *

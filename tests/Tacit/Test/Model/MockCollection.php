@@ -13,10 +13,8 @@ namespace Tacit\Test\Model;
 
 use Tacit\Model\Collection;
 
-class MockCollection
+class MockCollection extends Collection
 {
-    use Collection;
-
     /**
      * The native collection object from the Repository.
      *
