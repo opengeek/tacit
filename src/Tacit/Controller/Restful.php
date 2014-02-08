@@ -85,9 +85,8 @@ abstract class Restful
         $this->app = $app;
         $this->route = $this->app->router->getCurrentRoute();
         $this->fractal = new Manager();
-        $this->fractal->setRequestedScopes(explode(',', $this->app->request->get(
-            $this->app->config('embedded_scopes_param')
-        )));
+        $scopeParameter = $this->app->config('embedded_scopes_param') ? $this->app->config('embedded_scopes_param') : 'zoom';
+        $this->fractal->setRequestedScopes(explode(',', $this->app->request->get($scopeParameter)));
     }
 
     /**
