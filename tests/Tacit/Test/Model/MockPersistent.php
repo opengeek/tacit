@@ -15,15 +15,26 @@ use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Persistent;
 
-class MockPersistent
+/**
+ * Defines a simple hash-based mock Persistent implementation.
+ *
+ * @package Tacit\Test\Model
+ */
+class MockPersistent extends Persistent
 {
-    use Persistent
+    protected static $collectionName = 'mock_persistent';
 
-    /**
-     * The name of a field representing the unique identifier for this model item.
-     *
-     * @var string
-     */
+    /** @var string */
+    public $_id;
+    /** @var string */
+    public $name;
+    /** @var \DateTime */
+    public $date;
+    /** @var integer */
+    public $int;
+    /** @var float */
+    public $float;
+
     protected $_keyField = '_id';
 
     /**

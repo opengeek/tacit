@@ -13,16 +13,6 @@ namespace Tacit\Test\Model;
 
 class RepositoryTest extends ModelTestCase
 {
-    /** @var MockRepository */
-    public $fixture;
-
-    public function setUp()
-    {
-        parent::setUp();
-        $this->fixture = new MockRepository();
-        $this->fixture->addCollection('test');
-    }
-
     public function testGetInstance()
     {
         $this->assertInstanceOf('Tacit\\Model\\Repository', $this->fixture);

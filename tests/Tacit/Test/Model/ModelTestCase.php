@@ -13,7 +13,24 @@ namespace Tacit\Test\Model;
 
 use Tacit\TestCase;
 
+/**
+ * Base test cases for Tacit\Model.
+ *
+ * @package Tacit\Test\Model
+ */
 abstract class ModelTestCase extends TestCase
 {
+    /**
+     * A MockRepository fixture for the Model test cases.
+     *
+     * @var MockRepository
+     */
+    public $fixture;
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->fixture = new MockRepository();
+        $this->fixture->addCollection('test');
+    }
 }

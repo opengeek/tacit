@@ -14,10 +14,8 @@ namespace Tacit\Model\Monga;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Persistent;
 
-trait MongaPersistent
+abstract class MongaPersistent extends Persistent
 {
-    use Persistent;
-
     /**
      * Name of the field representing the unique key for this model item.
      *

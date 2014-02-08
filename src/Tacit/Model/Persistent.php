@@ -22,19 +22,19 @@ use Tacit\Validate\Validator;
  *
  * @package Tacit\Model
  */
-trait Persistent
+abstract class Persistent
 {
     use Routable;
 
     /**
-     * @var Collection The Collection represents a collection/table in a Repository
-     */
-    protected static $collection;
-
-    /**
-     * @var string The name of the collection/table within it's Repository
+     * @var string The name of the native collection container.
      */
     protected static $collectionName;
+
+    /**
+     * @var Collection A Collection wraps a collection container in a Repository.
+     */
+    protected static $collection;
 
     /**
      * @var array An array of Rules to use when validating objects if this class.
@@ -71,7 +71,7 @@ trait Persistent
     {
         /** @var Repository $repository */
         $repository = Tacit::getInstance()->container->get('repository');
-        static::$collection = $repository->collection(static::$collectionName);
+        static::$collection = $repository->collection(static::collectionName());
         return static::$collection;
     }
 
@@ -102,10 +102,10 @@ trait Persistent
         } catch (ModelValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new ModelInsertException("Error creating item in collection " . static::$collectionName, $e->getCode(), $e);
+            throw new ModelInsertException("Error creating item in collection " . static::collectionName(), $e->getCode(), $e);
         }
         if (false === $result) {
-            throw new ModelInsertException("Error creating item in collection " . static::$collectionName);
+            throw new ModelInsertException("Error creating item in collection " . static::collectionName());
         }
         return $instance;
     }
