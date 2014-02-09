@@ -78,6 +78,16 @@ class MongaCollection extends Collection
     }
 
     /**
+     * Drop the collection container from the Repository.
+     *
+     * @return bool Returns true if successfully dropped; false otherwise.
+     */
+    public function drop()
+    {
+        return $this->collection->drop();
+    }
+
+    /**
      * Find items in a collection based on the provided query.
      *
      * @param null|array|\Closure $query The query to use to filter the collection.
@@ -126,6 +136,16 @@ class MongaCollection extends Collection
     public function remove($query)
     {
         return $this->collection->remove($query);
+    }
+
+    /**
+     * Remove all items from a repository collection.
+     *
+     * @return bool Returns true on successful truncation; false on failure.
+     */
+    public function truncate()
+    {
+        return $this->collection->truncate();
     }
 
     /**

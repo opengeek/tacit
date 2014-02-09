@@ -72,6 +72,16 @@ class MockCollection extends Collection
     }
 
     /**
+     * Drop the collection container from the Repository.
+     *
+     * @return bool Returns true if successfully dropped; false otherwise.
+     */
+    public function drop()
+    {
+        return $this->truncate();
+    }
+
+    /**
      * Find items in a collection based on the provided query.
      *
      * @param null|array|\Closure $query The query to use to filter the collection.
@@ -127,6 +137,17 @@ class MockCollection extends Collection
             unset($this->collection[$idx]);
         }
         return count($removeable);
+    }
+
+    /**
+     * Remove all items from a repository collection.
+     *
+     * @return bool Returns true on successful truncation; false on failure.
+     */
+    public function truncate()
+    {
+        $this->collection = [];
+        return true;
     }
 
     /**

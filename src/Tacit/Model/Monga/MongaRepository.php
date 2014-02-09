@@ -54,4 +54,14 @@ class MongaRepository extends Repository
     {
         return new MongaCollection($name, $this->connection);
     }
+
+    /**
+     * Get the "native" Monga Database class.
+     *
+     * @return Monga\Database
+     */
+    public function getConnection()
+    {
+        return parent::getConnection();
+    }
 }

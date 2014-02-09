@@ -90,6 +90,13 @@ abstract class Collection
     abstract public function count($query);
 
     /**
+     * Drop the collection container from the Repository.
+     *
+     * @return bool Returns true if successfully dropped; false otherwise.
+     */
+    abstract public function drop();
+
+    /**
      * Find items in a collection based on the provided query.
      *
      * @param null|array|\Closure $query The query to use to filter the collection.
@@ -127,6 +134,13 @@ abstract class Collection
      * @return int|bool The number of items removed or false on failure.
      */
     abstract public function remove($query);
+
+    /**
+     * Remove all items from a repository collection.
+     *
+     * @return bool Returns true on successful truncation; false on failure.
+     */
+    abstract public function truncate();
 
     /**
      * Update one or more items in a collection with the provided data.

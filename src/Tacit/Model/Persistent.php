@@ -32,7 +32,7 @@ abstract class Persistent
     protected static $collectionName;
 
     /**
-     * @var Collection A Collection wraps a collection container in a Repository.
+     * @var Collection A Collection wraps a document/row container in a Repository.
      */
     protected static $collection;
 
@@ -40,6 +40,11 @@ abstract class Persistent
      * @var array An array of Rules to use when validating objects if this class.
      */
     protected static $validationRules;
+
+    /**
+     * @var Repository A Repository represents a collection container or database.
+     */
+    protected $_repository;
 
     /**
      * An array containing keys of fields that are dirty for this model item.
@@ -65,12 +70,15 @@ abstract class Persistent
     /**
      * Get the Collection from the Repository.
      *
-     * @return Collection
+     * @param Repository $repository A specific Repository to get the Collection from.
+     *
+     * @return Collection The Collection from the Repository.
      */
-    public static function collection()
+    public static function collection(Repository $repository = null)
     {
-        /** @var Repository $repository */
-        $repository = Tacit::getInstance()->container->get('repository');
+        if (null === $repository) {
+            $repository = Tacit::getInstance()->container->get('repository');
+        }
         static::$collection = $repository->collection(static::collectionName());
         return static::$collection;
     }
@@ -82,22 +90,24 @@ abstract class Persistent
      */
     public static function collectionName()
     {
-        return self::$collectionName;
+        return static::$collectionName;
     }
 
     /**
      * Create an instance of this model class in the persistence provider.
      *
-     * @param array $data
+     * @param array      $data The data to create the Persistent object with.
+     * @param Repository $repository A specific Repository to persist the object in.
      *
-     * @throws ModelInsertException
-     * @throws ModelValidationException
+     * @throws Exception\ModelInsertException
+     * @throws \Exception
+     * @throws Exception\ModelValidationException
      * @return Persistent|null
      */
-    public static function create(array $data = array())
+    public static function create(array $data = array(), Repository $repository = null)
     {
         try {
-            $instance = static::instance($data);
+            $instance = static::instance($data, $repository);
             $result = $instance->save();
         } catch (ModelValidationException $e) {
             throw $e;
@@ -113,29 +123,33 @@ abstract class Persistent
     /**
      * Create an instance of this model class.
      *
-     * @param array $data
-     * @return Persistent|null
+     * @param array      $data The data to initialize the Persistent object with.
+     * @param Repository $repository A specific Repository for ownership of the object.
+     *
+     * @return static|null An instance of the Persistent object or null.
      */
-    public static function instance(array $data = array())
+    public static function instance(array $data = array(), Repository $repository = null)
     {
         /** @var Persistent $instance */
-        $instance = new static();
+        $instance = new static($repository);
         $instance->hydrate($data);
         return $instance;
     }
 
     /**
-     * Find Documents within this Collection meeting the specified criteria.
+     * Find objects within this Collection meeting the specified criteria.
      *
      * @param array|\Closure $criteria
-     * @param array $fields An array of fields to be returned from the Document.
+     * @param array          $fields An array of fields to be returned from the object.
      * All fields are returned if not provided.
-     * @return array|null
+     * @param Repository     $repository A specific Repository to search for objects in.
+     *
+     * @return array[static]|null An array of Persistent objects or null.
      */
-    public static function find($criteria = array(), array $fields = array())
+    public static function find($criteria = array(), array $fields = array(), Repository $repository = null)
     {
         $collection = null;
-        $models = static::collection()->find($criteria, $fields);
+        $models = static::collection($repository)->find($criteria, $fields);
         if ($models) {
             $collection = array();
             foreach ($models as $id => $model) {
@@ -149,46 +163,52 @@ abstract class Persistent
     }
 
     /**
-     * Count Documents within this Collection meeting the specified criteria.
+     * Count objects within this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria
-     * @return int
+     * @param array|\Closure $criteria The criteria for limiting the objects to count.
+     * @param Repository     $repository A specific Repository to count the objects in.
+     *
+     * @return int The number of objects in the Collection.
      */
-    public static function count($criteria = array())
+    public static function count($criteria = array(), Repository $repository = null)
     {
-        return static::collection()->count($criteria);
+        return static::collection($repository)->count($criteria);
     }
 
     /**
-     * Find a Document within this Collection meeting the specified criteria.
+     * Find a single object within this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria
-     * @param array $fields
-     * @return Persistent|null
+     * @param array|\Closure $criteria The criteria for selecting the object from the Collection.
+     * @param array          $fields An array of fields to be returned from the object.
+     * All fields are returned if not provided.
+     * @param Repository     $repository A specific Repository to find the object in.
+     *
+     * @return static|null The Persistent object meeting the criteria or null.
      */
-    public static function findOne($criteria, array $fields = array())
+    public static function findOne($criteria, array $fields = array(), Repository $repository = null)
     {
         $instance = null;
-        if ($model = static::collection()->findOne($criteria, $fields)) {
+        if ($model = static::collection($repository)->findOne($criteria, $fields)) {
             /** @var Persistent $instance */
-            $instance = new static();
+            $instance = new static($repository);
             $instance->hydrate($model);
         }
         return $instance;
     }
 
     /**
-     * Update one or more Documents in this Collection meeting the specified criteria.
+     * Update one or more objects in this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria
-     * @param array $fields
-     * @param array $options
+     * @param array|\Closure $criteria The criteria for selecting the objects to update.
+     * @param array          $fields An associative array of fields to update in the object(s).
+     * @param array          $options An array of options for the update.
+     * @param Repository     $repository A specific Repository to update the objects in.
      *
-     * @return bool
+     * @return bool|int Returns the number of objects updated or false on failure.
      */
-    public static function update($criteria, array $fields, array $options = ['w' => 1])
+    public static function update($criteria, array $fields, array $options = ['w' => 1], Repository $repository = null)
     {
-        return static::collection()->update($fields, $criteria, $options);
+        return static::collection($repository)->update($fields, $criteria, $options);
     }
 
     /**
@@ -201,6 +221,42 @@ abstract class Persistent
     public static function validationRules(array $rules = [])
     {
         return array_merge_recursive(static::$validationRules, $rules);
+    }
+
+    /**
+     * Get a new instance of a Persistent object.
+     *
+     * @param Repository $repository A specific repository for the instance.
+     *
+     * @return Persistent
+     */
+    public function __construct(Repository $repository = null)
+    {
+        if (null === $repository) {
+            $this->_repository = Tacit::getInstance()->container->get('repository');
+        } else {
+            $this->_repository = $repository;
+        }
+    }
+
+    /**
+     * Get the Repository for this Persistent instance.
+     *
+     * @return Repository|null This instance's Repository or null if not set.
+     */
+    public function getRepository()
+    {
+        return $this->_repository;
+    }
+
+    /**
+     * Set this Persistent instance's Repository
+     *
+     * @param Repository $repository A Repository to set for this instance.
+     */
+    public function setRepository(Repository $repository)
+    {
+        $this->_repository = $repository;
     }
 
     /**
@@ -295,7 +351,7 @@ abstract class Persistent
      */
     public function remove()
     {
-        return (static::collection()->remove([$this->getKeyField() => $this->getKey()]) === 1);
+        return (static::collection($this->getRepository())->remove([$this->getKeyField() => $this->getKey()]) === 1);
     }
 
     /**
@@ -355,14 +411,14 @@ abstract class Persistent
                 foreach ($mask as $key) {
                     if (array_key_exists($key, $vars)) {
                         $varValue = $vars[$key];
-                        if ($cast === true) $varValue = $this->collection()->cast($varValue);
+                        if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
                         $array[$key] = $varValue;
                     }
                 }
             } else {
                 foreach ($vars as $varKey => $varValue) {
                     if ($mask === false || in_array($varKey, $mask)) {
-                        if ($cast === true) $varValue = $this->collection()->cast($varValue);
+                        if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
                         $array[$varKey] = $varValue;
                     }
                 }

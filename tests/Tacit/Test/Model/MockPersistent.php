@@ -45,7 +45,7 @@ class MockPersistent extends Persistent
      */
     protected function insert()
     {
-        return ($this->collection()->insert(Collection::getPublicVars($this)) !== false);
+        return (static::collection($this->getRepository())->insert(Collection::getPublicVars($this)) !== false);
     }
 
     /**
@@ -56,6 +56,6 @@ class MockPersistent extends Persistent
      */
     protected function patch()
     {
-        return ($this->collection()->update(array($this->getKeyField() => $this->getKey()), $this->dirty()) !== false);
+        return (static::collection($this->getRepository())->update(array($this->getKeyField() => $this->getKey()), $this->dirty()) !== false);
     }
 }

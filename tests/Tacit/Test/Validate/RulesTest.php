@@ -21,29 +21,30 @@ use Tacit\Validate\Validator;
 class RulesTest extends ValidateTestCase
 {
     /**
-     * Test the classof Rule.
+     * Test various Rules.
      *
      * @param array|object $input
      * @param array $ruleSet
      * @param bool $expected
      *
      * @group validate
-     * @dataProvider providerClassof
+     * @dataProvider providerRule
      */
-    public function testClassof($input, $ruleSet, $expected)
+    public function testRule($input, $ruleSet, $expected)
     {
         $this->assertEquals($expected, $this->validate($input, $ruleSet));
     }
 
     /**
-     * Data provider for testClassof.
+     * Data provider for testRule.
      *
      * @return array
      */
-    public function providerClassof()
+    public function providerRule()
     {
         return [
-            [['foo' => new \stdClass()], ['foo' => 'classof:\\stdClass'], true],
+            [['field' => 3.14], ['field' => 'type:float'], true],
+            [['field' => new \stdClass()], ['field' => 'classof:\\stdClass'], true],
         ];
     }
 
