@@ -19,40 +19,25 @@ use Tacit\Model\Collection;
  */
 class PersistentTest extends ModelTestCase
 {
+    /**
+     * Get fixture data starting with the specified index.
+     *
+     * @param int $idx The starting index value.
+     *
+     * @return array An array of associative arrays representing MockPersistent data.
+     */
     protected static function fixtureData($idx = 1)
     {
-        return [
-            [
-                'name'  => 'mock object 1',
+        $data = [];
+        for ($i = $idx; $i < 10; $i++) {
+            $data[] = [
+                'name'  => "MockPersistent #{$i}",
                 'date'  => new \DateTime(),
-                'int'   => $idx++,
-                'float' => (float)"{$idx}.{$idx}"
-            ],
-            [
-                'name'  => 'mock object 2',
-                'date'  => new \DateTime(),
-                'int'   => $idx++,
-                'float' => (float)"{$idx}.{$idx}"
-            ],
-            [
-                'name'  => 'mock object 3',
-                'date'  => new \DateTime(),
-                'int'   => $idx++,
-                'float' => (float)"{$idx}.{$idx}"
-            ],
-            [
-                'name'  => 'mock object 4',
-                'date'  => new \DateTime(),
-                'int'   => $idx++,
-                'float' => (float)"{$idx}.{$idx}"
-            ],
-            [
-                'name'  => 'mock object 5',
-                'date'  => new \DateTime(),
-                'int'   => $idx++,
-                'float' => (float)"{$idx}.{$idx}"
-            ]
-        ];
+                'int'   => $i,
+                'float' => (float)"{$i}.{$i}"
+            ];
+        }
+        return $data;
     }
 
     public function setUp()

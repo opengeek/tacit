@@ -22,6 +22,8 @@ class ValidatorTest extends ValidateTestCase
 {
     /**
      * Test the Validator::instance() method.
+     *
+     * @group validate
      */
     public function testInstance()
     {

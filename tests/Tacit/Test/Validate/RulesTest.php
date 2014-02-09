@@ -26,6 +26,8 @@ class RulesTest extends ValidateTestCase
      * @param array|object $input
      * @param array $ruleSet
      * @param bool $expected
+     *
+     * @group validate
      * @dataProvider providerClassof
      */
     public function testClassof($input, $ruleSet, $expected)
