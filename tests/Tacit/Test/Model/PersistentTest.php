@@ -30,7 +30,7 @@ class PersistentTest extends ModelTestCase
     protected static function fixtureData($idx = 1)
     {
         $data = [];
-        for ($i = $idx; $i < 10; $i++) {
+        for ($i = $idx; $i <= 10; $i++) {
             $data[] = [
                 'name'  => "MockPersistent #{$i}",
                 'text'  => "Text of MockPersistent #{$i}",
@@ -97,6 +97,28 @@ class PersistentTest extends ModelTestCase
     public function testCollectionName()
     {
         $this->assertEquals('mock_persistent', MockPersistent::collectionName($this->fixture));
+    }
+
+    /**
+     * Test Count
+     *
+     * @param int            $expected
+     * @param array|\Closure $criteria
+     *
+     * @dataProvider providerCount
+     * @group model
+     */
+    public function testCount($expected, $criteria)
+    {
+        $this->assertEquals($expected, MockPersistent::count($criteria, $this->fixture));
+    }
+    public function providerCount()
+    {
+        return [
+            [10, []],
+            [1, ['name' => 'MockPersistent #1']],
+            [1, ['name' => 'MockPersistent #9']],
+        ];
     }
 
     /**
@@ -207,6 +229,11 @@ class PersistentTest extends ModelTestCase
 
         $this->assertEquals($expected, array_values($collection));
     }
+    /**
+     * dataProvider for testFind().
+     *
+     * @return array
+     */
     public function providerFind()
     {
         return [
@@ -214,6 +241,68 @@ class PersistentTest extends ModelTestCase
                 [['name' => 'MockPersistent #1']],
                 ['name' => 'MockPersistent #1'],
                 ['name']
+            ]
+        ];
+    }
+
+    /**
+     * Test the MockPersistent::findOne() method.
+     *
+     * @param array $expected
+     * @param array $criteria
+     * @param array $fields
+     *
+     * @dataProvider providerFindOne
+     * @group model
+     */
+    public function testFindOne($expected, $criteria, $fields)
+    {
+        /** @var MockPersistent $object */
+        $object = MockPersistent::findOne($criteria, [], $this->fixture);
+        $this->assertEquals($expected, $object->toArray($fields));
+    }
+    /**
+     * dataProvider for testFindOne().
+     *
+     * @return array
+     */
+    public function providerFindOne()
+    {
+        return [
+            [
+                ['name' => 'MockPersistent #1'],
+                ['name' => 'MockPersistent #1'],
+                ['name']
+            ]
+        ];
+    }
+
+    /**
+     * Test MockPersistent::update().
+     *
+     * @param array          $expected
+     * @param array|\Closure $criteria
+     * @param array          $data
+     *
+     * @dataProvider providerUpdate
+     * @group model
+     */
+    public function testUpdate($expected, $criteria, $data)
+    {
+        $this->assertEquals($expected, MockPersistent::update($criteria, $data, [], $this->fixture));
+    }
+    public function providerUpdate()
+    {
+        return [
+            [
+                1,
+                ['name' => 'MockPersistent #1'],
+                ['text' => 'Updated text for MockPersistent #1']
+            ],
+            [
+                10,
+                [],
+                ['float' => 3.14]
             ]
         ];
     }

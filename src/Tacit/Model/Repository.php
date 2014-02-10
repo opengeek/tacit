@@ -30,26 +30,19 @@ abstract class Repository
     protected $connection;
 
     /**
-     * A native collection object for a repository.
-     *
-     * @var array|\ArrayAccess|\ArrayIterator
-     */
-    protected $collection;
-
-    /**
      * Get a Repository instance (singleton).
      *
      * @param array $configuration An array containing the configuration necessary to
-     * get a connection to and identify the repository within a repository.
+     * get a connection to and identify a collections container within a repository.
      *
      * @return static
      */
     public static function getInstance(array $configuration = [])
     {
-        if (null === self::$instance) {
-            self::$instance = new static($configuration);
+        if (null === static::$instance) {
+            static::$instance = new static($configuration);
         }
-        return self::$instance;
+        return static::$instance;
     }
 
     /**

@@ -95,7 +95,8 @@ class MockCollection extends Collection
      */
     public function findOne($query, $fields = [])
     {
-        return reset($this->find($query, $fields));
+        $found = $this->find($query, $fields);
+        return reset($found);
     }
 
     /**

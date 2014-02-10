@@ -208,7 +208,7 @@ abstract class Persistent
      */
     public static function update($criteria, array $fields, array $options = ['w' => 1], Repository $repository = null)
     {
-        return static::collection($repository)->update($fields, $criteria, $options);
+        return static::collection($repository)->update($criteria, $fields, $options);
     }
 
     /**
