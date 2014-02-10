@@ -17,6 +17,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\TransformerAbstract;
 use Slim\Route;
+use Tacit\Controller\Exception\NotImplementedException;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Model\Persistent;
@@ -92,31 +93,34 @@ abstract class Restful
     /**
      * Handle a DELETE request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function delete()
     {
-        // TODO: Implement delete() method.
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a GET request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function get()
     {
-        // TODO: Implement get() method.
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a HEAD request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function head()
     {
-        // TODO: Implement head() method.
+        throw new NotImplementedException($this);
     }
 
     /**
@@ -127,66 +131,95 @@ abstract class Restful
      */
     public function isAuthorized()
     {
-        // TODO: Implement isAuthorized() method.
+        return true;
     }
 
     /**
      * Handle an OPTIONS request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function options()
     {
-        // TODO: Implement options() method.
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a PATCH request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function patch()
     {
-        // TODO: Implement patch() method.
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a POST request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function post()
     {
-        // TODO: Implement post() method.
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a PUT request.
      *
+     * @throws Exception\RestfulException
      * @return void
      */
     public function put()
     {
-        // TODO: Implement put() method.
+        throw new NotImplementedException($this);
     }
 
+    /**
+     * Respond with a RestfulException.
+     *
+     * @param RestfulException $exception
+     */
     public function respondWithError(RestfulException $exception)
     {
         $item = new Item($exception, new RestfulExceptionTransformer());
         $this->respondWithItem($item, self::RESOURCE_TYPE_ERROR, $exception->getStatus());
     }
 
+    /**
+     * Encode an array of data representing a response body.
+     *
+     * @param array $body An array of data representing the response body.
+     * @param mixed $options Options for the encoding process.
+     *
+     * @return string The encoded response body as a string.
+     */
     protected function encode($body, $options = 0)
     {
         return json_encode($body, $options);
     }
 
+    /**
+     * Respond with a Collection.
+     *
+     * @param array[Persistent]   $collection A collection to transform and  respond with.
+     * @param TransformerAbstract $transformer The transformer to apply to the items in the collection.
+     */
     protected function respondWithCollection($collection, TransformerAbstract $transformer)
     {
         $resource = new Collection($collection, $transformer);
         $this->respond($resource, self::RESOURCE_TYPE_COLLECTION);
     }
 
+    /**
+     * Respond with an Item.
+     *
+     * @param Persistent          $item A resource item to transform and respond with.
+     * @param TransformerAbstract $transformer The transformer to apply to the item.
+     */
     protected function respondWithItem($item, TransformerAbstract $transformer)
     {
         $resource = new Item($item, $transformer);
@@ -194,7 +227,9 @@ abstract class Restful
     }
 
     /**
-     * @param array|Persistent $item
+     * Respond to the successful creation of an Item.
+     *
+     * @param Persistent $item
      * @param TransformerAbstract $transformer
      */
     protected function respondWithItemCreated($item, TransformerAbstract $transformer)
@@ -287,21 +322,36 @@ abstract class Restful
         $this->app->stop();
     }
 
-    public static function route($resource, $identifier = '', array $params = array())
+    /**
+     * Generate a route for a specific Resource.
+     *
+     * @param string|Routable $resource A Routable resource or a string.
+     * @param string          $identifier An identifier for clarifying the route.
+     * @param array           $params An array of parameters for the route.
+     *
+     * @return string The generated route's URL.
+     */
+    public function route($resource, $identifier = '', array $params = array())
     {
         if (is_string($resource)) {
             $name = $resource;
         } elseif ($resource instanceof Routable) {
-            $name = $resource->getRouteName();
+            $name = $resource->getRoute();
         } else {
             $name = static::$collectionName;
         }
-        $app = Tacit::getInstance();
-        $url = $app->request->getUrl();
-        $url .= $app->urlFor(static::$collectionName . $identifier, $params);
+        $url = $this->app->request->getUrl();
+        $url .= $this->app->urlFor($name . $identifier, $params);
         return $url;
     }
 
+    /**
+     * Generate a URL for the current requested route.
+     *
+     * @param array $params An array of parameters to add to the route.
+     *
+     * @return string The current route's URL.
+     */
     protected function url(array $params = array())
     {
         $request = $this->app->request();
