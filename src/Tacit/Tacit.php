@@ -12,6 +12,8 @@ namespace Tacit;
 
 
 use Slim\Slim;
+use Tacit\Controller\Exception\NotFoundException;
+use Tacit\Controller\Exception\RestfulException;
 
 /**
  * An extension of Slim to hide the RESTful RAD server features.
@@ -82,5 +84,50 @@ class Tacit extends Slim
         });
 
         $this->add(new MediaTypes());
+
+        $this->error(function (\Exception $e) {
+            $resource = [
+                'status' => 500,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ];
+            if ($e instanceof RestfulException) {
+                if ($e instanceof NotFoundException) {
+                    $this->notFound();
+                }
+                $resource['status'] = $e->getStatus();
+                $resource['description'] = $e->getDescription();
+                $resource['property'] = $e->getProperty();
+            }
+
+            /* @var \Slim\Http\Response $response */
+            $response = $this->response;
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setStatus($resource['status']);
+            if ($this->config('debug') === true) {
+                $resource['request_duration'] = microtime(true) - $this->config('startTime');
+            }
+            $response->setBody(json_encode($resource));
+
+            $this->stop();
+        });
+
+        $this->notFound(function () {
+            $resource = [
+                'status' => 404,
+                'message' => 'Resource not found'
+            ];
+
+            /* @var \Slim\Http\Response $response */
+            $response = $this->response;
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setStatus(404);
+            if ($this->config('debug') === true) {
+                $resource['request_duration'] = microtime(true) - $this->config('startTime');
+            }
+            $response->setBody(json_encode($resource));
+
+            $this->stop();
+        });
     }
 }
