@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class UnsupportedMediaTypeException extends RestfulException
 {
-    protected $code = 415;
+    protected $status = 415;
     protected $message = "Unsupported Media Type";
     protected $description = "The server is refusing to service this request because the entity is in a format not supported by the requested resource for the requested method.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class RequestEntityTooLargeException extends RestfulException
 {
-    protected $code = 413;
+    protected $status = 413;
     protected $message = "Request Entity Too Large";
     protected $description = "The representation was too large for the server to handle.";
 }

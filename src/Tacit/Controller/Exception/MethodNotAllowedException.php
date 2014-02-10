@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class MethodNotAllowedException extends RestfulException
 {
-    protected $code = 405;
+    protected $status = 405;
     protected $message = "Method Not Allowed";
     protected $description = "Method not allowed on this Resource.";
 }

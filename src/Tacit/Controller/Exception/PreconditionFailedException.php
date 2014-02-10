@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class PreconditionFailedException extends RestfulException
 {
-    protected $code = 412;
+    protected $status = 412;
     protected $message = "Precondition Failed";
     protected $description = "Operation not completed because preconditions were not met.";
 }

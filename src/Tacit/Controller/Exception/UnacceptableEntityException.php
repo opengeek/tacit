@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class UnacceptableEntityException extends RestfulException
 {
-    protected $code = 422;
+    protected $status = 422;
     protected $message = "Unprocessable Entity";
     protected $description = "The request was received but could not be processed.";
 }

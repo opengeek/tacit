@@ -21,8 +21,8 @@ class RestfulExceptionTransformer extends TransformerAbstract
             'status' => $resource->getStatus(),
             'code' => $resource->getCode(),
             'message' => $resource->getMessage(),
-            'property' => $resource->getProperty(),
-            'description' => $resource->getDescription()
+            'description' => $resource->getDescription(),
+            'property' => $resource->getProperty()
         ];
     }
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class UnauthorizedException extends RestfulException
 {
-    protected $code = 401;
+    protected $status = 401;
     protected $message = "Unauthorized";
     protected $description = "The resource requires authentication.";
 }

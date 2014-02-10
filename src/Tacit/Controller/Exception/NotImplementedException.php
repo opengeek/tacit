@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class NotImplementedException extends RestfulException
 {
-    protected $code = 501;
+    protected $status = 501;
     protected $message = "Not Implemented";
     protected $description = "Requested HTTP operation not implemented on this resource.";
 }

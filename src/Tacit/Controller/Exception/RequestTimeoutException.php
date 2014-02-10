@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class RequestTimeoutException extends RestfulException
 {
-    protected $code = 408;
+    protected $status = 408;
     protected $message = "Request Timeout";
     protected $description = "Request has timed out.";
 }

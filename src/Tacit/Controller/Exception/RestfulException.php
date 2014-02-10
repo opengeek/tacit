@@ -20,18 +20,18 @@ use Tacit\Controller\Restful;
 class RestfulException extends \Exception
 {
     protected $code;
-    protected $description;
-    protected $property;
+    protected $message = '';
+    protected $description = '';
+    protected $property = '';
     protected $status = 500;
 
-    public function __construct(Restful $controller, $message = 'Server Error', $property = '', $description = 'Internal Server Error.', $code = 0, $previous = null)
+    public function __construct(Restful $controller, $message = null, $description = null, $property = null, $previous = null)
     {
-        if ($code <= 0) {
-            $code = (int)"{$this->status}0";
-        }
+        $code = (int)"{$this->status}0";
+        if (null === $message) $message = $this->message;
         parent::__construct($message, $code, $previous);
-        $this->property = $property;
-        $this->description = $description;
+        if (null !== $property) $this->property = $property;
+        if (null !== $description) $this->description = $description;
 
         $controller->respondWithError($this);
     }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class LockedException extends RestfulException
 {
-    protected $code = 423;
+    protected $status = 423;
     protected $message = "Locked";
     protected $description = "The resource is currently locked.";
 }

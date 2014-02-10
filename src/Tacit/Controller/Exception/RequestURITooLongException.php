@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class RequestURITooLongException extends RestfulException
 {
-    protected $code = 414;
+    protected $status = 414;
     protected $message = "Request URI Too Long";
     protected $description = "The URI has more than 2000 characters.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class ProxyAuthenticationException extends RestfulException
 {
-    protected $code = 407;
+    protected $status = 407;
     protected $message = "Proxy Authentication";
     protected $description = "The resource requires proxy authentication.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class RequestedRangeNotSatisfiableException extends RestfulException
 {
-    protected $code = 416;
+    protected $status = 416;
     protected $message = "Requested Range Not Satisfiable";
     protected $description = "Requested range not satisfiable for this Resource.";
 }

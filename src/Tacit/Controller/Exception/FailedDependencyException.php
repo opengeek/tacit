@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class FailedDependencyException extends RestfulException
 {
-    protected $code = 424;
+    protected $status = 424;
     protected $message = "Failed Dependency";
     protected $description = "The operation failed because a dependent operation failed.";
 }

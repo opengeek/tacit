@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class HTTPVersionNotSupportedException extends RestfulException
 {
-    protected $code = 505;
+    protected $status = 505;
     protected $message = "HTTP Version Not Supported";
     protected $description = "The server does not support, or refuses to support, the HTTP protocol version that was used in the request message.";
 }

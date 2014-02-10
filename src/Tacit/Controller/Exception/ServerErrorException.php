@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class ServerErrorException extends RestfulException
 {
-    protected $code = 500;
+    protected $status = 500;
     protected $message = "Server Error";
     protected $description = "An internal server error occurred.";
 }

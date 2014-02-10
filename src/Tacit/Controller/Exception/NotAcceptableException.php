@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class NotAcceptableException extends RestfulException
 {
-    protected $code = 406;
+    protected $status = 406;
     protected $message = "Not Acceptable";
     protected $description = "Requested representation not available for this Resource.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class GoneException extends RestfulException
 {
-    protected $code = 410;
+    protected $status = 410;
     protected $message = "Gone";
     protected $description = "Resource is gone.";
 }

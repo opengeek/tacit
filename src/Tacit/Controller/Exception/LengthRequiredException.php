@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class LengthRequiredException extends RestfulException
 {
-    protected $code = 411;
+    protected $status = 411;
     protected $message = "Length Required";
     protected $description = "The server needs to know the size of the entity body and it should be specified in the Content Length header.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class ForbiddenException extends RestfulException
 {
-    protected $code = 403;
+    protected $status = 403;
     protected $message = "Forbidden";
     protected $description = "You do not have authority to access this Resource.";
 }

@@ -13,7 +13,7 @@ namespace Tacit\Controller\Exception;
 
 class InsufficientStorageException extends RestfulException
 {
-    protected $code = 507;
+    protected $status = 507;
     protected $message = "Insufficient Storage";
     protected $description = "Operation cannot be performed on the resource because the server is unable to store the representation needed to successfully complete the request.";
 }
