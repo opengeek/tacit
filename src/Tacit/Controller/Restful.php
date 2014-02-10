@@ -186,7 +186,7 @@ abstract class Restful
     public function respondWithError(RestfulException $exception)
     {
         $item = new Item($exception, new RestfulExceptionTransformer());
-        $this->respondWithItem($item, self::RESOURCE_TYPE_ERROR, $exception->getStatus());
+        $this->respond($item, self::RESOURCE_TYPE_ERROR, $exception->getStatus());
     }
 
     /**
@@ -217,7 +217,7 @@ abstract class Restful
     /**
      * Respond with an Item.
      *
-     * @param Persistent          $item A resource item to transform and respond with.
+     * @param array|Persistent    $item A resource item to transform and respond with.
      * @param TransformerAbstract $transformer The transformer to apply to the item.
      */
     protected function respondWithItem($item, TransformerAbstract $transformer)
