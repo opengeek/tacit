@@ -10,9 +10,11 @@
 
 namespace Tacit\Test\Controller;
 
-
-use Guzzle\Http\StaticClient;
-
+/**
+ * Test Restful controllers.
+ *
+ * @package Tacit\Test\Controller
+ */
 class RestfulControllerTest extends ControllerTestCase
 {
     /**
@@ -23,9 +25,11 @@ class RestfulControllerTest extends ControllerTestCase
      */
     public function testGet()
     {
-        $this->assertEquals(array_intersect_assoc(
-            ['message' => 'mock me do you?'],
-            StaticClient::get($GLOBALS['service_tests_url'])->json()),
+        $this->assertEquals(
+            array_intersect_assoc(
+                ['message' => 'mock me do you?'],
+                $this->request('/')->json()
+            ),
             ['message' => 'mock me do you?']
         );
     }
