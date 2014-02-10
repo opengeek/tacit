@@ -23,7 +23,7 @@ class MockRepository extends Repository
     /**
      * The native MockRepository connection.
      *
-     * @var \stdClass
+     * @var array
      */
     protected $connection;
 
@@ -34,7 +34,7 @@ class MockRepository extends Repository
      */
     public function __construct(array $configuration = array())
     {
-        $this->connection = new \stdClass();
+        $this->connection = [];
     }
 
     /**
@@ -47,16 +47,5 @@ class MockRepository extends Repository
     public function collection($name)
     {
         return new MockCollection($name, $this->connection);
-    }
-
-    /**
-     * Add a collection to this Repository.
-     *
-     * @param string $name
-     * @param array  $data
-     */
-    public function addCollection($name, $data = [])
-    {
-        $this->collection[$name] = $data;
     }
 }

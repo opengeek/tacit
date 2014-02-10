@@ -63,12 +63,12 @@ abstract class Collection
      * Create a new instance of the Collection.
      *
      * @param string $name The name of the collection.
-     * @param object $connection A native connection to the Repository containing the collection.
+     * @param object $connection A reference to the native connection for the Repository containing the collection.
      */
-    public function __construct($name, $connection)
+    public function __construct($name, &$connection)
     {
         $this->name = $name;
-        $this->connection = $connection;
+        $this->connection =& $connection;
     }
 
     /**

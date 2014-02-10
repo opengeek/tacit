@@ -11,6 +11,7 @@
 namespace Tacit\Test\Model;
 
 use Tacit\Model\Collection;
+use Tacit\Model\Exception\ModelValidationException;
 
 /**
  * Tests of the Tacit\Model\Persistent trait.
@@ -32,9 +33,12 @@ class PersistentTest extends ModelTestCase
         for ($i = $idx; $i < 10; $i++) {
             $data[] = [
                 'name'  => "MockPersistent #{$i}",
+                'text'  => "Text of MockPersistent #{$i}",
+                'integer'   => $i,
+                'float' => (float)"{$i}.{$i}",
                 'date'  => new \DateTime(),
-                'int'   => $i,
-                'float' => (float)"{$i}.{$i}"
+                'password' => 'abcdefg',
+                'arrayOfStrings' => []
             ];
         }
         return $data;
@@ -44,35 +48,173 @@ class PersistentTest extends ModelTestCase
     {
         parent::setUp();
 
-        $collection = $this->fixture->collection('mock_persistent');
-
         foreach (self::fixtureData() as $item) {
-            $collection->insert($item);
+            MockPersistent::create($item, $this->fixture);
         }
+    }
+
+    public function tearDown()
+    {
+        MockPersistent::collection($this->fixture)->truncate();
     }
 
     /**
      * Test the MockPersistent::instance() method.
+     *
+     * @group model
      */
     public function testGetMockPersistentInstance()
     {
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance());
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([]));
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([
-            'name'  => 'an instance',
-            'date'  => new \DateTime(),
-            'int'   => 144,
-            'float' => 3.14
+            'name'     => 'an instance',
+            'text'     => 'an instance\'s text',
+            'date'     => new \DateTime(),
+            'integer'  => 144,
+            'float'    => 3.14,
+            'password' => 'password'
         ]));
     }
 
     /**
      * Test the MockPersistent::collection() method.
+     *
+     * @group model
      */
     public function testCollection()
     {
-        $collection = MockPersistent::collection();
+        $collection = MockPersistent::collection($this->fixture);
         $this->assertTrue($collection instanceof Collection);
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockCollection', MockPersistent::collection());
+        $this->assertInstanceOf('Tacit\\Test\\Model\\MockCollection', $collection);
+    }
+
+    /**
+     * Test the MockPersistent::collectionName() method.
+     *
+     * @group model
+     */
+    public function testCollectionName()
+    {
+        $this->assertEquals('mock_persistent', MockPersistent::collectionName($this->fixture));
+    }
+
+    /**
+     * Test the MockPersistent::create() method.
+     *
+     * @param array $data
+     *
+     * @dataProvider providerCreate
+     * @group model
+     */
+    public function testCreate($data)
+    {
+        try {
+            $object = MockPersistent::create($data, $this->fixture);
+
+            $this->assertNotNull($object);
+            $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
+            $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', $object);
+        } catch (ModelValidationException $e) {
+            echo $e;
+        }
+    }
+    /**
+     * The dataProvider for testCreate().
+     *
+     * @return array[array]
+     */
+    public function providerCreate()
+    {
+        return [
+            [
+                [
+                    'name' => 'create test',
+                    'text' => 'this is a bunch of text for a create test',
+                    'integer' => 13,
+                    'float' => 3.14,
+                    'date' => new \DateTime(),
+                    'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
+                    'arrayOfStrings' => [
+                        'string #1',
+                        'string #2',
+                        'string #3'
+                    ]
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * Test the MockPersistent::instance() method.
+     *
+     * @param array $data An array of data to pass to the method.
+     *
+     * @dataProvider providerInstance
+     * @group model
+     */
+    public function testInstance($data)
+    {
+        $object = MockPersistent::instance($data, $this->fixture);
+
+        $this->assertNotNull($object);
+        $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
+        $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', $object);
+    }
+    /**
+     * dataProvider for testInstance()
+     *
+     * @return array
+     */
+    public function providerInstance()
+    {
+        return [
+            [
+                [
+                    'name' => 'create test',
+                    'text' => 'this is a bunch of text for a create test',
+                    'integer' => 13,
+                    'float' => 3.14,
+                    'date' => new \DateTime(),
+                    'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
+                    'arrayOfStrings' => [
+                        'string #1',
+                        'string #2',
+                        'string #3'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Test the MockPersistent::find() method.
+     *
+     * @param array $expected
+     * @param array $criteria
+     * @param array $fields
+     *
+     * @dataProvider providerFind
+     * @group model
+     */
+    public function testFind($expected, $criteria, $fields)
+    {
+        $collection = MockPersistent::find($criteria, [], $this->fixture);
+        array_walk($collection, function (&$value) use ($fields) {
+            /** @var MockPersistent $value */
+            $value = $value->toArray($fields);
+        });
+
+        $this->assertEquals($expected, array_values($collection));
+    }
+    public function providerFind()
+    {
+        return [
+            [
+                [['name' => 'MockPersistent #1']],
+                ['name' => 'MockPersistent #1'],
+                ['name']
+            ]
+        ];
     }
 }

@@ -16,23 +16,13 @@ use Tacit\Model\Collection;
 class MockCollection extends Collection
 {
     /**
-     * The native collection object from the Repository.
-     *
      * @var array
      */
-    protected $collection;
+    protected $connection;
 
-    /**
-     * Get a MockCollection instance.
-     *
-     * @param string $name
-     * @param \stdClass $connection
-     */
-    public function __construct($name, $connection)
+    public function __construct($name, &$connection)
     {
-        $this->name = $name;
-        $this->connection = $connection;
-        $this->collection = [];
+        parent::__construct($name, $connection);
     }
 
     /**
@@ -66,8 +56,8 @@ class MockCollection extends Collection
      */
     public function count($query)
     {
-        if (null === $query) return count($this->collection);
-        $filtered = $this->filter($this->collection, $query);
+        if (null === $query) return count($this->connection[$this->name]);
+        $filtered = $this->filter($this->connection[$this->name], $query);
         return count($filtered);
     }
 
@@ -91,7 +81,7 @@ class MockCollection extends Collection
      */
     public function find($query, $fields = [])
     {
-        $filtered = $this->filter($this->collection, $query);
+        $filtered = $this->filter($this->connection[$this->name], $query);
         return $this->mask($filtered, $fields);
     }
 
@@ -119,7 +109,10 @@ class MockCollection extends Collection
     public function insert($data, $options = [])
     {
         $id = sha1(uniqid('', true));
-        $this->collection[$id] = $data;
+        if (!isset($this->connection[$this->name])) {
+            $this->connection[$this->name] = [];
+        }
+        $this->connection[$this->name][$id] = $data;
         return $id;
     }
 
@@ -132,9 +125,9 @@ class MockCollection extends Collection
      */
     public function remove($query)
     {
-        $removeable = $this->filter($this->collection, $query);
+        $removeable = $this->filter($this->connection[$this->name], $query);
         foreach ($removeable as $idx => $removeMe) {
-            unset($this->collection[$idx]);
+            unset($this->connection[$this->name][$idx]);
         }
         return count($removeable);
     }
@@ -146,7 +139,7 @@ class MockCollection extends Collection
      */
     public function truncate()
     {
-        $this->collection = [];
+        $this->connection[$this->name] = [];
         return true;
     }
 
@@ -161,9 +154,9 @@ class MockCollection extends Collection
      */
     public function update($query, $data, $options = [])
     {
-        $filtered = $this->filter($this->collection, $query);
+        $filtered = $this->filter($this->connection[$this->name], $query);
         foreach ($filtered as $idx => $data) {
-            $this->collection[$idx] = array_merge($this->collection[$idx], $data);
+            $this->connection[$this->name][$idx] = array_merge($this->connection[$this->name][$idx], $data);
         }
         return count($filtered);
     }
@@ -183,14 +176,12 @@ class MockCollection extends Collection
             if (empty($query) || !is_array($query)) {
                 return $collection;
             }
-            $query = function (&$value) use ($query) {
+            $query = function ($value) use ($query) {
                 $intersection = array_intersect_assoc($query, $value);
-                if (count($intersection) !== count($query)) {
-                    $value = false;
-                }
+                return ($intersection === $query);
             };
         }
-        return array_filter(array_map($query, $collection));
+        return array_filter($collection, $query);
     }
 
     /**
@@ -205,7 +196,7 @@ class MockCollection extends Collection
     {
         if (is_array($mask) && !empty($mask)) {
             array_walk($collection, function (&$value) use ($mask) {
-                $value = array_diff_key($value, array_flip($mask));
+                $value = array_intersect_key($value, array_flip($mask));
             });
         }
         return $collection;

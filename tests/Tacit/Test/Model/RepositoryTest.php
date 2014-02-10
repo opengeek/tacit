@@ -34,7 +34,7 @@ class RepositoryTest extends ModelTestCase
      */
     public function testGetConnection()
     {
-        $this->assertInstanceOf('stdClass', $this->fixture->getConnection());
+        $this->assertTrue(is_array($this->fixture->getConnection()));
     }
 
     /**

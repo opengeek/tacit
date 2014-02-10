@@ -31,6 +31,5 @@ abstract class ModelTestCase extends TestCase
     {
         parent::setUp();
         $this->fixture = new MockRepository();
-        $this->fixture->addCollection('test');
     }
 }

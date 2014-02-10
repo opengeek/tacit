@@ -23,17 +23,32 @@ use Tacit\Model\Persistent;
 class MockPersistent extends Persistent
 {
     protected static $collectionName = 'mock_persistent';
+    protected static $validationRules = [
+        'name' => 'type:string|notempty',
+        'text' => 'type:string',
+        'integer' => 'type:integer',
+        'float' => 'type:float',
+        'date' => 'classof:\\DateTime,null',
+        'password' => 'type:string|notempty|minlen:6',
+        'arrayOfStrings' => 'type:array',
+    ];
 
     /** @var string */
     public $_id;
     /** @var string */
     public $name;
+    /** @var string */
+    public $text;
     /** @var \DateTime */
     public $date;
     /** @var integer */
-    public $int;
+    public $integer;
     /** @var float */
     public $float;
+    /** @var string */
+    public $password;
+    /** @var string */
+    public $arrayOfStrings = [];
 
     protected $_keyField = '_id';
 
