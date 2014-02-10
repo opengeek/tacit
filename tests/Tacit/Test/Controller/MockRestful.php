@@ -18,8 +18,6 @@ class MockRestful extends Restful
 {
     public function get()
     {
-        parent::get();
-
         $this->respondWithItem(['message' => 'mock me do you?'], new ArrayTransformer());
     }
 }
