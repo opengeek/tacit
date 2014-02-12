@@ -120,7 +120,7 @@ abstract class Restful
      */
     public function head()
     {
-        throw new NotImplementedException($this);
+        $this->get();
     }
 
     /**
@@ -207,11 +207,12 @@ abstract class Restful
      *
      * @param array[Persistent]   $collection A collection to transform and  respond with.
      * @param TransformerAbstract $transformer The transformer to apply to the items in the collection.
+     * @param array               $meta An array of metadata associated with the collection.
      */
-    protected function respondWithCollection($collection, TransformerAbstract $transformer)
+    protected function respondWithCollection($collection, TransformerAbstract $transformer, array $meta = [])
     {
         $resource = new Collection($collection, $transformer);
-        $this->respond($resource, self::RESOURCE_TYPE_COLLECTION);
+        $this->respond($resource, self::RESOURCE_TYPE_COLLECTION, 200, $meta);
     }
 
     /**

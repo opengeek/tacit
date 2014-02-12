@@ -16,12 +16,7 @@ use Tacit\Model\Persistent;
 
 abstract class MongaPersistent extends Persistent
 {
-    /**
-     * Name of the field representing the unique key for this model item.
-     *
-     * @var string
-     */
-    protected $_keyField = '_id';
+    public static $transformer = 'Tacit\\Transform\\MongaPersistentTransformer';
 
     /**
      * The unique identifier for a Mongo model item.
@@ -29,6 +24,16 @@ abstract class MongaPersistent extends Persistent
      * @var \MongoId
      */
     public $_id;
+
+    /**
+     * Get the unique key field(s) identifying this Monga entity.
+     *
+     * @return string|int|array[string|int]
+     */
+    public static function key()
+    {
+        return '_id';
+    }
 
     /**
      * Insert this model into the repository.

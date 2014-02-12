@@ -11,10 +11,12 @@
 namespace Tacit\Model;
 
 
+use League\Fractal\TransformerAbstract;
 use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Tacit;
+use Tacit\Transform\PersistentTransformer;
 use Tacit\Validate\Validator;
 
 /**
@@ -37,6 +39,11 @@ abstract class Persistent
     protected static $collection;
 
     /**
+     * @var string The transformer class to use on the model data.
+     */
+    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+
+    /**
      * @var array An array of Rules to use when validating objects if this class.
      */
     protected static $validationRules;
@@ -52,13 +59,6 @@ abstract class Persistent
      * @var array
      */
     protected $_dirty = array();
-
-    /**
-     * The name of a field representing the unique identifier for this model item.
-     *
-     * @var string
-     */
-    protected $_keyField;
 
     /**
      * A Validator instance for this model item.
@@ -197,6 +197,17 @@ abstract class Persistent
     }
 
     /**
+     * Get a Transformer for this instance.
+     *
+     * @return TransformerAbstract
+     */
+    public static function transformer()
+    {
+        $transformer = static::$transformer;
+        return new $transformer();
+    }
+
+    /**
      * Update one or more objects in this Collection meeting the specified criteria.
      *
      * @param array|\Closure $criteria The criteria for selecting the objects to update.
@@ -209,6 +220,16 @@ abstract class Persistent
     public static function update($criteria, array $fields, array $options = ['w' => 1], Repository $repository = null)
     {
         return static::collection($repository)->update($criteria, $fields, $options);
+    }
+
+    /**
+     * Get the unique key field(s) identifying this entity.
+     *
+     * @return string|int|array[string|int]
+     */
+    public static function key()
+    {
+        return 'id';
     }
 
     /**
@@ -306,11 +327,11 @@ abstract class Persistent
     /**
      * Get the field name representing the unique key for this model.
      *
-     * @return string
+     * @return string|array[string]
      */
     public function getKeyField()
     {
-        return $this->_keyField;
+        return static::key();
     }
 
     /**

@@ -50,7 +50,15 @@ class MockPersistent extends Persistent
     /** @var string */
     public $arrayOfStrings = [];
 
-    protected $_keyField = '_id';
+    /**
+     * Get the unique key field(s) identifying this entity.
+     *
+     * @return string|int|array[string|int]
+     */
+    public static function key()
+    {
+        return '_id';
+    }
 
     /**
      * Insert this model into the repository.
