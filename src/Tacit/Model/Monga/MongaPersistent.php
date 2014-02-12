@@ -43,7 +43,6 @@ abstract class MongaPersistent extends Persistent
      */
     protected function insert()
     {
-        $this->set('created_at', new \MongoDate());
         $validated = $this->validate([], MongaCollection::getMask($this, [], [$this->getKey()]));
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for new item in collection ' . static::$collectionName, $validated);
@@ -64,7 +63,6 @@ abstract class MongaPersistent extends Persistent
      */
     protected function patch()
     {
-        $this->set('updated_at', new \MongoDate());
         $validated = $this->validate([], array_keys($this->_dirty));
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for existing item in collection ' . static::$collectionName, $validated);
