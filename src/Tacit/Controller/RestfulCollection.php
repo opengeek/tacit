@@ -16,8 +16,18 @@ use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Query;
 
+/**
+ * An abstract representation of a RESTful collection controller.
+ *
+ * @package Tacit\Controller
+ */
 abstract class RestfulCollection extends Restful
 {
+    /**
+     * GET a representation of a pageable and sortable collection.
+     *
+     * @throws Exception\ServerErrorException
+     */
     public function get()
     {
         $limit = $this->app->request->get('limit', 25);
@@ -32,7 +42,7 @@ abstract class RestfulCollection extends Restful
             $total = $modelClass::count();
 
             $collection = $modelClass::find(function ($query) use ($offset, $limit, $orderBy, $orderDir) {
-                /** @var Query $query */
+                /** @var Query|object $query */
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
             });
         } catch (\Exception $e) {
@@ -42,6 +52,9 @@ abstract class RestfulCollection extends Restful
         $this->respondWithCollection($collection, $modelClass::transformer(), ['total' => $total]);
     }
 
+    /**
+     * Return a list of valid HTTP methods for the collection.
+     */
     public function options()
     {
         /* @var \Slim\Http\Response $response */
@@ -56,6 +69,12 @@ abstract class RestfulCollection extends Restful
         $this->app->stop();
     }
 
+    /**
+     * POST a new representation of an item into the collection.
+     *
+     * @throws Exception\ServerErrorException
+     * @throws Exception\UnacceptableEntityException
+     */
     public function post()
     {
         /** @var \Tacit\Model\Persistent $modelClass */

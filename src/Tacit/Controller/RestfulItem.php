@@ -17,8 +17,20 @@ use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelException;
 
+/**
+ * An abstract representation of a RESTful item from a RESTful collection.
+ *
+ * @package Tacit\Controller
+ */
 abstract class RestfulItem extends Restful
 {
+    /**
+     * Delete this item from the collection.
+     *
+     * @throws Exception\ServerErrorException
+     * @throws Exception\NotFoundException
+     * @throws Exception\BadRequestException
+     */
     public function delete()
     {
         /** @var \Tacit\Model\Persistent $modelClass */
@@ -54,6 +66,12 @@ abstract class RestfulItem extends Restful
         $this->respond(null, self::RESOURCE_TYPE_ITEM, 204);
     }
 
+    /**
+     * GET a representation of an item from the collection.
+     *
+     * @throws Exception\NotFoundException
+     * @throws Exception\BadRequestException
+     */
     public function get()
     {
         /** @var \Tacit\Model\Persistent $modelClass */
@@ -81,6 +99,9 @@ abstract class RestfulItem extends Restful
         $this->respondWithItem($item, $modelClass::transformer());
     }
 
+    /**
+     * Return a list of valid HTTP methods for the collection item.
+     */
     public function options()
     {
         /* @var \Slim\Http\Response $response */
@@ -95,6 +116,14 @@ abstract class RestfulItem extends Restful
         $this->app->stop();
     }
 
+    /**
+     * PATCH only the properties of this item specified in the request entity.
+     *
+     * @throws Exception\ServerErrorException
+     * @throws Exception\NotFoundException
+     * @throws Exception\UnacceptableEntityException
+     * @throws Exception\BadRequestException
+     */
     public function patch()
     {
         /** @var \Tacit\Model\Persistent $modelClass */
@@ -129,8 +158,49 @@ abstract class RestfulItem extends Restful
         $this->respondWithItem($item, $modelClass::transformer());
     }
 
+    /**
+     * PUT the representation of this item specified in the request entity.
+     *
+     * NOTE: This will replace the item with the properties specified in request
+     * entity. Properties not provided will be reset to default values for the item.
+     */
     public function put()
     {
-        $this->patch();
+        /** @var \Tacit\Model\Persistent $modelClass */
+        $modelClass = static::$modelClass;
+
+        switch (func_num_args()) {
+            case 0:
+                throw new NotFoundException($this);
+            case 1:
+                $criteria = [$modelClass::key() => func_get_arg(0)];
+                break;
+            default:
+                throw new BadRequestException($this);
+        }
+
+        /** @var \Tacit\Model\Persistent $item */
+        $item = $modelClass::findOne($criteria);
+
+        if (null === $item) {
+            throw new NotFoundException($this);
+        }
+
+        try {
+            /** @var \Tacit\Model\Persistent $newItem */
+            $newItem = new $modelClass();
+            $data = array_merge_recursive(
+                $newItem->toArray(),
+                $this->app->request->post(null, [])
+            );
+            $item->hydrate($data, (array)$modelClass::key());
+            $item->save();
+        } catch (ModelException $e) {
+            throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
+        } catch (\Exception $e) {
+            throw new ServerErrorException($this, $e->getMessage(), null, null, null, $e);
+        }
+
+        $this->respondWithItem($item, $modelClass::transformer());
     }
 }
