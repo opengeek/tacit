@@ -239,6 +239,8 @@ abstract class Restful
      */
     protected function respondWithCollection($collection, TransformerAbstract $transformer, array $meta = [])
     {
+        if (!isset($meta['total'])) $meta['total'] = count($collection);
+        if (!isset($meta['collectionName'])) $meta['collectionName'] = static::$collectionName;
         $resource = new Collection($collection, $transformer);
         $this->respond($resource, self::RESOURCE_TYPE_COLLECTION, 200, $meta);
     }
