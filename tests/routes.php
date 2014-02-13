@@ -8,6 +8,6 @@
  * file that was distributed with this source code.
  */ 
 
-$tacit->get('/', function () use ($tacit) {
-    (new \Tacit\Test\Controller\MockRestful($tacit))->get();
+$tacit->any('/', function () use ($tacit) {
+    (new \Tacit\Test\Controller\MockRestful($tacit))->handle();
 });

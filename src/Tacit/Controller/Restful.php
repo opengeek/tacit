@@ -17,6 +17,8 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\TransformerAbstract;
 use Slim\Route;
+use Tacit\Controller\Exception\MethodNotAllowedException;
+use Tacit\Controller\Exception\NotAcceptableException;
 use Tacit\Controller\Exception\NotImplementedException;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
@@ -35,6 +37,13 @@ abstract class Restful
     const RESOURCE_TYPE_ERROR      = 0;
     const RESOURCE_TYPE_ITEM       = 1;
     const RESOURCE_TYPE_COLLECTION = 2;
+
+    /**
+     * An array of allowed HTTP methods for the controller.
+     *
+     * @var array[string]
+     */
+    protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
     /**
      * A Resource model class represented by this Controller.
@@ -113,6 +122,21 @@ abstract class Restful
     }
 
     /**
+     * Route to the appropriate HTTP method.
+     *
+     * @throws Exception\RestfulException
+     * @return void
+     */
+    public function handle()
+    {
+        $method = strtoupper($this->app->request->getMethod());
+        if (method_exists($this, $method)) {
+            call_user_func_array([$this, $method], func_get_args());
+        }
+        throw new NotAcceptableException($this);
+    }
+
+    /**
      * Handle a HEAD request.
      *
      * @throws Exception\RestfulException
@@ -142,7 +166,11 @@ abstract class Restful
      */
     public function options()
     {
-        throw new NotImplementedException($this);
+        $this->app->response->headers->set('Content-Type', static::$responseType);
+        $this->app->response->setStatus(200);
+        $this->app->response->headers->set('Allow', implode(',', static::$allowedMethods));
+
+        $this->app->stop();
     }
 
     /**
@@ -344,6 +372,16 @@ abstract class Restful
         $url = $this->app->request->getUrl();
         $url .= $this->app->urlFor($name . $identifier, $params);
         return $url;
+    }
+
+    /**
+     * @throws Exception\MethodNotAllowedException
+     */
+    protected function checkMethod()
+    {
+        if (!in_array($this->app->request->getMethod(), static::$allowedMethods)) {
+            throw new MethodNotAllowedException($this);
+        }
     }
 
     /**

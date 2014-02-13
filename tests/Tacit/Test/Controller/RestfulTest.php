@@ -15,7 +15,7 @@ use Tacit\TestCase;
 
 class RestfulTest extends TestCase
 {
-    public function testRespondWithItem()
+    public function testHandle()
     {
 
     }

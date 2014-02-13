@@ -16,6 +16,8 @@ use Tacit\Transform\ArrayTransformer;
 
 class MockRestful extends Restful
 {
+    protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET'];
+
     public function get()
     {
         $this->respondWithItem(['message' => 'mock me do you?'], new ArrayTransformer());
