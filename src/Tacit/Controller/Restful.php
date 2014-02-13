@@ -239,6 +239,16 @@ abstract class Restful
     }
 
     /**
+     * Add an array of refs to this controller.
+     *
+     * @param array $refs An array of refs to add to this controller.
+     */
+    public function addRefs(array $refs = [])
+    {
+        $this->refs = array_merge($this->refs, $refs);
+    }
+
+    /**
      * Encode an array of data representing a response body.
      *
      * @param array $body An array of data representing the response body.
