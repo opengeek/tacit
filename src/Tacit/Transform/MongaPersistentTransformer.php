@@ -20,7 +20,7 @@ class MongaPersistentTransformer extends TransformerAbstract
     public function transform(MongaPersistent $resource)
     {
         return array_merge(
-            ['id' => $resource->_id],
+            ['id' => (string)$resource->_id],
             $resource->toArray(MongaCollection::getMask($resource))
         );
     }
