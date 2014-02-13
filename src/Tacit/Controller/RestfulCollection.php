@@ -23,6 +23,8 @@ use Tacit\Model\Query;
  */
 abstract class RestfulCollection extends Restful
 {
+    protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST'];
+
     /**
      * GET a representation of a pageable and sortable collection.
      *
@@ -50,23 +52,6 @@ abstract class RestfulCollection extends Restful
         }
 
         $this->respondWithCollection($collection, $modelClass::transformer(), ['total' => $total]);
-    }
-
-    /**
-     * Return a list of valid HTTP methods for the collection.
-     */
-    public function options()
-    {
-        /* @var \Slim\Http\Response $response */
-        $response = $this->app->response;
-        $response->headers->set('Content-Type', static::$responseType);
-        $response->setStatus(200);
-        if ($this->app->config('debug') === true) {
-            $resource['request_duration'] = microtime(true) - $this->app->config('startTime');
-        }
-        $response->headers->set('Allow', implode(',', ['OPTIONS', 'HEAD', 'GET', 'POST']));
-
-        $this->app->stop();
     }
 
     /**

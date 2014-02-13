@@ -24,6 +24,8 @@ use Tacit\Model\Exception\ModelException;
  */
 abstract class RestfulItem extends Restful
 {
+    protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'PATCH', 'PUT', 'DELETE'];
+
     /**
      * Delete this item from the collection.
      *
@@ -97,23 +99,6 @@ abstract class RestfulItem extends Restful
         }
 
         $this->respondWithItem($item, $modelClass::transformer());
-    }
-
-    /**
-     * Return a list of valid HTTP methods for the collection item.
-     */
-    public function options()
-    {
-        /* @var \Slim\Http\Response $response */
-        $response = $this->app->response;
-        $response->headers->set('Content-Type', static::$responseType);
-        $response->setStatus(200);
-        if ($this->app->config('debug') === true) {
-            $resource['request_duration'] = microtime(true) - $this->app->config('startTime');
-        }
-        $response->headers->set('Allow', implode(',', ['OPTIONS', 'HEAD', 'GET', 'PUT', 'PATCH', 'DELETE']));
-
-        $this->app->stop();
     }
 
     /**
