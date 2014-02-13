@@ -23,7 +23,6 @@ use Tacit\Controller\Exception\NotImplementedException;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Model\Persistent;
-use Tacit\Model\Routable;
 use Tacit\Tacit;
 use Tacit\Transform\RestfulExceptionTransformer;
 
@@ -38,6 +37,8 @@ abstract class Restful
     const RESOURCE_TYPE_ITEM       = 1;
     const RESOURCE_TYPE_COLLECTION = 2;
 
+    public static $name = 'A RESTful Controller';
+
     /**
      * An array of allowed HTTP methods for the controller.
      *
@@ -46,11 +47,11 @@ abstract class Restful
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
     /**
-     * A Resource model class represented by this Controller.
+     * The plural name of the Resource represented by this Controller.
      *
      * @var string
      */
-    protected static $modelClass;
+    protected static $collectionName = 'collection';
 
     /**
      * The singular name of the Resource represented by this Controller.
@@ -60,11 +61,11 @@ abstract class Restful
     protected static $itemName = 'item';
 
     /**
-     * The plural name of the Resource represented by this Controller.
+     * A Resource model class represented by this Controller.
      *
      * @var string
      */
-    protected static $collectionName = 'collection';
+    protected static $modelClass;
 
     /**
      * The Content-Type this Controller responds with.
@@ -79,6 +80,13 @@ abstract class Restful
      * @var Tacit
      */
     protected $app;
+
+    /**
+     * An array of refs for this controller.
+     *
+     * @var array
+     */
+    protected $refs = [];
 
     /**
      * @var Route The route that instantiated this controller.
@@ -207,6 +215,19 @@ abstract class Restful
     }
 
     /**
+     * Get an array of refs for this controller.
+     *
+     * @param array $refs An optional array of refs to merge with those already
+     * defined for this controller.
+     *
+     * @return array An array of refs for this controller.
+     */
+    public function refs(array $refs = [])
+    {
+        return array_merge(['self' => ['href' => $this->url(), 'title' => static::$name]], $this->refs, $refs);
+    }
+
+    /**
      * Respond with a RestfulException.
      *
      * @param RestfulException $exception
@@ -260,21 +281,18 @@ abstract class Restful
     /**
      * Respond to the successful creation of an Item.
      *
-     * @param Persistent $item
+     * @param Persistent          $item
+     * @param string              $location
      * @param TransformerAbstract $transformer
      */
-    protected function respondWithItemCreated($item, TransformerAbstract $transformer)
+    protected function respondWithItemCreated($item, $location, TransformerAbstract $transformer)
     {
         $resource = new Item($item, $transformer);
         $this->respond(
             $resource,
             self::RESOURCE_TYPE_ITEM,
             201,
-            ['headers' => [
-                'Location' => $this->route(
-                    ucfirst($item->getKeyField()), $item, [$item->getKeyField() => $item->getKey()]
-                )
-            ]]
+            ['headers' => ['Location' => $location]]
         );
     }
 
@@ -292,10 +310,11 @@ abstract class Restful
     {
         $bodyRaw = null;
         if ($resource !== null && $status !== 204) {
-            $bodyRaw = array();
+            $bodyRaw = [];
             $scope = $this->fractal->createData($resource)->toArray();
             switch ($type) {
                 case self::RESOURCE_TYPE_ITEM:
+                    $bodyRaw['_links'] = $this->refs();
                     foreach ($scope['data'] as $key => $value) {
                         $bodyRaw[$key] = $value;
                     }
@@ -305,16 +324,13 @@ abstract class Restful
                     $total = $meta['total'];
                     $limit = (int)$this->app->request->get('limit', 25);
                     $offset = (int)$this->app->request->get('offset', 0);
-                    if (!empty($this->route)) {
-                        $links['self'] = ['href' => $this->url()];
-                    }
                     if ($total > $offset) {
                         $links['first'] = ['href' => $this->url(['offset' => 0])];
                         $links['previous'] = ($offset > 0) ? ['href' => $this->url(['offset' => $offset - $limit])] : null;
                         $links['next'] = (($offset + $limit) < $total) ? ['href' => $this->url(['offset' => $offset + $limit])] : null;
                         $links['last'] = ['href' => $this->url(['offset' => (floor(($total - 1) / $limit) * $limit)])];
                     }
-                    $bodyRaw['_links'] = $links;
+                    $bodyRaw['_links'] = $this->refs($links);
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
                     if ($total > $offset) {
                         $bodyRaw['total_items'] = $total;
@@ -324,12 +340,7 @@ abstract class Restful
                     }
                     break;
                 case self::RESOURCE_TYPE_ERROR:
-                    foreach ($scope['data'] as $key => $value) {
-                        if ($key === 'status') {
-                            $status = (int)$value;
-                        }
-                        $bodyRaw[$key] = $value;
-                    }
+                    $bodyRaw = $scope['data'];
                     break;
             }
         }
@@ -345,7 +356,7 @@ abstract class Restful
         $response->setStatus($status);
         if ($bodyRaw !== null && $status !== 204) {
             if ($this->app->config('debug') === true) {
-                $bodyRaw['request_duration'] = microtime(true) - $this->app->config('startTime');
+                $bodyRaw['execution_time'] = microtime(true) - $this->app->config('startTime');
             }
             $response->setBody($this->encode($bodyRaw));
         }
@@ -356,27 +367,33 @@ abstract class Restful
     /**
      * Generate a route for a specific Resource.
      *
-     * @param string|Routable $resource A Routable resource or a string.
-     * @param string          $identifier An identifier for clarifying the route.
-     * @param array           $params An array of parameters for the route.
+     * @param string $resource A Restful controller class or named route.
+     * @param string $identifier An identifier for clarifying the route.
+     * @param array  $params An array of parameters for the route.
      *
      * @return string The generated route's URL.
      */
     public function route($resource, $identifier = '', array $params = array())
     {
+        $name = '';
         if (is_string($resource)) {
-            $name = $resource;
-        } elseif ($resource instanceof Routable) {
-            $name = $resource->getRoute();
-        } else {
-            $name = static::$collectionName;
+            if (class_exists($resource)) {
+                $name = $resource::$name;
+            } else {
+                $name = $resource;
+            }
+        } elseif ($resource instanceof Route) {
+            $name = $resource->getName() . $identifier;
         }
+        $name .= $identifier;
         $url = $this->app->request->getUrl();
-        $url .= $this->app->urlFor($name . $identifier, $params);
+        $url .= $this->app->urlFor($name, $params);
         return $url;
     }
 
     /**
+     * Check if the current method is allowed on this controller.
+     *
      * @throws Exception\MethodNotAllowedException
      */
     protected function checkMethod()

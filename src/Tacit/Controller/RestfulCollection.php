@@ -26,6 +26,13 @@ abstract class RestfulCollection extends Restful
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST'];
 
     /**
+     * The name of a RestfulItem controller related to this RestfulCollection.
+     *
+     * @var string
+     */
+    protected static $itemController = 'Tacit\\Controller\\RestfulItem';
+
+    /**
      * GET a representation of a pageable and sortable collection.
      *
      * @throws Exception\ServerErrorException
@@ -73,6 +80,6 @@ abstract class RestfulCollection extends Restful
             throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithItemCreated($item, $modelClass::transformer());
+        $this->respondWithItemCreated($item, static::$itemController, $modelClass::transformer());
     }
 }

@@ -16,7 +16,6 @@ use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Tacit;
-use Tacit\Transform\PersistentTransformer;
 use Tacit\Validate\Validator;
 
 /**
@@ -26,8 +25,6 @@ use Tacit\Validate\Validator;
  */
 abstract class Persistent
 {
-    use Routable;
-
     /**
      * @var string The name of the native collection container.
      */
