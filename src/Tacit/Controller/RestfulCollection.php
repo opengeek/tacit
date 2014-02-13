@@ -48,7 +48,7 @@ abstract class RestfulCollection extends Restful
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
             });
         } catch (\Exception $e) {
-            throw new ServerErrorException($this, null, null, null, $e);
+            throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
 
         $this->respondWithCollection($collection, $modelClass::transformer(), ['total' => $total]);
@@ -70,7 +70,7 @@ abstract class RestfulCollection extends Restful
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
-            throw new ServerErrorException($this, null, null, null, $e);
+            throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
 
         $this->respondWithItemCreated($item, $modelClass::transformer());
