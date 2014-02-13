@@ -16,7 +16,7 @@ use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\RestfulException;
 
 /**
- * An extension of Slim to hide the RESTful RAD server features.
+ * An extension of Slim to wrap RESTful RAD server features.
  *
  * @package Tacit
  */
@@ -30,40 +30,11 @@ class Tacit extends Slim
      */
     public function __construct($configuration = null)
     {
-        if (is_string($configuration) && is_readable($configuration)) {
-            $configuration = include $configuration;
-        }
-        if (!is_array($configuration)) {
-            $configuration = [
-                'app' => [
-                    'mode' => 'development',
-                    'startTime' => microtime(true)
-                ],
-                'connection' => [
-                    'class' => 'Tacit\\Model\\Monga\\MongaRepository',
-                    'server' => 'mongodb://localhost',
-                    'options' => array('connect' => false),
-                    'repository' => 'test'
-                ]
-            ];
-        }
-        if (!isset($configuration['app']) || !is_array($configuration['app'])) {
-            $configuration['app'] = [
-                'mode' => 'development',
-                'startTime' => microtime(true)
-            ];
-        }
+        $configuration = $this->loadConfiguration($configuration);
 
-        parent::__construct($configuration['app']);
+        parent::__construct($configuration);
 
-        if (!isset($configuration['connection']) || !is_array($configuration['connection'])) {
-            $configuration['connection'] = [
-                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
-                'server' => 'mongodb://localhost',
-                'options' => array('connect' => false),
-                'repository' => 'test'
-            ];
-        }
+        $connection = $this->config('connection');
 
         $this->configureMode('production', function () {
             $this->config([
@@ -78,9 +49,9 @@ class Tacit extends Slim
             ]);
         });
 
-        $this->container->singleton('repository', function () use ($configuration) {
-            $dbClass = $configuration['connection']['class'];
-            return new $dbClass($configuration['connection']);
+        $this->container->singleton('repository', function () use ($connection) {
+            $dbClass = $connection['class'];
+            return new $dbClass($connection);
         });
 
         $this->add(new MediaTypes());
@@ -129,5 +100,51 @@ class Tacit extends Slim
 
             $this->stop();
         });
+    }
+
+    /**
+     * Load the configuration from a file stream or array.
+     *
+     * @param string|array $configuration A configuration array or stream path.
+     *
+     * @return array The configuration array.
+     */
+    protected function loadConfiguration($configuration)
+    {
+        if (is_string($configuration) && is_readable($configuration)) {
+            $file = new \SplFileInfo($configuration);
+            switch ($file->getExtension()) {
+                case 'json':
+                    $configuration = json_decode(file_get_contents($configuration), true);
+                    break;
+                case 'php':
+                    $configuration = include $configuration;
+                    break;
+            }
+        }
+        if (!is_array($configuration)) {
+            $configuration = [
+                'mode' => 'development',
+                'startTime' => microtime(true),
+                'connection' => [
+                    'class' => 'Tacit\\Model\\Monga\\MongaRepository',
+                    'server' => 'mongodb://localhost',
+                    'options' => array('connect' => false),
+                    'repository' => 'test'
+                ]
+            ];
+        }
+        if (!isset($configuration['connection'])) {
+            $configuration['connection'] = [
+                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
+                'server' => 'mongodb://localhost',
+                'options' => array('connect' => false),
+                'repository' => 'test'
+            ];
+        }
+        if (!isset($configuration['startTime'])) {
+            $configuration['startTime'] = microtime(true);
+        }
+        return $configuration;
     }
 }

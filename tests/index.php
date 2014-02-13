@@ -11,18 +11,18 @@
 require 'bootstrap.php';
 
 /** @var \Tacit\Tacit $tacit */
-$tacit = new \Tacit\Tacit([
-    'app' => [
+$tacit = new \Tacit\Tacit(
+    [
         'mode' => 'development',
-        'startTime' => microtime(true)
-    ],
-    'connection' => [
-        'class' => 'Tacit\\Test\\Model\\MockRepository',
-        'server' => 'localhost',
-        'options' => array('connect' => false),
-        'repository' => 'tacit_test'
+        'startTime' => microtime(true),
+        'connection' => [
+            'class' => 'Tacit\\Test\\Model\\MockRepository',
+            'server' => 'localhost',
+            'options' => array('connect' => false),
+            'repository' => 'tacit_test'
+        ]
     ]
-]);
+);
 
 require 'routes.php';
 
