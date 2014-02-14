@@ -37,8 +37,6 @@ abstract class Restful
     const RESOURCE_TYPE_ITEM       = 1;
     const RESOURCE_TYPE_COLLECTION = 2;
 
-    public static $name = 'A RESTful Controller';
-
     /**
      * An array of allowed HTTP methods for the controller.
      *
@@ -219,12 +217,22 @@ abstract class Restful
      *
      * @param array $refs An optional array of refs to merge with those already
      * defined for this controller.
+     * @param array $parameters An array of parameters for building the self link.
      *
      * @return array An array of refs for this controller.
      */
-    public function refs(array $refs = [])
+    public function refs(array $refs = [], array $parameters = [])
     {
-        return array_merge(['self' => ['href' => $this->url(), 'title' => static::$name]], $this->refs, $refs);
+        return array_merge(
+            [
+                'self' => [
+                    'href' => $this->url($parameters),
+                    'title' => $this->route->getName()
+                ]
+            ],
+            $this->refs,
+            $refs
+        );
     }
 
     /**
