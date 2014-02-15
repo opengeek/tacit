@@ -32,6 +32,8 @@ abstract class RestfulCollection extends Restful
      */
     protected static $itemController = 'Tacit\\Controller\\RestfulItem';
 
+    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+
     /**
      * GET a representation of a pageable and sortable collection.
      *
@@ -58,7 +60,7 @@ abstract class RestfulCollection extends Restful
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithCollection($collection, $modelClass::transformer(), ['total' => $total]);
+        $this->respondWithCollection($collection, $this->transformer(), ['total' => $total]);
     }
 
     /**
@@ -80,6 +82,6 @@ abstract class RestfulCollection extends Restful
             throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithItemCreated($item, static::$itemController, $modelClass::transformer());
+        $this->respondWithItemCreated($item, static::$itemController, $this->transformer());
     }
 }

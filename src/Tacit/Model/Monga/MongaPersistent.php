@@ -18,6 +18,11 @@ abstract class MongaPersistent extends Persistent
 {
     public static $transformer = 'Tacit\\Transform\\MongaPersistentTransformer';
 
+    protected static $validationRules = [
+        'created_at' => 'classof:\\MongoDate',
+        'updated_at' => 'classof:\\MongoDate,null'
+    ];
+
     /**
      * The unique identifier for a Mongo model item.
      *

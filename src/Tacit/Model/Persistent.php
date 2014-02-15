@@ -36,11 +36,6 @@ abstract class Persistent
     protected static $collection;
 
     /**
-     * @var string The transformer class to use on the model data.
-     */
-    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
-
-    /**
      * @var array An array of Rules to use when validating objects if this class.
      */
     protected static $validationRules;
@@ -191,17 +186,6 @@ abstract class Persistent
             $instance->hydrate($model);
         }
         return $instance;
-    }
-
-    /**
-     * Get a Transformer for this instance.
-     *
-     * @return TransformerAbstract
-     */
-    public static function transformer()
-    {
-        $transformer = static::$transformer;
-        return new $transformer();
     }
 
     /**

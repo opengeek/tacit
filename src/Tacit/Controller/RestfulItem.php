@@ -26,6 +26,8 @@ abstract class RestfulItem extends Restful
 {
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'PATCH', 'PUT', 'DELETE'];
 
+    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+
     /**
      * Delete this item from the collection.
      *
@@ -98,7 +100,7 @@ abstract class RestfulItem extends Restful
             throw new NotFoundException($this);
         }
 
-        $this->respondWithItem($item, $modelClass::transformer());
+        $this->respondWithItem($item, $this->transformer());
     }
 
     /**
@@ -140,7 +142,7 @@ abstract class RestfulItem extends Restful
             throw new ServerErrorException($this, $e->getMessage(), null, null, null, $e);
         }
 
-        $this->respondWithItem($item, $modelClass::transformer());
+        $this->respondWithItem($item, $this->transformer());
     }
 
     /**
@@ -186,6 +188,6 @@ abstract class RestfulItem extends Restful
             throw new ServerErrorException($this, $e->getMessage(), null, null, null, $e);
         }
 
-        $this->respondWithItem($item, $modelClass::transformer());
+        $this->respondWithItem($item, $this->transformer());
     }
 }

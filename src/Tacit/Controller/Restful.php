@@ -73,6 +73,13 @@ abstract class Restful
     protected static $responseType = 'application/json';
 
     /**
+     * The default Transformer for this controller.
+     *
+     * @var string
+     */
+    protected static $transformer = '\\Tacit\\Transform\\ArrayTransformer';
+
+    /**
      * An instance of Tacit.
      *
      * @var Tacit
@@ -103,6 +110,16 @@ abstract class Restful
         $this->fractal = new Manager();
         $scopeParameter = $this->app->config('embedded_scopes_param') ? $this->app->config('embedded_scopes_param') : 'zoom';
         $this->fractal->setRequestedScopes(explode(',', $this->app->request->get($scopeParameter)));
+    }
+
+    /**
+     * Add an array of refs to this controller.
+     *
+     * @param array $refs An array of refs to add to this controller.
+     */
+    public function addRefs(array $refs = [])
+    {
+        $this->refs = array_merge($this->refs, $refs);
     }
 
     /**
@@ -247,13 +264,20 @@ abstract class Restful
     }
 
     /**
-     * Add an array of refs to this controller.
+     * Get and/or set the Transformer for this controller.
      *
-     * @param array $refs An array of refs to add to this controller.
+     * @param null|string $transformerClass Accepts an optional class name to set
+     * the current Transformer for this controller to before returning an instance.
+     *
+     * @return TransformerAbstract An instance of the current Transformer for this
+     * controller.
      */
-    public function addRefs(array $refs = [])
+    public function transformer($transformerClass = null)
     {
-        $this->refs = array_merge($this->refs, $refs);
+        if (is_string($transformerClass) && class_exists($transformerClass)) {
+            static::$transformer = $transformerClass;
+        }
+        return new static::$transformer;
     }
 
     /**
