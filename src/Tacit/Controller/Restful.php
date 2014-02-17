@@ -112,6 +112,11 @@ abstract class Restful
      */
     public $route;
 
+    public static function className()
+    {
+        return __CLASS__;
+    }
+
     /**
      * Get the route name of this Restful controller.
      *
@@ -119,7 +124,11 @@ abstract class Restful
      */
     public static function name()
     {
-        return static::$name ?: __CLASS__;
+        if (!isset(static::$name)) {
+            $explodedClass = explode('\\', static::className());
+            static::$name = array_pop($explodedClass);
+        }
+        return static::$name;
     }
 
     /**
