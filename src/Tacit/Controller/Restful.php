@@ -105,7 +105,7 @@ abstract class Restful
      */
     public function __construct(Tacit &$app)
     {
-        $this->app = $app;
+        $this->app =& $app;
         $this->route = $this->app->router->getCurrentRoute();
         $this->fractal = new Manager();
         $scopeParameter = $this->app->config('embedded_scopes_param') ? $this->app->config('embedded_scopes_param') : 'zoom';
@@ -409,7 +409,7 @@ abstract class Restful
     /**
      * Generate a route for a specific Resource.
      *
-     * @param string $resource A Restful controller class or named route.
+     * @param string $resource A Restful controller, Persistent class or named Route.
      * @param string $identifier An identifier for clarifying the route.
      * @param array  $params An array of parameters for the route.
      *

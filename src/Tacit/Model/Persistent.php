@@ -38,7 +38,7 @@ abstract class Persistent
     /**
      * @var array An array of Rules to use when validating objects if this class.
      */
-    protected static $validationRules;
+    protected static $validationRules = [];
 
     /**
      * @var Repository A Repository represents a collection container or database.
