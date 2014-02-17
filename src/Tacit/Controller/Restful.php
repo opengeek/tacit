@@ -66,11 +66,25 @@ abstract class Restful
     protected static $modelClass;
 
     /**
+     * The route name of the controller
+     *
+     * @var string
+     */
+    protected static $name;
+
+    /**
      * The Content-Type this Controller responds with.
      *
      * @var string
      */
     protected static $responseType = 'application/json';
+
+    /**
+     * The title of the controller.
+     *
+     * @var string
+     */
+    protected static $title;
 
     /**
      * The default Transformer for this controller.
@@ -97,6 +111,68 @@ abstract class Restful
      * @var Route The route that instantiated this controller.
      */
     public $route;
+
+    /**
+     * Get the route name of this Restful controller.
+     *
+     * @return string
+     */
+    public static function name()
+    {
+        return static::$name ?: __CLASS__;
+    }
+
+    /**
+     * Return a RESTful ref element for this controller.
+     *
+     * @param array  $routeParams
+     * @param array  $params
+     * @param string $suffix
+     *
+     * @return array
+     */
+    public static function ref(array $routeParams = [], array $params = [], $suffix = '')
+    {
+        return [
+            'href' => static::url($routeParams, $params),
+            'title' => static::title() . $suffix ? " {$suffix}" : ''
+        ];
+    }
+
+    /**
+     * Get the title of this Restful controller.
+     * @return string
+     */
+    public static function title()
+    {
+        return static::$title ?: static::name();
+    }
+
+    /**
+     * Get the URL for this Restful controller.
+     *
+     * @param array $routeParams
+     * @param array $params
+     *
+     * @return string
+     */
+    public static function url(array $routeParams = [], array $params = [])
+    {
+        $app = Tacit::getInstance();
+        $url = $app->request->getUrl();
+        $url .= $app->urlFor(static::name(), $routeParams);
+        $getParams = $app->request->get();
+        $getParams = array_merge($getParams, $params);
+        if (!empty($getParams)) {
+            $url .= '?';
+            $qs = array();
+            foreach ($getParams as $qKey => $qValue) {
+                $qs[] = urlencode($qKey) . "=" . urlencode($qValue);
+            }
+            $url .= implode('&', $qs);
+        }
+        return $url;
+    }
 
     /**
      * Construct a new instance of the Restful controller.
@@ -368,10 +444,10 @@ abstract class Restful
                     $limit = (int)$this->app->request->get('limit', 25);
                     $offset = (int)$this->app->request->get('offset', 0);
                     if ($total > $offset) {
-                        $links['first'] = ['href' => $this->url(['offset' => 0])];
-                        $links['previous'] = ($offset > 0) ? ['href' => $this->url(['offset' => $offset - $limit])] : null;
-                        $links['next'] = (($offset + $limit) < $total) ? ['href' => $this->url(['offset' => $offset + $limit])] : null;
-                        $links['last'] = ['href' => $this->url(['offset' => (floor(($total - 1) / $limit) * $limit)])];
+                        $links['first'] = static::ref($this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
+                        $links['previous'] = ($offset > 0) ? static::ref($this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
+                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
+                        $links['last'] = static::ref($this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
                     $bodyRaw['_links'] = $this->refs($links);
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
@@ -408,33 +484,6 @@ abstract class Restful
     }
 
     /**
-     * Generate a route for a specific Resource.
-     *
-     * @param string $resource A Restful controller, Persistent class or named Route.
-     * @param string $identifier An identifier for clarifying the route.
-     * @param array  $params An array of parameters for the route.
-     *
-     * @return string The generated route's URL.
-     */
-    public function route($resource, $identifier = '', array $params = array())
-    {
-        $name = '';
-        if (is_string($resource)) {
-            if (class_exists($resource)) {
-                $name = $resource::$name;
-            } else {
-                $name = $resource;
-            }
-        } elseif ($resource instanceof Route) {
-            $name = $resource->getName() . $identifier;
-        }
-        $name .= $identifier;
-        $url = $this->app->request->getUrl();
-        $url .= $this->app->urlFor($name, $params);
-        return $url;
-    }
-
-    /**
      * Check if the current method is allowed on this controller.
      *
      * @throws Exception\MethodNotAllowedException
@@ -453,7 +502,7 @@ abstract class Restful
      *
      * @return string The current route's URL.
      */
-    protected function url(array $params = array())
+    protected function self(array $params = array())
     {
         $request = $this->app->request();
         $url = $request->getUrl();
