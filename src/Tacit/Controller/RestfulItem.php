@@ -40,18 +40,8 @@ abstract class RestfulItem extends Restful
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        switch (func_num_args()) {
-            case 0:
-                throw new NotFoundException($this);
-            case 1:
-                $criteria = [$modelClass::key() => func_get_arg(0)];
-                break;
-            default:
-                throw new BadRequestException($this);
-        }
-
         /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria);
+        $item = $modelClass::findOne($this->criteria(func_get_args()));
 
         if (null === $item) {
             throw new NotFoundException($this);
@@ -81,15 +71,7 @@ abstract class RestfulItem extends Restful
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        switch (func_num_args()) {
-            case 0:
-                throw new NotFoundException($this);
-            case 1:
-                $criteria = [$modelClass::key() => func_get_arg(0)];
-                break;
-            default:
-                throw new BadRequestException($this);
-        }
+        $criteria = $this->criteria(func_get_args());
 
         $fields = $this->app->request->get('fields', []);
 
@@ -116,15 +98,7 @@ abstract class RestfulItem extends Restful
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        switch (func_num_args()) {
-            case 0:
-                throw new NotFoundException($this);
-            case 1:
-                $criteria = [$modelClass::key() => func_get_arg(0)];
-                break;
-            default:
-                throw new BadRequestException($this);
-        }
+        $criteria = $this->criteria(func_get_args());
 
         /** @var \Tacit\Model\Persistent $item */
         $item = $modelClass::findOne($criteria);
@@ -156,15 +130,7 @@ abstract class RestfulItem extends Restful
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        switch (func_num_args()) {
-            case 0:
-                throw new NotFoundException($this);
-            case 1:
-                $criteria = [$modelClass::key() => func_get_arg(0)];
-                break;
-            default:
-                throw new BadRequestException($this);
-        }
+        $criteria = $this->criteria(func_get_args());
 
         /** @var \Tacit\Model\Persistent $item */
         $item = $modelClass::findOne($criteria);

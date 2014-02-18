@@ -17,6 +17,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\TransformerAbstract;
 use Slim\Route;
+use Tacit\Controller\Exception\BadRequestException;
 use Tacit\Controller\Exception\MethodNotAllowedException;
 use Tacit\Controller\Exception\NotAcceptableException;
 use Tacit\Controller\Exception\NotImplementedException;
@@ -129,6 +130,16 @@ abstract class Restful
             static::$name = array_pop($explodedClass);
         }
         return static::$name;
+    }
+
+    /**
+     * Get the required parameter keys for this controller.
+     *
+     * @return array[string]
+     */
+    public static function keys()
+    {
+        return [];
     }
 
     /**
@@ -329,8 +340,8 @@ abstract class Restful
         return array_merge(
             [
                 'self' => [
-                    'href' => $this->url($parameters),
-                    'title' => $this->route->getName()
+                    'href' => $this->self($parameters),
+                    'title' => static::title()
                 ]
             ],
             $this->refs,
@@ -364,6 +375,24 @@ abstract class Restful
             static::$transformer = $transformerClass;
         }
         return new static::$transformer;
+    }
+
+    /**
+     * Get the criteria used to identify the resource associated with this controller.
+     *
+     * @param array $args
+     *
+     * @throws BadRequestException
+     * @return array
+     */
+    protected function criteria(array $args)
+    {
+        $keys = static::keys();
+        if (count($keys) !== func_num_args()) {
+            throw new BadRequestException($this);
+        }
+
+        return array_combine($keys, func_get_args());
     }
 
     /**

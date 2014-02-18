@@ -41,13 +41,13 @@ abstract class RestfulCollection extends Restful
      */
     public function get()
     {
-        $limit = $this->app->request->get('limit', 25);
-        $offset = $this->app->request->get('offset', 0);
-        $orderBy = $this->app->request->get('sort', 'created_at');
-        $orderDir = $this->app->request->get('sort_dir', 'desc');
-
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
+
+        $limit = $this->app->request->get('limit', 25);
+        $offset = $this->app->request->get('offset', 0);
+        $orderBy = $this->app->request->get('sort', $modelClass::key());
+        $orderDir = $this->app->request->get('sort_dir', 'desc');
 
         try {
             $total = $modelClass::count();
