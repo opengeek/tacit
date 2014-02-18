@@ -144,7 +144,7 @@ abstract class Restful
     {
         return [
             'href' => static::url($routeParams, $params),
-            'title' => static::title() . $suffix ? " {$suffix}" : ''
+            'title' => static::title() . (!empty($suffix) ? " {$suffix}" : '')
         ];
     }
 
