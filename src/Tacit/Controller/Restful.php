@@ -454,7 +454,7 @@ abstract class Restful
                     $offset = (int)$this->app->request->get('offset', 0);
                     if ($total > $offset) {
                         $links['first'] = static::ref($this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
-                        $links['previous'] = ($offset > 0) ? static::ref($this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
+                        $links['prev'] = ($offset > 0) ? static::ref($this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
                         $links['next'] = (($offset + $limit) < $total) ? static::ref($this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
                         $links['last'] = static::ref($this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
