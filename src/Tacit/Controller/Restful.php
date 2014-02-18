@@ -388,11 +388,14 @@ abstract class Restful
     protected function criteria(array $args)
     {
         $keys = static::keys();
-        if (count($keys) !== func_num_args()) {
+        if (count($keys) !== count($args)) {
             throw new BadRequestException($this);
         }
-
-        return array_combine($keys, func_get_args());
+        $criteria = [];
+        foreach ($keys as $key) {
+            $criteria[$key] = array_shift($args);
+        }
+        return $criteria;
     }
 
     /**
