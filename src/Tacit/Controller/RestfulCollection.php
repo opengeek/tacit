@@ -44,16 +44,21 @@ abstract class RestfulCollection extends Restful
         /** @var \Tacit\Model\Persistent $modelClass */
         $modelClass = static::$modelClass;
 
+        $criteria = $this->criteria(func_get_args());
+
         $limit = $this->app->request->get('limit', 25);
         $offset = $this->app->request->get('offset', 0);
         $orderBy = $this->app->request->get('sort', $modelClass::key());
         $orderDir = $this->app->request->get('sort_dir', 'desc');
 
         try {
-            $total = $modelClass::count();
+            $total = $modelClass::count($criteria);
 
-            $collection = $modelClass::find(function ($query) use ($offset, $limit, $orderBy, $orderDir) {
+            $collection = $modelClass::find(function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
                 /** @var Query|object $query */
+                foreach ($criteria as $criterionKey => $criterion) {
+                    $query->where($criterionKey, $criterion);
+                }
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
             });
         } catch (\Exception $e) {
