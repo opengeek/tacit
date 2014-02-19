@@ -119,6 +119,16 @@ abstract class Restful
     }
 
     /**
+     * Get default criteria for this controller.
+     *
+     * @return array
+     */
+    public static function defaultCriteria()
+    {
+        return [];
+    }
+
+    /**
      * Get the route name of this Restful controller.
      *
      * @return string
@@ -389,9 +399,9 @@ abstract class Restful
     {
         $keys = static::keys();
         if (count($keys) !== count($args)) {
-            throw new BadRequestException($this);
+            throw new BadRequestException($this, null, "Wrong number of arguments for this resource", static::keys());
         }
-        $criteria = [];
+        $criteria = static::defaultCriteria();
         foreach ($keys as $key) {
             $criteria[$key] = array_shift($args);
         }
