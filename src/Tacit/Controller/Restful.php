@@ -155,13 +155,13 @@ abstract class Restful
     /**
      * Return a RESTful ref element for this controller.
      *
-     * @param array  $routeParams
-     * @param array  $params
-     * @param string $suffix
+     * @param array      $routeParams
+     * @param array|bool $params
+     * @param string     $suffix
      *
      * @return array
      */
-    public static function ref(array $routeParams = [], array $params = [], $suffix = '')
+    public static function ref(array $routeParams = [], $params = false, $suffix = '')
     {
         return [
             'href' => static::url($routeParams, $params),
