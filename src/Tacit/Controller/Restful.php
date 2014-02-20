@@ -195,7 +195,7 @@ abstract class Restful
             $getParams = $app->router->getCurrentRoute()->getName() !== static::name()
                 ? $app->request->get()
                 : [];
-            $getParams = array_merge($getParams, is_array($params) ?: []);
+            $getParams = array_merge($getParams, is_array($params) ? $params : []);
             if (!empty($getParams)) {
                 $url .= '?';
                 $qs = array();
