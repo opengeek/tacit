@@ -182,24 +182,28 @@ abstract class Restful
      * Get the URL for this Restful controller.
      *
      * @param array $routeParams
-     * @param array $params
+     * @param array|bool $params
      *
      * @return string
      */
-    public static function url(array $routeParams = [], array $params = [])
+    public static function url(array $routeParams = [], $params = [])
     {
         $app = Tacit::getInstance();
         $url = $app->request->getUrl();
         $url .= $app->urlFor(static::name(), $routeParams);
-        $getParams = $app->request->get();
-        $getParams = array_merge($getParams, $params);
-        if (!empty($getParams)) {
-            $url .= '?';
-            $qs = array();
-            foreach ($getParams as $qKey => $qValue) {
-                $qs[] = urlencode($qKey) . "=" . urlencode($qValue);
+        if (false !== $params) {
+            $getParams = $app->router->getCurrentRoute()->getName() !== static::name()
+                ? $app->request->get()
+                : [];
+            $getParams = array_merge($getParams, is_array($params) ?: []);
+            if (!empty($getParams)) {
+                $url .= '?';
+                $qs = array();
+                foreach ($getParams as $qKey => $qValue) {
+                    $qs[] = urlencode($qKey) . "=" . urlencode($qValue);
+                }
+                $url .= implode('&', $qs);
             }
-            $url .= implode('&', $qs);
         }
         return $url;
     }
