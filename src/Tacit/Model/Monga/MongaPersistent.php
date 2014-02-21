@@ -47,7 +47,7 @@ abstract class MongaPersistent extends Persistent
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for new item in collection ' . static::$collectionName, $validated);
         }
-        $saved = static::collection($this->getRepository())->insert($this->toArray(MongaCollection::getMask($this, [], [$this->getKeyField()])), ['w' => 1]);
+        $saved = static::collection($this->getRepository())->insert($this->toArray(MongaCollection::getMask($this, [], [$this->getKeyField()]), false), ['w' => 1]);
         if ($saved instanceof \MongoId) {
             $this->{$this->getKeyField()} = $saved;
             return true;
