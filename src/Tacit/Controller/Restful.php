@@ -263,6 +263,7 @@ abstract class Restful
      */
     public function handle()
     {
+        $this->checkMethod();
         $method = strtoupper($this->app->request->getMethod());
         if (method_exists($this, $method)) {
             call_user_func_array([$this, $method], func_get_args());
