@@ -504,7 +504,7 @@ abstract class Restful
                         $links['next'] = (($offset + $limit) < $total) ? static::ref($this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
                         $links['last'] = static::ref($this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
-                    $bodyRaw['_links'] = $this->refs($links);
+                    $bodyRaw['_links'] = $this->refs(array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
                     if ($total > $offset) {
                         $bodyRaw['total_items'] = $total;
