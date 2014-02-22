@@ -32,6 +32,13 @@ abstract class Collection
     protected $connection;
 
     /**
+     * The peer object responsible for interacting with the collection.
+     *
+     * @var object
+     */
+    protected $peer;
+
+    /**
      * Get the public fields of an object as an array.
      *
      * @param object $object An object to get public fields from.
@@ -69,6 +76,23 @@ abstract class Collection
     {
         $this->name = $name;
         $this->connection =& $connection;
+    }
+
+    /**
+     * Call a method of the Collection peer if it exists.
+     *
+     * @param $name
+     * @param $arguments
+     *
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
+    function __call($name, $arguments)
+    {
+        if (method_exists($this->peer, $name)) {
+            return call_user_func_array([$this->peer, $name], $arguments);
+        }
+        throw new \BadMethodCallException();
     }
 
     /**

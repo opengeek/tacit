@@ -26,19 +26,21 @@ class MongaCollection extends Collection
     /**
      * @var \League\Monga\Collection
      */
-    protected $collection;
+    protected $peer;
 
     /**
      * Get a MongaCollection instance.
      *
      * @param string $name
      * @param Database $connection
+     *
+     * @return MongaCollection
      */
     public function __construct($name, $connection)
     {
         $this->name = $name;
         $this->connection = $connection;
-        $this->collection = $connection->collection($this->name);
+        $this->peer = $connection->collection($this->name);
     }
 
     /**
@@ -74,7 +76,7 @@ class MongaCollection extends Collection
      */
     public function count($query)
     {
-        return $this->collection->count($query);
+        return $this->peer->count($query);
     }
 
     /**
@@ -84,7 +86,7 @@ class MongaCollection extends Collection
      */
     public function drop()
     {
-        return $this->collection->drop();
+        return $this->peer->drop();
     }
 
     /**
@@ -97,7 +99,7 @@ class MongaCollection extends Collection
      */
     public function find($query, $fields = [])
     {
-        return $this->collection->find($query, $fields);
+        return $this->peer->find($query, $fields);
     }
 
     /**
@@ -110,7 +112,7 @@ class MongaCollection extends Collection
      */
     public function findOne($query, $fields = [])
     {
-        return $this->collection->findOne($query, $fields);
+        return $this->peer->findOne($query, $fields);
     }
 
     /**
@@ -123,7 +125,7 @@ class MongaCollection extends Collection
      */
     public function insert($data, $options = [])
     {
-        return $this->collection->insert($data, $options);
+        return $this->peer->insert($data, $options);
     }
 
     /**
@@ -135,7 +137,7 @@ class MongaCollection extends Collection
      */
     public function remove($query)
     {
-        return $this->collection->remove($query);
+        return $this->peer->remove($query);
     }
 
     /**
@@ -145,7 +147,7 @@ class MongaCollection extends Collection
      */
     public function truncate()
     {
-        return $this->collection->truncate();
+        return $this->peer->truncate();
     }
 
     /**
@@ -159,6 +161,6 @@ class MongaCollection extends Collection
      */
     public function update($query, $data, $options = [])
     {
-        return $this->collection->update($data, $query, $options);
+        return $this->peer->update($data, $query, $options);
     }
 }
