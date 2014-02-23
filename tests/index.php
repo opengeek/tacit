@@ -20,7 +20,8 @@ $tacit = new \Tacit\Tacit(
             'server' => 'localhost',
             'options' => array('connect' => false),
             'repository' => 'tacit_test'
-        ]
+        ],
+        'tacit.identitiesFile' => __DIR__ . '/identities.php'
     ]
 );
 

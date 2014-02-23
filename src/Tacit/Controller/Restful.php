@@ -255,6 +255,11 @@ abstract class Restful
         throw new NotImplementedException($this);
     }
 
+    public function getApp()
+    {
+        return $this->app;
+    }
+
     /**
      * Route to the appropriate HTTP method.
      *

@@ -118,7 +118,7 @@ abstract class Persistent
      * @param array      $data The data to initialize the Persistent object with.
      * @param Repository $repository A specific Repository for ownership of the object.
      *
-     * @return static|null An instance of the Persistent object or null.
+     * @return Persistent|null An instance of the Persistent object or null.
      */
     public static function instance(array $data = array(), Repository $repository = null)
     {
@@ -175,7 +175,7 @@ abstract class Persistent
      * All fields are returned if not provided.
      * @param Repository     $repository A specific Repository to find the object in.
      *
-     * @return static|null The Persistent object meeting the criteria or null.
+     * @return Persistent|null The Persistent object meeting the criteria or null.
      */
     public static function findOne($criteria, array $fields = array(), Repository $repository = null)
     {
