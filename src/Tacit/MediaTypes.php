@@ -22,9 +22,10 @@ class MediaTypes extends ContentTypes
     public function call()
     {
         $mediaType = $this->app->request()->getMediaType();
-        if (in_array($mediaType, array('application/json', 'application/xml'))) {
+        if ($mediaType) {
             $env = $this->app->environment();
-            $env['slim.request.form_hash'] = $this->parse($env['slim.input'], $mediaType);
+            $env['slim.input_original'] = $env['slim.input'];
+            $env['slim.request.form_hash'] = $env['slim.input'] = $this->parse($env['slim.input'], $mediaType);
         }
         $this->next->call();
     }
