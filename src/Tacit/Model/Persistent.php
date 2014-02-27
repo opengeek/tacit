@@ -328,7 +328,8 @@ abstract class Persistent
         }
         foreach ($data as $key => $value) {
             if (false === $mask || in_array($key, $mask)) {
-                $this->set($key, $value);
+                $this->{$key} = $value;
+                $this->_dirty[$key] = $key;
             }
         }
         if (!$this->isNew()) {
