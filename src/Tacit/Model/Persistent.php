@@ -124,7 +124,7 @@ abstract class Persistent
     {
         /** @var Persistent $instance */
         $instance = new static($repository);
-        $instance->hydrate($data);
+        $instance->hydrate($data, true);
         return $instance;
     }
 
