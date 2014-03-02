@@ -87,6 +87,13 @@ abstract class RestfulCollection extends Restful
             throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithItemCreated($item, static::$itemController, $this->transformer());
+        /** @var RestfulItem $itemController */
+        $itemController = static::$itemController;
+
+        $this->respondWithItemCreated(
+            $item,
+            $itemController::url([$item->getKeyField() => $item->getKey()], false),
+            $this->transformer()
+        );
     }
 }
