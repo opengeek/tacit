@@ -11,7 +11,6 @@
 namespace Tacit\Model;
 
 
-use League\Fractal\TransformerAbstract;
 use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
@@ -99,7 +98,9 @@ abstract class Persistent
     public static function create(array $data = array(), Repository $repository = null)
     {
         try {
-            $instance = static::instance($data, $repository);
+            /** @var Persistent $instance */
+            $instance = new static($repository);
+            $instance->fromArray($data, true);
             $result = $instance->save();
         } catch (ModelValidationException $e) {
             throw $e;
@@ -273,6 +274,27 @@ abstract class Persistent
             $dirty[$key] = $this->get($key);
         }
         return $dirty;
+    }
+
+    /**
+     * Set the properties of this instance using the provided data and an optional mask.
+     *
+     * @param array $data
+     * @param bool|array $mask
+     */
+    public function fromArray(array $data, $mask = false)
+    {
+        if (!is_array($mask) && false !== $mask) {
+            $mask = Collection::getMask($this, [], ['_id']);
+        }
+        foreach ($data as $key => $value) {
+            if (false === $mask || in_array($key, $mask)) {
+                $this->set($key, $value);
+            }
+        }
+        if (!$this->isNew()) {
+            $this->_dirty = array();
+        }
     }
 
     /**
