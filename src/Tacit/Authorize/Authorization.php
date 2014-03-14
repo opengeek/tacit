@@ -13,17 +13,18 @@ namespace Tacit\Authorize;
 
 use Slim\Http\Request;
 use Tacit\Controller\Restful;
+use Tacit\Tacit;
 
 interface Authorization
 {
     /**
      * Get the input data from the request to be used for validation.
      *
-     * @param Request $request
+     * @param \Tacit\Tacit $app
      *
      * @return string A string representation of the input data elements.
      */
-    public function getInput(Request $request);
+    public function getInput(Tacit $app);
 
     /**
      * Get the signature provided by the client for validation.

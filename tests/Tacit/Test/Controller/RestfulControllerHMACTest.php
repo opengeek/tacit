@@ -28,7 +28,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
         $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
         $fingerprint = implode("\n", [
             'GET',
-            '',
+            md5(''),
             '',
             '/hmac-test'
         ]);
@@ -40,7 +40,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
                     'get',
                     [
                         'headers' => [
-                            'Content-MD5' => '',
+                            'Content-MD5' => md5(''),
                             'Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
                         ]
                     ]

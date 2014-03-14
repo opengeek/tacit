@@ -16,6 +16,7 @@ use Slim\Slim;
 use Tacit\Controller\Exception\ResourceConflictException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Controller\Restful;
+use Tacit\Tacit;
 
 class HMAC implements Authorization
 {
@@ -35,17 +36,17 @@ class HMAC implements Authorization
     /**
      * Get the input data from the request to be used for validation.
      *
-     * @param Request $request
+     * @param \Tacit\Tacit $app
      *
      * @return string A string representation of the input data elements.
      */
-    public function getInput(Request $request)
+    public function getInput(Tacit $app)
     {
         return implode("\n", [
-            $request->getMethod(),
-            $request->headers('Content-MD5'),
-            $request->headers('Content-Type'),
-            $request->getResourceUri()
+            $app->request->getMethod(),
+            md5($app->environment['slim.input_original']),
+            $app->request->headers('Content-Type'),
+            $app->request->getResourceUri()
         ]);
     }
 
@@ -76,11 +77,21 @@ class HMAC implements Authorization
 
         $signature = $this->getSignature($request);
         if (empty($signature)) {
-            throw new UnauthorizedException($controller, 'Unsigned Request', 'No valid authorization signature was provided with the request.', 'Signature-HMAC:');
+            throw new UnauthorizedException(
+                $controller,
+                'Unsigned Request',
+                'No valid authorization signature was provided with the request.',
+                ['Signature-HMAC' => $signature]
+            );
         }
         $exploded = explode(':', $signature, 3);
         if (count($exploded) !== 3) {
-            throw new UnauthorizedException($controller, 'Invalid Signature', 'The request contains an invalid authorization signature.', 'Signature-HMAC:');
+            throw new UnauthorizedException(
+                $controller,
+                'Invalid Signature',
+                'The request contains an invalid authorization signature.',
+                ['Signature-HMAC' => $signature]
+            );
         }
 
         list($timestamp, $clientKey, $rawHash) = $exploded;
@@ -89,16 +100,26 @@ class HMAC implements Authorization
         $expires = $requested + (60*15);
 
         if (time() >= $expires) {
-            throw new ResourceConflictException($controller, 'Request Outdated', 'The signature indicates this request has expired and is no longer valid.', 'SignatureHMAC:');
+            throw new ResourceConflictException(
+                $controller,
+                'Request Outdated',
+                'The signature indicates this request has expired and is no longer valid.',
+                ['SignatureHMAC' => $signature]
+            );
         }
 
         $secret = $this->getSecretKey($controller->getApp(), $clientKey);
 
-        $fingerprint = $this->getInput($request);
+        $fingerprint = $this->getInput($controller->getApp());
         $test = hash_hmac('sha1', $fingerprint, $secret);
 
         if ($test !== $rawHash) {
-            throw new UnauthorizedException($controller, 'Unauthorized Signature', 'The request is not properly signed and has been rejected.', 'Signature-HMAC:');
+            throw new UnauthorizedException(
+                $controller,
+                'Unauthorized Signature',
+                'The request is not properly signed and has been rejected.',
+                ['Signature-HMAC' => $signature]
+            );
         }
         return true;
     }
