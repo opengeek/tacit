@@ -6,5 +6,6 @@ php:
 
 before_script:
   - composer install
+  - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 script: phpunit --coverage-text
