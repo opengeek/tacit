@@ -11,10 +11,10 @@
 namespace Tacit\Controller;
 
 
-use Tacit\Controller\Exception\BadRequestException;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
+use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelException;
 
 /**
@@ -108,7 +108,7 @@ abstract class RestfulItem extends Restful
         }
 
         try {
-            $item->hydrate($this->app->request->post(null, []), (array)$modelClass::key());
+            $item->hydrate($this->app->request->post(null, []), Collection::getMask($item));
             $item->save();
         } catch (ModelException $e) {
             throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
@@ -146,7 +146,7 @@ abstract class RestfulItem extends Restful
                 $newItem->toArray(),
                 $this->app->request->post(null, [])
             );
-            $item->hydrate($data, (array)$modelClass::key());
+            $item->hydrate($data, Collection::getMask($item));
             $item->save();
         } catch (ModelException $e) {
             throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
