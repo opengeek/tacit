@@ -110,8 +110,11 @@ class Rules
 
     public static function url($field, $value, $args)
     {
-        if (!filter_var($value, FILTER_VALIDATE_URL)) {
-            throw new ValidationFailedException(sprintf('%1s must be a valid URL', $field), 422);
+        $allowNull = isset($args[0]) && $args[0] === 'null';
+        if (!(null === $value && true === $allowNull)) {
+            if (!filter_var($value, FILTER_VALIDATE_URL)) {
+                throw new ValidationFailedException(sprintf('%1s must be a valid URL', $field), 422);
+            }
         }
     }
 }

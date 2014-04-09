@@ -45,6 +45,9 @@ class RulesTest extends ValidateTestCase
         return [
             [['field' => 3.14], ['field' => 'type:float'], true],
             [['field' => new \stdClass()], ['field' => 'classof:\\stdClass'], true],
+            [['field' => 'http://localhost'], ['field' => 'url'], true],
+            [['field' => null], ['field' => 'url'], false],
+            [['field' => null], ['field' => 'url:null'], true],
         ];
     }
 

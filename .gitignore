@@ -29,3 +29,6 @@ test-*.json
 
 # ignore /vendor/
 /vendor/
+
+# ignore composer.lock
+/composer.lock
