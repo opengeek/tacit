@@ -376,7 +376,7 @@ abstract class Persistent
      */
     public function remove()
     {
-        return (static::collection($this->getRepository())->remove([$this->getKeyField() => $this->getKey()]) === 1);
+        return (static::collection($this->getRepository())->remove([$this->getKeyField() => $this->getKey()]) !== false);
     }
 
     /**
