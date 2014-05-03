@@ -292,7 +292,7 @@ abstract class Persistent
                 $this->set($key, $value);
             }
         }
-        if (!$this->isNew()) {
+        if ($this->isNew()) {
             $this->_dirty = array();
         }
     }

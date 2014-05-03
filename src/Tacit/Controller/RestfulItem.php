@@ -108,7 +108,7 @@ abstract class RestfulItem extends Restful
         }
 
         try {
-            $item->hydrate($this->app->request->post(null, []), Collection::getMask($item));
+            $item->fromArray($this->app->request->post(null, []), Collection::getMask($item));
             $item->save();
         } catch (ModelException $e) {
             throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
@@ -146,7 +146,7 @@ abstract class RestfulItem extends Restful
                 $newItem->toArray(),
                 $this->app->request->post(null, [])
             );
-            $item->hydrate($data, Collection::getMask($item));
+            $item->fromArray($data, Collection::getMask($item));
             $item->save();
         } catch (ModelException $e) {
             throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
