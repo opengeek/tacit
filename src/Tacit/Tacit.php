@@ -49,10 +49,12 @@ class Tacit extends Slim
             ]);
         });
 
-        $this->container->singleton('repository', function () use ($connection) {
-            $dbClass = $connection['class'];
-            return new $dbClass($connection);
-        });
+        if ($connection !== null) {
+            $this->container->singleton('repository', function () use ($connection) {
+                $dbClass = $connection['class'];
+                return new $dbClass($connection);
+            });
+        }
 
         $this->add(new MediaTypes());
 
@@ -134,7 +136,7 @@ class Tacit extends Slim
                 ]
             ];
         }
-        if (!isset($configuration['connection'])) {
+        if (!array_key_exists('connection', $configuration)) {
             $configuration['connection'] = [
                 'class' => 'Tacit\\Model\\Monga\\MongaRepository',
                 'server' => 'mongodb://localhost',
