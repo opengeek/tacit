@@ -149,4 +149,17 @@ class Tacit extends Slim
         }
         return $configuration;
     }
+
+    /**
+     * Similar as run method, but returns Response instead of echoing it
+     *
+     * @return \Slim\Http\Response
+     */
+    public function invoke()
+    {
+        $this->middleware[0]->call();
+        $this->response()->finalize();
+
+        return $this->response();
+    }
 }
