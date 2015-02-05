@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-$GLOBALS['service_tests_url'] = 'http://localhost/tacit/tests';
-
 $includeIfReadable = function ($file)
 {
     return is_readable($file) ? include $file : false;

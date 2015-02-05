@@ -10,6 +10,8 @@
 
 namespace Tacit\Test\Controller;
 
+use Tacit\Tacit;
+
 /**
  * Test Restful controllers.
  *
@@ -21,14 +23,19 @@ class RestfulControllerTest extends ControllerTestCase
      * Test a very basic RESTful GET request.
      *
      * @group controller
-     * @group server
      */
     public function testGet()
     {
+        $this->mockEnvironment([
+            'PATH_INFO' => '/'
+        ]);
+
+        $response = $this->tacit->invoke();
+
         $this->assertEquals(
             array_intersect_assoc(
                 ['message' => 'mock me do you?'],
-                $this->request('/')->json()
+                json_decode($response->getBody(), true)
             ),
             ['message' => 'mock me do you?']
         );

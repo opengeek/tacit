@@ -17,13 +17,16 @@ namespace Tacit;
  */
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
+    /** @var Tacit */
+    protected $tacit;
+
     /**
      * Get a clean instance of Tacit for use in tests.
      */
     protected function setUp()
     {
         parent::setUp();
-        new Tacit([
+        $this->tacit = new Tacit([
             'app' => [
                 'mode' => 'development',
                 'startTime' => microtime(true)

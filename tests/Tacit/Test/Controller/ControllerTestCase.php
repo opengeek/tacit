@@ -13,6 +13,8 @@ namespace Tacit\Test\Controller;
 
 
 use Guzzle\Http\StaticClient;
+use Slim\Environment;
+use Tacit\Tacit;
 use Tacit\TestCase;
 
 /**
@@ -22,29 +24,26 @@ use Tacit\TestCase;
  */
 abstract class ControllerTestCase extends TestCase
 {
-    /**
-     * Make a service request to a controller path.
-     *
-     * @param string $path The controller path.
-     * @param string $method The HTTP method to use.
-     * @param array  $parameters The parameters to send.
-     *
-     * @return \Guzzle\Http\Message\Response|\Guzzle\Stream\Stream The response.
-     */
-    protected function request($path = '/', $method = 'get', array $parameters = [])
+    protected $environment = [];
+
+    protected function mockEnvironment(array $vars = [])
     {
-        return StaticClient::request($method, $this->serviceUrl($path), $parameters);
+        $this->environment = [
+            'REQUEST_METHOD' => 'GET',
+            'CONTENT_TYPE' => 'application/json',
+            'slim.input' => '',
+        ];
+
+        $this->environment = array_merge_recursive($this->environment, $vars);
+
+        Environment::mock($this->environment);
     }
 
-    /**
-     * Get the full service tests URL appending the specified path.
-     *
-     * @param string $path The controller path to append.
-     *
-     * @return string The complete URL to the controller.
-     */
-    protected function serviceUrl($path)
+    protected function setUp()
     {
-        return $GLOBALS['service_tests_url'] . '/' . ltrim($path, '/');
+        parent::setUp();
+
+        $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
+        require __DIR__ . '/../../../routes.php';
     }
 }
