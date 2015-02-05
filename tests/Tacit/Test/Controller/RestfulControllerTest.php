@@ -33,8 +33,11 @@ class RestfulControllerTest extends ControllerTestCase
         $response = $this->tacit->invoke();
 
         $this->assertEquals(
-            ['message' => 'mock me do you?'],
-            json_decode($response->getBody(), true)
+            array_intersect_assoc(
+                ['message' => 'mock me do you?'],
+                json_decode($response->getBody(), true)
+            ),
+            ['message' => 'mock me do you?']
         );
     }
 }
