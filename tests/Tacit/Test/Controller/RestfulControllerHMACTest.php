@@ -38,10 +38,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
             'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
         ]);
 
-        /** @var Tacit $app */
-        $app = Tacit::getInstance();
-
-        $response = $app->invoke();
+        $response = $this->tacit->invoke();
 
         $this->assertEquals(
             $bodyRaw,

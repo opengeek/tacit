@@ -6,7 +6,9 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- */ 
+ */
+
+$tacit =& $this->tacit;
 
 $tacit->any('/', function () use ($tacit) {
     (new \Tacit\Test\Controller\MockRestful($tacit))->handle();

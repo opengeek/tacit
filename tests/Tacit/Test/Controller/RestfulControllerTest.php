@@ -30,10 +30,7 @@ class RestfulControllerTest extends ControllerTestCase
             'PATH_INFO' => '/'
         ]);
 
-        /** @var Tacit $app */
-        $app = Tacit::getInstance();
-
-        $response = $app->invoke();
+        $response = $this->tacit->invoke();
 
         $this->assertEquals(
             ['message' => 'mock me do you?'],

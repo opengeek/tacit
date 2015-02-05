@@ -24,27 +24,26 @@ use Tacit\TestCase;
  */
 abstract class ControllerTestCase extends TestCase
 {
-    protected $environment = [
-        'REQUEST_METHOD' => 'GET',
-        'CONTENT_TYPE' => 'application/json',
-        'slim.input' => '',
-    ];
+    protected $environment = [];
 
-    protected function mockEnvironment(array $vars = [], $merge = true)
+    protected function mockEnvironment(array $vars = [])
     {
-        $this->environment = $merge
-            ? array_merge_recursive($this->environment, $vars)
-            : $vars;
+        $this->environment = [
+            'REQUEST_METHOD' => 'GET',
+            'CONTENT_TYPE' => 'application/json',
+            'slim.input' => '',
+        ];
+
+        $this->environment = array_merge_recursive($this->environment, $vars);
+
         Environment::mock($this->environment);
-        return $this->environment;
     }
 
     protected function setUp()
     {
         parent::setUp();
 
-        $tacit = Tacit::getInstance();
-        $tacit->config('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
+        $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
         require __DIR__ . '/../../../routes.php';
     }
 }
