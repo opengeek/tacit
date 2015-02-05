@@ -19,7 +19,6 @@ class RestfulControllerHMACTest extends ControllerTestCase
      * Test a very basic RESTful GET request.
      *
      * @group controller
-     * @group server
      */
     public function testGet()
     {
@@ -32,21 +31,21 @@ class RestfulControllerHMACTest extends ControllerTestCase
             '',
             '/hmac-test'
         ]);
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/hmac-test',
+            'Http_Content-MD5' => md5(''),
+            'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
+        ]);
+
+        /** @var Tacit $app */
+        $app = Tacit::getInstance();
+
+        $response = $app->invoke();
+
         $this->assertEquals(
-            array_intersect_assoc(
-                $bodyRaw,
-                $this->request(
-                    '/hmac-test',
-                    'get',
-                    [
-                        'headers' => [
-                            'Content-MD5' => md5(''),
-                            'Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
-                        ]
-                    ]
-                )->json()
-            ),
-            $bodyRaw
+            $bodyRaw,
+            json_decode($response->getBody(), true)
         );
     }
 }
