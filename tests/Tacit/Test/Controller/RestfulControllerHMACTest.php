@@ -28,7 +28,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
         $fingerprint = implode("\n", [
             'GET',
             md5(''),
-            '',
+            'application/json',
             '/hmac-test'
         ]);
 
@@ -41,8 +41,11 @@ class RestfulControllerHMACTest extends ControllerTestCase
         $response = $this->tacit->invoke();
 
         $this->assertEquals(
-            $bodyRaw,
-            json_decode($response->getBody(), true)
+            array_intersect_assoc(
+                $bodyRaw,
+                json_decode($response->getBody(), true)
+            ),
+            $bodyRaw
         );
     }
 }
