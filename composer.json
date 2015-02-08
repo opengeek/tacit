@@ -21,6 +21,7 @@
         "league/monga": "1.0.x"
     },
     "require-dev": {
+        "ext-mongo": "*",
         "phpunit/phpunit": "~3.7.0",
         "guzzle/guzzle": "3.x"
     },
