@@ -55,9 +55,9 @@ Please see [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
 ## Credits
 
-[Jason Coward](https://github.com/opengeek/)
-[John Peca](https://github.com/TheBoxer/)
-[All Contributors](https://github.com/opengeek/tacit/graphs/contributors)
+* [Jason Coward](https://github.com/opengeek/)
+* [John Peca](https://github.com/TheBoxer/)
+* [All Contributors](https://github.com/opengeek/tacit/graphs/contributors)
 
 
 ## License
