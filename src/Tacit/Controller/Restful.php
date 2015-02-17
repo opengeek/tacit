@@ -426,7 +426,7 @@ abstract class Restful
      *
      * @return string The encoded response body as a string.
      */
-    protected function encode($body, $options = 0)
+    protected function encode($body, $options = JSON_PRETTY_PRINT)
     {
         return json_encode($body, $options);
     }
