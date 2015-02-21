@@ -11,6 +11,7 @@
 namespace Tacit;
 
 
+use Slim\Middleware\ContentTypes;
 use Slim\Slim;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\RestfulException;
@@ -56,7 +57,7 @@ class Tacit extends Slim
             });
         }
 
-        $this->add(new MediaTypes());
+        $this->add(new ContentTypes());
 
         $this->error(function (\Exception $e) {
             $resource = [
