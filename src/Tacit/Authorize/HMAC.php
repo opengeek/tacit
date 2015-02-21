@@ -20,18 +20,7 @@ use Tacit\Tacit;
 
 class HMAC implements Authorization
 {
-    private static $identities;
-
-    public static function identities(Slim $app)
-    {
-        if (!is_array(static::$identities)) {
-            $identitiesFile = $app->config('tacit.identitiesFile');
-            if (is_readable($identitiesFile)) {
-                static::$identities = include $identitiesFile;
-            }
-        }
-        return static::$identities;
-    }
+    use Identity;
 
     /**
      * Get the input data from the request to be used for validation.
@@ -53,13 +42,13 @@ class HMAC implements Authorization
     /**
      * Get the signature provided by the client for validation.
      *
-     * @param Request $request
+     * @param Tacit $app
      *
      * @return string The signature.
      */
-    public function getSignature(Request $request)
+    public function getSignature(Tacit $app)
     {
-        return $request->headers('Signature-HMAC');
+        return $app->request->headers('Signature-HMAC');
     }
 
     /**
@@ -73,9 +62,7 @@ class HMAC implements Authorization
      */
     public function isValidRequest(Restful $controller)
     {
-        $request = $controller->getApp()->request;
-
-        $signature = $this->getSignature($request);
+        $signature = $this->getSignature($controller->getApp());
         if (empty($signature)) {
             throw new UnauthorizedException(
                 $controller,
@@ -122,14 +109,5 @@ class HMAC implements Authorization
             );
         }
         return true;
-    }
-
-    public function getSecretKey($app, $clientKey)
-    {
-        $identities = static::identities($app);
-        if (isset($identities[$clientKey])) {
-            return $identities[$clientKey]['secretKey'];
-        }
-        return false;
     }
 }

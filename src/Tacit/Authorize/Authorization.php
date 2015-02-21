@@ -29,11 +29,11 @@ interface Authorization
     /**
      * Get the signature provided by the client for validation.
      *
-     * @param Request $request
+     * @param \Tacit\Tacit $app
      *
      * @return string The signature.
      */
-    public function getSignature(Request $request);
+    public function getSignature(Tacit $app);
 
     /**
      * Determine if the client has authorization to make the request.
