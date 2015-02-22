@@ -16,6 +16,7 @@ use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelException;
+use Tacit\Model\Exception\ModelValidationException;
 
 /**
  * An abstract representation of a RESTful item from a RESTful collection.
@@ -110,10 +111,10 @@ abstract class RestfulItem extends Restful
         try {
             $item->fromArray($this->app->request->post(null, []), Collection::getMask($item));
             $item->save();
-        } catch (ModelException $e) {
-            throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
+        } catch (ModelValidationException $e) {
+            throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
-            throw new ServerErrorException($this, $e->getMessage(), null, null, null, $e);
+            throw new ServerErrorException($this, 'Error patching resource', $e->getMessage(), null, $e);
         }
 
         $this->respondWithItem($item, $this->transformer());
@@ -148,10 +149,10 @@ abstract class RestfulItem extends Restful
             );
             $item->fromArray($data, Collection::getMask($item));
             $item->save();
-        } catch (ModelException $e) {
-            throw new UnacceptableEntityException($this, $e->getMessage(), null, null, null, $e);
+        } catch (ModelValidationException $e) {
+            throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
-            throw new ServerErrorException($this, $e->getMessage(), null, null, null, $e);
+            throw new ServerErrorException($this, 'Error updating resource', $e->getMessage(), null, $e);
         }
 
         $this->respondWithItem($item, $this->transformer());
