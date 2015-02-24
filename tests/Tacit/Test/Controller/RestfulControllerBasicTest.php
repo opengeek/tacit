@@ -42,4 +42,35 @@ class RestfulControllerBasicTest extends ControllerTestCase
             $bodyRaw
         );
     }
+
+    /**
+     * Test a very simple RESTful POST request with Basic authentication.
+     *
+     * @group controller
+     */
+    public function testPostFromJson()
+    {
+        $bodyRaw = ['message' => 'mock me do you mocker?'];
+        $clientKey = 'cb892ecb-6458-425c-9e3a-b3e99ec86f56';
+        $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/basic-test',
+            'REQUEST_METHOD' => 'POST',
+            'PHP_AUTH_USER' => $clientKey,
+            'PHP_AUTH_PW' => $secretKey,
+            'CONTENT_TYPE' => 'application/json',
+            'slim.input' => '{"target":"mocker"}'
+        ]);
+
+        $response = $this->tacit->invoke();
+
+        $this->assertEquals(
+            array_intersect_assoc(
+                $bodyRaw,
+                json_decode($response->getBody(), true)
+            ),
+            $bodyRaw
+        );
+    }
 }

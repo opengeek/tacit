@@ -11,10 +11,10 @@
 namespace Tacit;
 
 
-use Slim\Middleware\ContentTypes;
 use Slim\Slim;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\RestfulException;
+use Tacit\Middleware\ContentTypes;
 
 /**
  * An extension of Slim to wrap RESTful RAD server features.

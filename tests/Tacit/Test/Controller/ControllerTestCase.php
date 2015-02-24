@@ -24,19 +24,9 @@ use Tacit\TestCase;
  */
 abstract class ControllerTestCase extends TestCase
 {
-    protected $environment = [];
-
-    protected function mockEnvironment(array $vars = [])
+    protected function mockEnvironment(array $vars = ['REQUEST_METHOD' => 'GET'])
     {
-        $this->environment = [
-            'REQUEST_METHOD' => 'GET',
-            'CONTENT_TYPE' => 'application/json',
-            'slim.input' => '',
-        ];
-
-        $this->environment = array_merge_recursive($this->environment, $vars);
-
-        Environment::mock($this->environment);
+        Environment::mock($vars);
     }
 
     protected function setUp()

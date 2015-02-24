@@ -11,12 +11,10 @@
 namespace Tacit\Test\Controller;
 
 
-use Tacit\Tacit;
-
 class RestfulControllerHMACTest extends ControllerTestCase
 {
     /**
-     * Test a very basic RESTful GET request.
+     * Test a very basic RESTful GET request with Tacit HMAC authentication.
      *
      * @group controller
      */
@@ -33,7 +31,9 @@ class RestfulControllerHMACTest extends ControllerTestCase
         ]);
 
         $this->mockEnvironment([
+            'REQUEST_METHOD' => 'GET',
             'PATH_INFO' => '/hmac-test',
+            'CONTENT_TYPE' => 'application/json',
             'Http_Content-MD5' => md5(''),
             'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
         ]);
@@ -41,11 +41,48 @@ class RestfulControllerHMACTest extends ControllerTestCase
         $response = $this->tacit->invoke();
 
         $this->assertEquals(
+            $bodyRaw,
             array_intersect_assoc(
                 $bodyRaw,
                 json_decode($response->getBody(), true)
-            ),
-            $bodyRaw
+            )
+        );
+    }
+
+    /**
+     * Test a very simple RESTful POST request with Basic authentication.
+     *
+     * @group controller
+     */
+    public function testPostFromJson()
+    {
+        $bodyRaw = ['message' => 'mock me do you mocker?'];
+        $clientKey = 'cb892ecb-6458-425c-9e3a-b3e99ec86f56';
+        $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
+        $fingerprint = implode("\n", [
+            'POST',
+            md5('{"target":"mocker"}'),
+            'application/json',
+            '/hmac-test'
+        ]);
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/hmac-test',
+            'REQUEST_METHOD' => 'POST',
+            'CONTENT_TYPE' => 'application/json',
+            'Http_Content-MD5' => md5(''),
+            'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey),
+            'slim.input' => '{"target":"mocker"}'
+        ]);
+
+        $response = $this->tacit->invoke();
+
+        $this->assertEquals(
+            $bodyRaw,
+            array_intersect_assoc(
+                $bodyRaw,
+                json_decode($response->getBody(), true)
+            )
         );
     }
 }
