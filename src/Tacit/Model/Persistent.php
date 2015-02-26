@@ -269,11 +269,7 @@ abstract class Persistent
      */
     public function dirty()
     {
-        $dirty = array();
-        foreach ($this->_dirty as $key) {
-            $dirty[$key] = $this->get($key);
-        }
-        return $dirty;
+        return $this->toArray($this->_dirty);
     }
 
     /**
