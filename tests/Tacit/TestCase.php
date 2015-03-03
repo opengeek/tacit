@@ -21,6 +21,28 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $tacit;
 
     /**
+     * Recursively compare multi-dimensional associative array items.
+     *
+     * @param mixed $val1
+     * @param mixed $val2
+     *
+     * @return int 0 if equal, non-zero otherwise
+     */
+    public function compareMultidimensionalArray($val1, $val2)
+    {
+        if (is_array($val1) && is_array($val2)) {
+            $arr = array_uintersect_assoc($val1, $val2, array($this, 'compareMultidimensionalArray'));
+            if (count($arr) == max(count($val1), count($val2))) {
+                return 0;
+            }
+
+            return -1;
+        }
+
+        return strcmp($val1, $val2);
+    }
+
+    /**
      * Get a clean instance of Tacit for use in tests.
      */
     protected function setUp()

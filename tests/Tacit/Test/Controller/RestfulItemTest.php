@@ -102,17 +102,6 @@ class RestfulItemTest extends ControllerTestCase
         }
     }
 
-    public function compareMultidimensionalArray($val1, $val2)
-    {
-        if (is_array($val1) && is_array($val2)) {
-            $arr = array_uintersect_assoc($val1, $val2, array($this, 'compareMultidimensionalArray'));
-            if (count($arr) == max(count($val1), count($val2))) return 0;
-            return -1;
-        }
-
-        return strcmp($val1, $val2);
-    }
-
     public function providerPut()
     {
         return [
