@@ -91,7 +91,7 @@ class RestfulItemTest extends ControllerTestCase
 
             unset($data['password']);
 
-            $matches = array_intersect_assoc($data, $item);
+            $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
             $this->assertEquals($data, $matches);
 
@@ -100,6 +100,17 @@ class RestfulItemTest extends ControllerTestCase
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }
+    }
+
+    public function compareMultidimensionalArray($val1, $val2)
+    {
+        if (is_array($val1) && is_array($val2)) {
+            $arr = array_uintersect_assoc($val1, $val2, array($this, 'compareMultidimensionalArray'));
+            if (count($arr) == max(count($val1), count($val2))) return 0;
+            return -1;
+        }
+
+        return strcmp($val1, $val2);
     }
 
     public function providerPut()
