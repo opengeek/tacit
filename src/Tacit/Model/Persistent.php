@@ -424,24 +424,20 @@ abstract class Persistent
         if ($mask === true) {
             $mask = array_keys($vars);
         }
-        if ($mask === false || empty($mask)) {
-            $array = $vars;
-        } else {
-            $array = array();
-            if (is_array($mask)) {
-                foreach ($mask as $key) {
-                    if (array_key_exists($key, $vars)) {
-                        $varValue = $vars[$key];
-                        if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
-                        $array[$key] = $varValue;
-                    }
+        $array = array();
+        if (is_array($mask) && !empty($mask)) {
+            foreach ($mask as $key) {
+                if (array_key_exists($key, $vars)) {
+                    $varValue = $vars[$key];
+                    if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
+                    $array[$key] = $varValue;
                 }
-            } else {
-                foreach ($vars as $varKey => $varValue) {
-                    if ($mask === false || in_array($varKey, $mask)) {
-                        if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
-                        $array[$varKey] = $varValue;
-                    }
+            }
+        } else {
+            foreach ($vars as $varKey => $varValue) {
+                if ($mask === false || in_array($varKey, $mask)) {
+                    if ($cast === true) $varValue = static::collection($this->getRepository())->cast($varValue);
+                    $array[$varKey] = $varValue;
                 }
             }
         }

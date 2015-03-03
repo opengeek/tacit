@@ -110,6 +110,7 @@ class MockCollection extends Collection
     public function insert($data, $options = [])
     {
         $id = sha1(uniqid('', true));
+        $data['_id'] = $id;
         if (!isset($this->connection[$this->name])) {
             $this->connection[$this->name] = [];
         }
@@ -202,4 +203,4 @@ class MockCollection extends Collection
         }
         return $collection;
     }
-} 
+}

@@ -10,8 +10,6 @@
 
 namespace Tacit\Test\Controller;
 
-use Tacit\Tacit;
-
 /**
  * Test Restful controllers.
  *

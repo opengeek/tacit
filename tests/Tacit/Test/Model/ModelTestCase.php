@@ -30,6 +30,6 @@ abstract class ModelTestCase extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->fixture = new MockRepository();
+        $this->fixture = $this->tacit->container->get('repository');
     }
 }

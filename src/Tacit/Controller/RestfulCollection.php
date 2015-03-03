@@ -60,7 +60,7 @@ abstract class RestfulCollection extends Restful
                     $query->where($criterionKey, $criterion);
                 }
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
-            });
+            }, [], $this->app->container->get('repository'));
         } catch (\Exception $e) {
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
@@ -80,7 +80,7 @@ abstract class RestfulCollection extends Restful
         $modelClass = static::$modelClass;
 
         try {
-            $item = $modelClass::create($this->app->request->post(null, []));
+            $item = $modelClass::create($this->app->request->post(null, []), $this->app->container->get('repository'));
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {

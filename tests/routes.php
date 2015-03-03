@@ -15,6 +15,15 @@ $tacit->any('/', function () use ($tacit) {
     (new \Tacit\Test\Controller\MockRestful($tacit))->handle();
 });
 
+$tacit->group('/collection', function () use ($tacit) {
+    $tacit->any('/', function () use ($tacit) {
+
+    });
+    $tacit->any('/:_id', function ($_id) use ($tacit) {
+        (new \Tacit\Test\Controller\MockRestfulItem($tacit))->handle($_id);
+    });
+});
+
 $tacit->any('/basic-test', function () use ($tacit) {
     $mockRestful = new \Tacit\Test\Controller\MockRestful($tacit);
     if ((new \Tacit\Authorize\Basic())->isValidRequest($mockRestful)) {

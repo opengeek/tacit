@@ -68,6 +68,7 @@ class PersistentTest extends ModelTestCase
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance());
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([]));
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([
+            '_id'      => 99999,
             'name'     => 'an instance',
             'text'     => 'an instance\'s text',
             'date'     => new \DateTime(),
@@ -151,6 +152,7 @@ class PersistentTest extends ModelTestCase
         return [
             [
                 [
+                    '_id' => '8888',
                     'name' => 'create test',
                     'text' => 'this is a bunch of text for a create test',
                     'integer' => 13,

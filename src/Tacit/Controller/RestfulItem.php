@@ -15,7 +15,6 @@ use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Collection;
-use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelValidationException;
 
 /**
@@ -42,7 +41,7 @@ abstract class RestfulItem extends Restful
         $modelClass = static::$modelClass;
 
         /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($this->criteria(func_get_args()));
+        $item = $modelClass::findOne($this->criteria(func_get_args()), [], $this->app->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
@@ -77,13 +76,13 @@ abstract class RestfulItem extends Restful
         $fields = $this->app->request->get('fields', []);
 
         /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria, $fields);
+        $item = $modelClass::findOne($criteria, $fields, $this->app->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
         }
 
-        $this->respondWithItem($item, $this->transformer());
+        $this->respondWithItem($item, new static::$transformer());
     }
 
     /**
@@ -102,7 +101,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria(func_get_args());
 
         /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria);
+        $item = $modelClass::findOne($criteria, [], $this->app->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
@@ -117,7 +116,7 @@ abstract class RestfulItem extends Restful
             throw new ServerErrorException($this, 'Error patching resource', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithItem($item, $this->transformer());
+        $this->respondWithItem($item, new static::$transformer());
     }
 
     /**
@@ -134,7 +133,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria(func_get_args());
 
         /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria);
+        $item = $modelClass::findOne($criteria, [], $this->app->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
@@ -144,7 +143,7 @@ abstract class RestfulItem extends Restful
             /** @var \Tacit\Model\Persistent $newItem */
             $newItem = new $modelClass();
             $data = array_merge_recursive(
-                $newItem->toArray(),
+                array_filter($newItem->toArray(), [$this, 'filterNull']),
                 $this->app->request->post(null, [])
             );
             $item->fromArray($data, Collection::getMask($item));
@@ -155,6 +154,18 @@ abstract class RestfulItem extends Restful
             throw new ServerErrorException($this, 'Error updating resource', $e->getMessage(), null, $e);
         }
 
-        $this->respondWithItem($item, $this->transformer());
+        $this->respondWithItem($item, new static::$transformer());
+    }
+
+    protected function filterNull($item)
+    {
+        if (is_array($item)) {
+            return array_filter($item, [$this, 'filterNull']);
+        }
+
+        if ($item === null) {
+            return false;
+        }
+        return true;
     }
 }
