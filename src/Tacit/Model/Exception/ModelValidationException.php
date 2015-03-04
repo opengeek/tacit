@@ -59,7 +59,7 @@ class ModelValidationException extends ModelException
         $output = [ parent::__toString() ];
         foreach ($this->validationMessages as $field => $errors) {
             foreach ($errors as $error) {
-                $output[] .= "[{$field}#{$errors['code']}] {$error['message']}";
+                $output[] .= "[{$field}#{$error['code']}] {$error['message']}";
             }
         }
         return implode("\n", $output);
