@@ -388,13 +388,17 @@ abstract class Persistent
                 return $this->insert();
             } catch (ModelException $e) {
                 throw $e;
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                throw new ModelException('Error creating item in collection: ' . $e->getMessage(), $e->getCode(), $e);
+            }
         } elseif (!empty($this->_dirty)) {
             try {
                 return $this->patch();
             } catch (ModelException $e) {
                 throw $e;
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                throw new ModelException('Error updating item in collection: ' . $e->getMessage(), $e->getCode(), $e);
+            }
         }
         return false;
     }
