@@ -62,6 +62,39 @@ class MockCollection extends Collection
     }
 
     /**
+     * Get an array of distinct values from an array field in the model.
+     *
+     * @param string $field The name of the field to get distinct values from.
+     * @param null|array|\Closure $query The query to use to filter the collection.
+     *
+     * @return array An array of unique values in the specified field from a collection filtered by the query.
+     */
+    public function distinct($field, $query = null)
+    {
+        if (null !== $query) {
+            $collection = $this->filter($this->connection[$this->name], $query);
+        } else {
+            $collection = $this->connection[$this->name];
+        }
+
+        $distinct = [];
+        foreach ($collection as $id => $item) {
+            if (isset($item[$field])) {
+                if (is_array($item[$field])) {
+                    foreach ($item[$field] as $value) {
+                        $distinct[] = $value;
+                    }
+                } else {
+                    $distinct[] = $item[$field];
+                }
+            }
+        }
+        $distinct = array_unique($distinct);
+        sort($distinct);
+        return $distinct;
+    }
+
+    /**
      * Drop the collection container from the Repository.
      *
      * @return bool Returns true if successfully dropped; false otherwise.

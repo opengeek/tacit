@@ -38,7 +38,7 @@ class PersistentTest extends ModelTestCase
                 'float' => (float)"{$i}.{$i}",
                 'date'  => new \DateTime(),
                 'password' => 'abcdefg',
-                'arrayOfStrings' => []
+                'arrayOfStrings' => ['string #' . (($i % 3) + 1)]
             ];
         }
         return $data;
@@ -307,5 +307,10 @@ class PersistentTest extends ModelTestCase
                 ['float' => 3.14]
             ]
         ];
+    }
+
+    public function testDistinct()
+    {
+        $this->assertEquals(['string #1','string #2','string #3'], MockPersistent::collection($this->fixture)->distinct('arrayOfStrings'));
     }
 }

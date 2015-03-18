@@ -114,6 +114,16 @@ abstract class Collection
     abstract public function count($query);
 
     /**
+     * Get an array of distinct values from an array field in the model.
+     *
+     * @param string $field The name of the field to get distinct values from.
+     * @param null|array|\Closure $query The query to use to filter the collection.
+     *
+     * @return array An array of unique values in the specified field from a collection filtered by the query.
+     */
+    abstract public function distinct($field, $query = null);
+
+    /**
      * Drop the collection container from the Repository.
      *
      * @return bool Returns true if successfully dropped; false otherwise.
