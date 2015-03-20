@@ -52,7 +52,7 @@ abstract class RestfulCollection extends Restful
         $orderDir = $this->app->request->get('sort_dir', 'desc');
 
         try {
-            $total = $modelClass::count($criteria);
+            $total = $modelClass::count($criteria, $this->app->container->get('repository'));
 
             $collection = $modelClass::find(function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
                 /** @var Query|object $query */
