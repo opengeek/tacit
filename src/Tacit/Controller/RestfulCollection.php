@@ -92,7 +92,7 @@ abstract class RestfulCollection extends Restful
 
         $this->respondWithItemCreated(
             $item,
-            $itemController::url([$item->getKeyField() => $item->getKey()], false),
+            $itemController::url($this->app, [$item->getKeyField() => $item->getKey()], false),
             $this->transformer()
         );
     }

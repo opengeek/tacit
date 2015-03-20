@@ -155,16 +155,17 @@ abstract class Restful
     /**
      * Return a RESTful ref element for this controller.
      *
+     * @param Tacit      $app
      * @param array      $routeParams
      * @param array|bool $params
      * @param string     $suffix
      *
      * @return array
      */
-    public static function ref(array $routeParams = [], $params = false, $suffix = '')
+    public static function ref(Tacit &$app, array $routeParams = [], $params = false, $suffix = '')
     {
         return [
-            'href' => static::url($routeParams, $params),
+            'href' => static::url($app, $routeParams, $params),
             'title' => static::title() . (!empty($suffix) ? " {$suffix}" : '')
         ];
     }
@@ -181,14 +182,14 @@ abstract class Restful
     /**
      * Get the URL for this Restful controller.
      *
-     * @param array $routeParams
+     * @param Tacit      $app
+     * @param array      $routeParams
      * @param array|bool $params
      *
      * @return string
      */
-    public static function url(array $routeParams = [], $params = [])
+    public static function url(Tacit &$app, array $routeParams = [], $params = [])
     {
-        $app = Tacit::getInstance();
         $url = $app->request->getUrl();
         $url .= $app->urlFor(static::name(), $routeParams);
         if (false !== $params) {
@@ -506,10 +507,10 @@ abstract class Restful
                     $limit = (int)$this->app->request->get('limit', 25);
                     $offset = (int)$this->app->request->get('offset', 0);
                     if ($total > $offset) {
-                        $links['first'] = static::ref($this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
-                        $links['prev'] = ($offset > 0) ? static::ref($this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
-                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
-                        $links['last'] = static::ref($this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
+                        $links['first'] = static::ref($this->app, $this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
+                        $links['prev'] = ($offset > 0) ? static::ref($this->app, $this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
+                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->app, $this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
+                        $links['last'] = static::ref($this->app, $this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
                     $bodyRaw['_links'] = $this->refs(array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
