@@ -8,36 +8,33 @@
  * file that was distributed with this source code.
  */
 
-/** @var \Tacit\Tacit $tacit */
-$tacit =& $this->tacit;
-
-$tacit->any('/', function () use ($tacit) {
-    (new \Tacit\Test\Controller\MockRestful($tacit))->handle();
+$this->tacit->any('/', function () {
+    (new \Tacit\Test\Controller\MockRestful($this->tacit))->handle();
 });
 
-$tacit->group('/collection', function () use ($tacit) {
-    $tacit->any('/', function () use ($tacit) {
-
-    });
-    $tacit->any('/:_id', function ($_id) use ($tacit) {
-        (new \Tacit\Test\Controller\MockRestfulItem($tacit))->handle($_id);
-    });
+$this->tacit->group('/collection', function () {
+    $this->tacit->any('/', function () {
+        (new \Tacit\Test\Controller\MockRestfulCollection($this->tacit))->handle();
+    })->name('MockRestfulCollection');
+    $this->tacit->any('/:_id', function ($_id) {
+        (new \Tacit\Test\Controller\MockRestfulItem($this->tacit))->handle($_id);
+    })->name('MockRestfulItem');
 });
 
-$tacit->any('/basic-test', function () use ($tacit) {
-    $mockRestful = new \Tacit\Test\Controller\MockRestful($tacit);
+$this->tacit->any('/basic-test', function () {
+    $mockRestful = new \Tacit\Test\Controller\MockRestful($this->tacit);
     if ((new \Tacit\Authorize\Basic())->isValidRequest($mockRestful)) {
         $mockRestful->handle();
     } else {
-        $tacit->halt(401, 'Unauthorized Error');
+        $this->tacit->halt(401, 'Unauthorized Error');
     }
 });
 
-$tacit->any('/hmac-test', function () use ($tacit) {
-    $mockRestful = new \Tacit\Test\Controller\MockRestful($tacit);
+$this->tacit->any('/hmac-test', function () {
+    $mockRestful = new \Tacit\Test\Controller\MockRestful($this->tacit);
     if ((new \Tacit\Authorize\HMAC())->isValidRequest($mockRestful)) {
         $mockRestful->handle();
     } else {
-        $tacit->halt(401, 'Unauthorized Error');
+        $this->tacit->halt(401, 'Unauthorized Error');
     }
 });
