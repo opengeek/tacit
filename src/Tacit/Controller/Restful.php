@@ -513,12 +513,10 @@ abstract class Restful
                     }
                     $bodyRaw['_links'] = $this->refs(array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
-                    if ($total > $offset) {
-                        $bodyRaw['total_items'] = $total;
-                        $bodyRaw['returned_items'] = count($scope['data']);
-                        $bodyRaw['limit'] = $limit;
-                        $bodyRaw['offset'] = $offset;
-                    }
+                    $bodyRaw['total_items'] = $total;
+                    $bodyRaw['returned_items'] = count($scope['data']);
+                    $bodyRaw['limit'] = $limit;
+                    $bodyRaw['offset'] = $offset;
                     break;
                 case self::RESOURCE_TYPE_ERROR:
                     $bodyRaw = $scope['data'];
