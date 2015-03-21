@@ -39,23 +39,23 @@ abstract class Collection
     protected $peer;
 
     /**
-     * Get the public fields of an object as an array.
+     * Get the public fields of an object or class as an array.
      *
-     * @param object $object An object to get public fields from.
+     * @param object|string $object An object or class name to get public fields from.
      *
-     * @return array An associative array of public fields from the object.
+     * @return array An associative array of public fields from the object or class.
      */
     public static function getPublicVars($object)
     {
-        return get_object_vars($object);
+        return is_string($object) ? get_class_vars($object) : get_object_vars($object);
     }
 
     /**
      * Get a field mask consisting of public fields minus excludes.
      *
-     * @param object $object An object to produce a mask for.
-     * @param array  $exclude An array of fields to exclude from the mask.
-     * @param array  $excludeDefaults An array of default fields to exclude from
+     * @param object|string $object An object or class name to produce a mask for.
+     * @param array         $exclude An array of fields to exclude from the mask.
+     * @param array         $excludeDefaults An array of default fields to exclude from
      * the mask.
      *
      * @return array A mask of public field names for an object minus various excludes.

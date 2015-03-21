@@ -308,9 +308,4 @@ class PersistentTest extends ModelTestCase
             ]
         ];
     }
-
-    public function testDistinct()
-    {
-        $this->assertEquals(['string #1','string #2','string #3'], MockPersistent::collection($this->fixture)->distinct('arrayOfStrings'));
-    }
 }
