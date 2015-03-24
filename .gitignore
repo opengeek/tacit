@@ -32,3 +32,6 @@ test-*.json
 
 # ignore composer.lock
 /composer.lock
+
+# ignore generated mkdocs /site/
+/site/
