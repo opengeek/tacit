@@ -1,0 +1,4 @@
+site_name: Tacit Documentation
+pages:
+- [index.md, Home]
+theme: readthedocs
