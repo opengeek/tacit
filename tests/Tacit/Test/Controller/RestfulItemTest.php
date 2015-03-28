@@ -90,8 +90,6 @@ class RestfulItemTest extends ControllerTestCase
 
         } catch (RestfulException $e) {
             $this->fail($e->getMessage());
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
         }
     }
 

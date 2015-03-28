@@ -73,7 +73,7 @@ abstract class RestfulItem extends Restful
 
         $criteria = $this->criteria(func_get_args());
 
-        $fields = explode(',', $this->app->request->get('fields', ''));
+        $fields = array_filter(explode(',', $this->app->request->get('fields', '')));
 
         /** @var \Tacit\Model\Persistent $item */
         $item = $modelClass::findOne($criteria, $fields, $this->app->container->get('repository'));
