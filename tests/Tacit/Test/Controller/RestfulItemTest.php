@@ -12,6 +12,7 @@ namespace Tacit\Test\Controller;
 
 
 use Tacit\Controller\Exception\RestfulException;
+use Tacit\Model\Collection;
 use Tacit\Test\Model\MockPersistent;
 use Tacit\Test\Model\MockRepository;
 
@@ -61,6 +62,67 @@ class RestfulItemTest extends ControllerTestCase
     public function tearDown()
     {
         MockPersistent::collection($this->fixture)->truncate();
+    }
+
+    /**
+     * Test a GET request for a RestfulItem.
+     */
+    public function testGet()
+    {
+        /** @var MockPersistent $itemObj */
+        $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_METHOD' => 'GET',
+        ]);
+
+        try {
+            $response = $this->tacit->invoke();
+
+            $item = json_decode($response->getBody(), true);
+
+            $data = $itemObj->toArray(Collection::getMask($itemObj));
+
+            $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
+
+            $this->assertEquals($data, $matches);
+
+        } catch (RestfulException $e) {
+            $this->fail($e->getMessage());
+        } catch (\Exception $e) {
+            $this->fail($e->getMessage());
+        }
+    }
+
+    /**
+     * Test a GET request for a RestfulItem with fields specified to return.
+     */
+    public function testGetWithFields()
+    {
+        /** @var MockPersistent $itemObj */
+        $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'QUERY_STRING' => 'fields=name,text',
+            'REQUEST_METHOD' => 'GET',
+        ]);
+
+        try {
+            $response = $this->tacit->invoke();
+
+            $item = json_decode($response->getBody(), true);
+
+            $data = $itemObj->toArray(Collection::getMask($itemObj, ['integer', 'float', 'date', 'arrayOfStrings']));
+
+            $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
+
+            $this->assertEquals($data, $matches);
+
+        } catch (RestfulException $e) {
+            $this->fail($e->getMessage());
+        }
     }
 
     /**
