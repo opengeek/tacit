@@ -265,11 +265,13 @@ abstract class Persistent
     /**
      * Get an array of properties with dirty values.
      *
+     * @param bool $cast
+     *
      * @return array
      */
-    public function dirty()
+    public function dirty($cast = true)
     {
-        return $this->toArray($this->_dirty);
+        return $this->toArray($this->_dirty, $cast);
     }
 
     /**

@@ -79,6 +79,6 @@ class MockPersistent extends Persistent
      */
     protected function patch()
     {
-        return (static::collection($this->getRepository())->update(array($this->getKeyField() => $this->getKey()), $this->dirty()) !== false);
+        return (static::collection($this->getRepository())->update(array($this->getKeyField() => $this->getKey()), $this->dirty(false)) !== false);
     }
 }
