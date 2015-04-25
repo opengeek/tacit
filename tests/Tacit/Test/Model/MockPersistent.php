@@ -29,6 +29,7 @@ class MockPersistent extends Persistent
         'integer' => 'type:integer',
         'float' => 'type:float',
         'date' => 'classof:\\DateTime,null',
+        'boolean' => 'type:boolean',
         'password' => 'type:string|notempty|minlen:6',
         'arrayOfStrings' => 'type:array',
     ];
@@ -45,6 +46,8 @@ class MockPersistent extends Persistent
     public $integer;
     /** @var float */
     public $float;
+    /** @var bool */
+    public $boolean = true;
     /** @var string */
     public $password;
     /** @var string */

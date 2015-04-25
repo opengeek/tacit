@@ -22,6 +22,7 @@ class MongaPersistentObject extends MongaPersistent
         'integer' => 'type:integer',
         'float' => 'type:float',
         'date' => 'classof:\\MongoDate,null',
+        'boolean' => 'type:boolean',
         'password' => 'type:string|notempty|minlen:6',
         'arrayOfStrings' => 'type:array',
     ];
@@ -31,6 +32,25 @@ class MongaPersistentObject extends MongaPersistent
     public $integer;
     public $float;
     public $date;
+    public $boolean = true;
     public $password;
     public $arrayOfStrings = [];
+
+    public function set($key, $value)
+    {
+        switch ($key) {
+            case 'date':
+                if (!$value instanceof \MongoDate) {
+                    if ($value instanceof \DateTime) {
+                        $value = new \MongoDate($value->getTimestamp());
+                    } elseif (is_string($value)) {
+                        $value = new \MongoDate(strtotime($value));
+                    } elseif (is_int($value)) {
+                        $value = new \MongoDate($value);
+                    }
+                }
+                break;
+        }
+        parent::set($key, $value);
+    }
 }

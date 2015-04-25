@@ -21,6 +21,17 @@ $this->tacit->group('/collection', function () {
     })->name('MockRestfulItem');
 });
 
+$this->tacit->group('/monga', function () {
+    $this->tacit->group('/collection', function () {
+//        $this->tacit->any('/', function () {
+//            (new \Tacit\Test\Controller\Monga\MongaRestfulCollection($this->tacit))->handle();
+//        })->name('MongaRestfulCollection');
+        $this->tacit->any('/:_id', function ($_id) {
+            (new \Tacit\Test\Controller\Monga\MongaRestfulItem($this->tacit))->handle($_id);
+        })->name('MongaRestfulItem');
+    });
+});
+
 $this->tacit->any('/basic-test', function () {
     $mockRestful = new \Tacit\Test\Controller\MockRestful($this->tacit);
     if ((new \Tacit\Authorize\Basic())->isValidRequest($mockRestful)) {

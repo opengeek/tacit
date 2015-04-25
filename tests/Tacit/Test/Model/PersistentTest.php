@@ -158,6 +158,7 @@ class PersistentTest extends ModelTestCase
                     'integer' => 13,
                     'float' => 3.14,
                     'date' => new \DateTime(),
+                    'boolean' => true,
                     'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                     'arrayOfStrings' => [
                         'string #1',
@@ -200,6 +201,7 @@ class PersistentTest extends ModelTestCase
                     'integer' => 13,
                     'float' => 3.14,
                     'date' => new \DateTime(),
+                    'boolean' => false,
                     'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                     'arrayOfStrings' => [
                         'string #1',
@@ -305,7 +307,12 @@ class PersistentTest extends ModelTestCase
                 10,
                 [],
                 ['float' => 3.14]
-            ]
+            ],
+            [
+                10,
+                [],
+                ['float' => 3.14, 'boolean' => false]
+            ],
         ];
     }
 }

@@ -142,7 +142,7 @@ abstract class RestfulItem extends Restful
         try {
             /** @var \Tacit\Model\Persistent $newItem */
             $newItem = new $modelClass();
-            $data = array_merge_recursive(
+            $data = array_replace_recursive(
                 array_filter($newItem->toArray(), [$this, 'filterNull']),
                 $this->app->request->post(null, [])
             );

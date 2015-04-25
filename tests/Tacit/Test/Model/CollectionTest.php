@@ -68,7 +68,7 @@ class CollectionTest extends ModelTestCase
         $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', $object);
         $this->assertEquals(
             [
-                '_id', 'name', 'text', 'date', 'integer', 'float', 'password', 'arrayOfStrings'
+                '_id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'
             ],
             array_keys(Collection::getPublicVars($object))
         );
@@ -80,7 +80,7 @@ class CollectionTest extends ModelTestCase
     public function testGetPublicVarsFromClass()
     {
         $this->assertEquals(
-            ['_id', 'name', 'text', 'date', 'integer', 'float', 'password', 'arrayOfStrings'],
+            ['_id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'],
             array_keys(Collection::getPublicVars('Tacit\\Test\\Model\\MockPersistent'))
         );
     }
@@ -108,15 +108,15 @@ class CollectionTest extends ModelTestCase
     {
         return [
             [
-                ['name', 'text', 'date', 'integer', 'float', 'arrayOfStrings'],
+                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
                 []
             ],
             [
-                ['text', 'date', 'integer', 'float', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
                 ['name']
             ],
             [
-                ['text', 'date', 'integer', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings'],
                 ['name', 'float']
             ],
         ];
@@ -142,15 +142,15 @@ class CollectionTest extends ModelTestCase
     {
         return [
             [
-                ['name', 'text', 'date', 'integer', 'float', 'arrayOfStrings'],
+                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
                 []
             ],
             [
-                ['text', 'date', 'integer', 'float', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
                 ['name']
             ],
             [
-                ['text', 'date', 'integer', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings'],
                 ['name', 'float']
             ],
         ];

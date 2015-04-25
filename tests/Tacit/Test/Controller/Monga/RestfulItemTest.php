@@ -8,23 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Tacit\Test\Controller;
+namespace Tacit\Test\Controller\Monga;
 
 
 use Tacit\Controller\Exception\RestfulException;
-use Tacit\Model\Collection;
-use Tacit\Test\Model\MockPersistent;
-use Tacit\Test\Model\MockRepository;
+use Tacit\Model\Monga\MongaCollection;
+use Tacit\Test\Model\Monga\MongaPersistentObject;
 
 class RestfulItemTest extends ControllerTestCase
 {
-    /**
-     * A MockRepository fixture for the RestfulItem test cases.
-     *
-     * @var MockRepository
-     */
-    public $fixture;
-
     /**
      * Get fixture data starting with the specified index.
      *
@@ -42,6 +34,7 @@ class RestfulItemTest extends ControllerTestCase
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
                 'date'  => new \DateTime(),
+                'boolean' => (bool)rand(0,1),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => []
             ];
@@ -49,19 +42,20 @@ class RestfulItemTest extends ControllerTestCase
         return $data;
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->fixture = $this->tacit->container->get('repository');
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($item, $this->fixture);
+            MongaPersistentObject::create($item, $this->fixture);
         }
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
-        MockPersistent::collection($this->fixture)->truncate();
+        MongaPersistentObject::collection($this->fixture)->truncate();
+
+        parent::tearDown();
     }
 
     /**
@@ -69,11 +63,11 @@ class RestfulItemTest extends ControllerTestCase
      */
     public function testGet()
     {
-        /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        /** @var MongaPersistentObject $itemObj */
+        $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'PATH_INFO' => '/monga/collection/' . (string)$itemObj->_id,
             'REQUEST_METHOD' => 'GET',
         ]);
 
@@ -82,7 +76,7 @@ class RestfulItemTest extends ControllerTestCase
 
             $item = json_decode($response->getBody(), true);
 
-            $data = $itemObj->toArray(Collection::getMask($itemObj));
+            $data = $itemObj->toArray(MongaCollection::getMask($itemObj));
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -98,11 +92,11 @@ class RestfulItemTest extends ControllerTestCase
      */
     public function testGetWithFields()
     {
-        /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        /** @var MongaPersistentObject $itemObj */
+        $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
@@ -112,7 +106,7 @@ class RestfulItemTest extends ControllerTestCase
 
             $item = json_decode($response->getBody(), true);
 
-            $data = $itemObj->toArray(Collection::getMask($itemObj, ['integer', 'float', 'date', 'arrayOfStrings']));
+            $data = $itemObj->toArray(MongaCollection::getMask($itemObj, ['integer', 'float', 'date', 'boolean', 'arrayOfStrings']));
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -134,11 +128,11 @@ class RestfulItemTest extends ControllerTestCase
      */
     public function testPut(array $data)
     {
-        /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne(['name' => $data['name']], [], $this->fixture);
+        /** @var MongaPersistentObject $itemObj */
+        $itemObj = MongaPersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => json_encode($data)
@@ -157,8 +151,6 @@ class RestfulItemTest extends ControllerTestCase
 
         } catch (RestfulException $e) {
             $this->fail($e->getMessage());
-        } catch (\Exception $e) {
-            $this->fail($e->getMessage());
         }
     }
 
@@ -171,16 +163,18 @@ class RestfulItemTest extends ControllerTestCase
                     'text'  => "Text of MockPersistent #1",
                     'integer'   => 1,
                     'float' => 1.1,
-                    'date'  => (new \DateTime())->format(DATE_ISO8601),
+                    'date'  => (new \DateTime("@" . time()))->format(DATE_ISO8601),
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
-                ],
+                ]
+            ],
+            [
                 [
                     'name'  => "MockPersistent #2",
                     'text'  => "Text of MockPersistent #2",
                     'integer'   => 2,
                     'float' => 2.2,
-                    'date'  => (new \DateTime())->format(DATE_ISO8601),
+                    'date'  => (new \DateTime("@" . time()))->format(DATE_ISO8601),
                     'boolean' => false,
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
