@@ -80,7 +80,9 @@ abstract class RestfulCollection extends Restful
         $modelClass = static::$modelClass;
 
         try {
-            $item = $modelClass::create($this->app->request->post(null, []), $this->app->container->get('repository'));
+            $criteria = $this->criteria(func_get_args());
+            $data = !empty($criteria) ? array_replace_recursive($this->app->request->post(null, []), $criteria) : $this->app->request->post(null, []);
+            $item = $modelClass::create($data, $this->app->container->get('repository'));
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
