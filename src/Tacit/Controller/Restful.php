@@ -504,8 +504,10 @@ abstract class Restful
                 case self::RESOURCE_TYPE_COLLECTION:
                     $links = array();
                     $total = $meta['total'];
-                    $limit = (int)$this->app->request->get('limit', 25);
-                    $offset = (int)$this->app->request->get('offset', 0);
+                    $limit = isset($meta['limit']) && (int)$meta['limit'] > 0
+                        ? (int)$meta['limit']
+                        : (int)$this->app->request->get('limit', 25);
+                    $offset = isset($meta['offset']) ? (int)$meta['offset'] : (int)$this->app->request->get('offset', 0);
                     if ($total > $offset) {
                         $links['first'] = static::ref($this->app, $this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
                         $links['prev'] = ($offset > 0) ? static::ref($this->app, $this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
