@@ -16,6 +16,7 @@ use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
+use Tacit\Operations\OperationalException;
 
 /**
  * An abstract representation of a RESTful item from a RESTful collection.
@@ -108,8 +109,13 @@ abstract class RestfulItem extends Restful
         }
 
         try {
-            $item->fromArray($this->app->request->post(null, []), Collection::getMask($item));
+            $data = $this->app->request->post(null, []);
+            $data = $this->patchBeforeSet($data);
+            
+            $item->fromArray($data, Collection::getMask($item));
             $item->save();
+        } catch (OperationalException $e) {
+            $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
@@ -146,8 +152,13 @@ abstract class RestfulItem extends Restful
                 array_filter($newItem->toArray(), [$this, 'filterNull']),
                 $this->app->request->post(null, [])
             );
+            
+            $data = $this->putBeforeSet($data);
+            
             $item->fromArray($data, Collection::getMask($item));
             $item->save();
+        } catch (OperationalException $e) {
+            $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
@@ -155,6 +166,28 @@ abstract class RestfulItem extends Restful
         }
 
         $this->respondWithItem($item, new static::$transformer());
+    }
+
+    /**
+     * Executes during PUT request, before data is set to the Item
+     *
+     * @param $data
+     * @return array
+     */
+    protected function putBeforeSet($data)
+    {
+        return $data;
+    }
+
+    /**
+     * Executes during PATCH request, before data is set to the Item
+     *
+     * @param $data
+     * @return array
+     */
+    protected function patchBeforeSet($data)
+    {
+        return $data;
     }
 
     protected function filterNull($item)

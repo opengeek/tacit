@@ -15,6 +15,7 @@ use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Query;
+use Tacit\Operations\OperationalException;
 
 /**
  * An abstract representation of a RESTful collection controller.
@@ -82,7 +83,11 @@ abstract class RestfulCollection extends Restful
         try {
             $criteria = $this->criteria(func_get_args());
             $data = !empty($criteria) ? array_replace_recursive($this->app->request->post(null, []), $criteria) : $this->app->request->post(null, []);
+            $data = $this->postBeforeSet($data);
+            
             $item = $modelClass::create($data, $this->app->container->get('repository'));
+        } catch (OperationalException $e) {
+            $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (\Exception $e) {
@@ -97,5 +102,16 @@ abstract class RestfulCollection extends Restful
             $itemController::url($this->app, [$item->getKeyField() => $item->getKey()], false),
             $this->transformer()
         );
+    }
+
+    /**
+     * Executes during POST request, before data is set to the new Item
+     *
+     * @param $data
+     * @return array
+     */
+    protected function postBeforeSet($data)
+    {
+        return $data;
     }
 }
