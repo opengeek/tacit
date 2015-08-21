@@ -40,7 +40,7 @@ class Rules
         }
     }
 
-    public static function email($field, $value, $args)
+    public static function email($field, $value, $args = [])
     {
         if (is_array($value)) {
             foreach ($value as $subVal) {
@@ -71,14 +71,14 @@ class Rules
         }
     }
 
-    public static function notempty($field, $value, $args)
+    public static function notempty($field, $value, $args = [])
     {
         if (empty($value) && $value !== '0') {
             throw new ValidationFailedException(sprintf('%1s cannot have an empty value', $field), 422);
         }
     }
 
-    public static function required($field, $value, $args)
+    public static function required($field, $value, $args = [])
     {
         if ($value === null) {
             throw new ValidationFailedException(sprintf('%1s is a required field', $field), 422);
