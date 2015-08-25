@@ -19,7 +19,7 @@ class Rules
     {
         if (isset(self::$rules[$name]) && is_callable(self::$rules[$name])) {
             $callable = self::$rules[$name];
-            return $callable(array_shift($arguments), array_shift($arguments), array_shift($arguments));
+            return $callable(array_shift($arguments), array_shift($arguments), array_shift($arguments), array_shift($arguments));
         }
         throw new \BadMethodCallException(sprintf('%1s is not a valid Rule', $name), 500);
     }
@@ -29,7 +29,7 @@ class Rules
         self::$rules[$name] = $callable;
     }
 
-    public static function classof($field, $value, $args)
+    public static function classof($field, $value, $args = [], $context = null)
     {
         $class = $args[0];
         $allowNull = isset($args[1]) && $args[1] === 'null';
@@ -40,7 +40,7 @@ class Rules
         }
     }
 
-    public static function email($field, $value, $args = [])
+    public static function email($field, $value, $args = [], $context = null)
     {
         if (is_array($value)) {
             foreach ($value as $subVal) {
@@ -55,7 +55,7 @@ class Rules
         }
     }
 
-    public static function maxlen($field, $value, $args)
+    public static function maxlen($field, $value, $args, $context = null)
     {
         $length = (integer)$args[0];
         if (!is_string($value) || strlen($value) > $length) {
@@ -63,7 +63,7 @@ class Rules
         }
     }
 
-    public static function minlen($field, $value, $args)
+    public static function minlen($field, $value, $args = [], $context = null)
     {
         $length = (integer)$args[0];
         if (!is_string($value) || strlen($value) < $length) {
@@ -71,21 +71,21 @@ class Rules
         }
     }
 
-    public static function notempty($field, $value, $args = [])
+    public static function notempty($field, $value, $args = [], $context = null)
     {
         if (empty($value) && $value !== '0') {
             throw new ValidationFailedException(sprintf('%1s cannot have an empty value', $field), 422);
         }
     }
 
-    public static function required($field, $value, $args = [])
+    public static function required($field, $value, $args = [], $context = null)
     {
         if ($value === null) {
             throw new ValidationFailedException(sprintf('%1s is a required field', $field), 422);
         }
     }
 
-    public static function strlen($field, $value, $args)
+    public static function strlen($field, $value, $args = [], $context = null)
     {
         $length = (integer)$args[0];
         if (!is_string($value) || strlen($value) !== $length) {
@@ -93,7 +93,7 @@ class Rules
         }
     }
 
-    public static function type($field, $value, $args)
+    public static function type($field, $value, $args = [], $context = null)
     {
         $type = strtolower($args[0]);
         if ($type === 'float') {
@@ -108,7 +108,7 @@ class Rules
         }
     }
 
-    public static function url($field, $value, $args)
+    public static function url($field, $value, $args = [], $context = null)
     {
         $allowNull = isset($args[0]) && $args[0] === 'null';
         if (!(null === $value && true === $allowNull)) {

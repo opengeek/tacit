@@ -81,7 +81,7 @@ class Validator
                     $rule = $ruleExploded[0];
                     $ruleArgs = isset($ruleExploded[1]) ? explode(',', $ruleExploded[1]) : [];
                     try {
-                        Rules::$rule($field, $fieldValue, $ruleArgs);
+                        Rules::$rule($field, $fieldValue, $ruleArgs, $data);
                     } catch (ValidationFailedException $failure) {
                         $this->addFailure($field, $failure->getMessage(), $failure->getCode());
                         $this->failed = true;
