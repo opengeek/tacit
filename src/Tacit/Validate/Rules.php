@@ -55,7 +55,7 @@ class Rules
         }
     }
 
-    public static function maxlen($field, $value, $args, $context = null)
+    public static function maxlen($field, $value, $args = [], $context = null)
     {
         $length = (integer)$args[0];
         if (!is_string($value) || strlen($value) > $length) {
