@@ -65,12 +65,14 @@ class Validator
      * @param array|object|Persistent $input The input data to check.
      * @param bool $all If true, all rules will be checked even if the field
      * does not exist in the input data.
+     * @param array|object $context Contextual data that can be used by the Rules.
      *
      * @return bool True if all Rules pass, false otherwise.
      */
-    public function check($input, $all = false)
+    public function check($input, $all = false, $context = [])
     {
         $data = new \ArrayIterator($input);
+        $context = new \ArrayIterator($context);
         foreach ($this->ruleSet as $field => $rules) {
             if ($all || $data->offsetExists($field)) {
                 $fieldValue = $data->offsetExists($field)
@@ -81,7 +83,7 @@ class Validator
                     $rule = $ruleExploded[0];
                     $ruleArgs = isset($ruleExploded[1]) ? explode(',', $ruleExploded[1]) : [];
                     try {
-                        Rules::$rule($field, $fieldValue, $ruleArgs, $data);
+                        Rules::$rule($field, $fieldValue, $ruleArgs, $context);
                     } catch (ValidationFailedException $failure) {
                         $this->addFailure($field, $failure->getMessage(), $failure->getCode());
                         $this->failed = true;

@@ -462,7 +462,7 @@ abstract class Persistent
     {
         $this->_validator = Validator::instance(static::validationRules($rules));
         $all = empty($mask);
-        $passed = $this->_validator->check($this->toArray($mask, false), $all);
+        $passed = $this->_validator->check($this->toArray($mask, false), $all, $this->toArray([], false));
         return $passed === true ? true : $this->_validator->failures();
     }
 
