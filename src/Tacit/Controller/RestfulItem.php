@@ -149,7 +149,7 @@ abstract class RestfulItem extends Restful
             /** @var \Tacit\Model\Persistent $newItem */
             $newItem = new $modelClass();
             $data = array_replace_recursive(
-                array_filter($newItem->toArray(), [$this, 'filterNull']),
+                $newItem->toArray(),
                 $this->app->request->post(null, [])
             );
             

@@ -162,6 +162,29 @@ class RestfulItemTest extends ControllerTestCase
         }
     }
 
+    public function testPartialPut()
+    {
+        /** @var MockPersistent $itemObj */
+        $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+
+        $this->mockEnvironment([
+            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_METHOD' => 'PUT',
+            'CONTENT_TYPE' => 'application/json',
+            'slim.input' => json_encode([
+                'name' => 'New MockPersistent #1',
+                'password' => 'new_password'
+            ])
+        ]);
+
+        $response = $this->tacit->invoke();
+
+        $item = json_decode($response->getBody(), true);
+
+        $this->assertEquals('New MockPersistent #1', $item['name']);
+        $this->assertNull($item['text']);
+    }
+
     public function providerPut()
     {
         return [
