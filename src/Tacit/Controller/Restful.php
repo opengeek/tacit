@@ -572,14 +572,9 @@ abstract class Restful
         $url .= $request->getRootUri();
         $url .= $request->getResourceUri();
         $getParams = $request->get();
-        $getParams = array_merge($getParams, $params);
+        $getParams = array_replace_recursive($getParams, $params);
         if (!empty($getParams)) {
-            $url .= '?';
-            $qs = array();
-            foreach ($getParams as $qKey => $qValue) {
-                $qs[] = urlencode($qKey) . "=" . urlencode($qValue);
-            }
-            $url .= implode('&', $qs);
+            $url .= '?' . http_build_query($getParams);
         }
         return $url;
     }
