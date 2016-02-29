@@ -8,71 +8,74 @@
  * file that was distributed with this source code.
  */
 
-namespace Tacit\Test\Model\Monga;
+namespace Tacit\Test\Model\RethinkDB;
 
+use DateTime;
 use Tacit\Model\Exception\ModelValidationException;
 
 /**
  * Test the MongaPersistent implementation.
  *
- * @package Tacit\Test\Model\Monga
+ * @package Tacit\Test\Model\RethinkDB
  */
-class MongaPersistentTest extends MongaTestCase
+class PersistentTest extends TestCase
 {
     public function setUp()
     {
         parent::setUp();
 
         /* make sure we start with a clean collection container */
-        MongaPersistentObject::collection($this->fixture)->truncate();
+        \r\tableCreate(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
     }
 
     public function tearDown()
     {
         /* remove all the collection items after the test */
-        MongaPersistentObject::collection($this->fixture)->truncate();
+        \r\tableDrop(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
+
+        parent::tearDown();
     }
 
     /**
-     * Test MongaPersistent::collectionName()
+     * Test Persistent::collectionName()
      *
      * @group model
-     * @group monga
+     * @group rethinkdb
      */
     public function testCollectionName()
     {
-        $this->assertEquals('test_objects', MongaPersistentObject::collectionName());
+        $this->assertEquals('test_objects', PersistentObject::collectionName());
     }
 
     /**
-     * Test MongaPersistent::collection()
+     * Test Persistent::collection()
      *
      * @group model
-     * @group monga
+     * @group rethinkdb
      */
     public function testCollection()
     {
-        $this->assertInstanceOf('Tacit\\Model\\Monga\\MongaCollection', MongaPersistentObject::collection($this->fixture));
+        $this->assertInstanceOf('Tacit\Model\RethinkDB\Collection', PersistentObject::collection($this->fixture));
     }
 
     /**
-     * Test MongaPersistent::create()
+     * Test Persistent::create()
      *
      * @param array $data The data used to create the object.
      *
      * @dataProvider providerCreate
      * @group model
-     * @group monga
+     * @group rethinkdb
      */
     public function testCreate($data)
     {
         try {
-            $object = MongaPersistentObject::create($data, $this->fixture);
+            $object = PersistentObject::create($data, $this->fixture);
 
             $this->assertNotNull($object);
-            $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
-            $this->assertInstanceOf('Tacit\\Model\\Monga\\MongaPersistent', $object);
-            $this->assertInstanceOf('Tacit\\Test\\Model\\Monga\\MongaPersistentObject', $object);
+            $this->assertInstanceOf('Tacit\Model\Persistent', $object);
+            $this->assertInstanceOf('Tacit\Model\RethinkDB\Persistent', $object);
+            $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         } catch (ModelValidationException $e) {
             echo $e;
         }
@@ -90,7 +93,7 @@ class MongaPersistentTest extends MongaTestCase
                 'text' => 'this is a bunch of text for a create test',
                 'integer' => 13,
                 'float' => 3.14,
-                'date' => new \MongoDate(),
+                'date' => new DateTime(),
                 'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                 'arrayOfStrings' => [
                     'string #1',
@@ -103,7 +106,7 @@ class MongaPersistentTest extends MongaTestCase
                 'text' => 'this is a bunch more text for another create test',
                 'integer' => 200999,
                 'float' => 3.145673241,
-                'date' => new \MongoDate(),
+                'date' => new DateTime(),
                 'boolean' => false,
                 'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                 'arrayOfStrings' => [

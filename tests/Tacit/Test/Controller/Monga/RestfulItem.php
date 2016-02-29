@@ -11,9 +11,7 @@
 namespace Tacit\Test\Controller\Monga;
 
 
-use Tacit\Controller\RestfulItem;
-
-class MongaRestfulItem extends RestfulItem
+class RestfulItem extends \Tacit\Controller\RestfulItem
 {
     protected static $collectionName = 'monga_persistent';
     protected static $itemName = 'monga_persistent';

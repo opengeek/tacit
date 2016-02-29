@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Tacit\Test\Controller\Monga;
+namespace Tacit\Test\Controller\RethinkDB;
 
 
 use Tacit\Controller\Exception\RestfulException;
-use Tacit\Model\Monga\MongaCollection;
-use Tacit\Test\Model\Monga\MongaPersistentObject;
+use Tacit\Model\RethinkDB\Collection;
+use Tacit\Test\Model\RethinkDB\PersistentObject;
 
 class RestfulItemTest extends ControllerTestCase
 {
@@ -46,14 +46,16 @@ class RestfulItemTest extends ControllerTestCase
     {
         parent::setUp();
 
+        \r\tableCreate(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
+
         foreach (self::fixtureData() as $item) {
-            MongaPersistentObject::create($item, $this->fixture);
+            PersistentObject::create($item, $this->fixture);
         }
     }
 
     protected function tearDown()
     {
-        MongaPersistentObject::collection($this->fixture)->truncate();
+        \r\tableDrop(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
 
         parent::tearDown();
     }
@@ -62,15 +64,15 @@ class RestfulItemTest extends ControllerTestCase
      * Test a GET request for a RestfulItem.
      *
      * @group controller
-     * @group monga
+     * @group rethinkdb
      */
     public function testGet()
     {
-        /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        /** @var PersistentObject $itemObj */
+        $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/monga/collection/' . (string)$itemObj->_id,
+            'PATH_INFO' => '/rethinkdb/collection/' . (string)$itemObj->id,
             'REQUEST_METHOD' => 'GET',
         ]);
 
@@ -79,7 +81,7 @@ class RestfulItemTest extends ControllerTestCase
 
             $item = json_decode($response->getBody(), true);
 
-            $data = $itemObj->toArray(MongaCollection::getMask($itemObj));
+            $data = $itemObj->toArray(Collection::getMask($itemObj));
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -94,15 +96,15 @@ class RestfulItemTest extends ControllerTestCase
      * Test a GET request for a RestfulItem with fields specified to return.
      *
      * @group controller
-     * @group monga
+     * @group rethinkdb
      */
     public function testGetWithFields()
     {
-        /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        /** @var PersistentObject $itemObj */
+        $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
+            'PATH_INFO' => '/rethinkdb/collection/' . $itemObj->id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
@@ -112,7 +114,7 @@ class RestfulItemTest extends ControllerTestCase
 
             $item = json_decode($response->getBody(), true);
 
-            $data = $itemObj->toArray(MongaCollection::getMask($itemObj, ['integer', 'float', 'date', 'boolean', 'arrayOfStrings']));
+            $data = $itemObj->toArray(Collection::getMask($itemObj, ['integer', 'float', 'date', 'boolean', 'arrayOfStrings']));
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -129,17 +131,17 @@ class RestfulItemTest extends ControllerTestCase
      * @param array $data
      *
      * @group controller
-     * @group monga
+     * @group rethinkdb
      *
      * @dataProvider providerPut
      */
     public function testPut(array $data)
     {
-        /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
+        /** @var PersistentObject $itemObj */
+        $itemObj = PersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
 
         $this->mockEnvironment([
-            'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
+            'PATH_INFO' => '/rethinkdb/collection/' . $itemObj->id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => json_encode($data)

@@ -16,6 +16,7 @@ Tacit is a high-performance REST server library for PHP 5.4+ built on the [Slim 
 * Extensible output transformers via [Fractal](https://github.com/thephpleague/fractal)
 * A flexible persistence layer
     * Support for MongoDB provided via [Monga](https://github.com/thephpleague/monga)
+    * Support for RethinkDB provided via [PHP-RQL](http://danielmewes.github.io/php-rql/)
     * Simple and extensible validation library tightly integrated
 
 

@@ -24,11 +24,22 @@ $this->tacit->group('/collection', function () {
 $this->tacit->group('/monga', function () {
     $this->tacit->group('/collection', function () {
 //        $this->tacit->any('/', function () {
-//            (new \Tacit\Test\Controller\Monga\MongaRestfulCollection($this->tacit))->handle();
+//            (new \Tacit\Test\Controller\Monga\RestfulCollection($this->tacit))->handle();
 //        })->name('MongaRestfulCollection');
         $this->tacit->any('/:_id', function ($_id) {
-            (new \Tacit\Test\Controller\Monga\MongaRestfulItem($this->tacit))->handle($_id);
+            (new \Tacit\Test\Controller\Monga\RestfulItem($this->tacit))->handle($_id);
         })->name('MongaRestfulItem');
+    });
+});
+
+$this->tacit->group('/rethinkdb', function () {
+    $this->tacit->group('/collection', function () {
+//        $this->tacit->any('/', function () {
+//            (new \Tacit\Test\Controller\RethinkDB\RestfulCollection($this->tacit))->handle();
+//        })->name('RethinkDBRestfulCollection');
+        $this->tacit->any('/:id', function ($id) {
+            (new \Tacit\Test\Controller\RethinkDB\RestfulItem($this->tacit))->handle($id);
+        })->name('RethinkDBRestfulItem');
     });
 });
 

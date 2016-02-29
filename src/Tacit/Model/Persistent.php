@@ -338,10 +338,10 @@ abstract class Persistent
     /**
      * Hydrate this instance using the provided data and an optional mask.
      *
-     * @param array $data
+     * @param array|object $data
      * @param bool|array $mask
      */
-    public function hydrate(array $data, $mask = false)
+    public function hydrate($data, $mask = false)
     {
         if (!is_array($mask) && false !== $mask) {
             $mask = Collection::getMask($this, [], ['_id']);

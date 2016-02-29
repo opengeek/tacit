@@ -60,7 +60,7 @@ abstract class Collection
      *
      * @return array A mask of public field names for an object minus various excludes.
      */
-    public static function getMask($object, array $exclude = [], array $excludeDefaults = ['_id', '_type', 'password'])
+    public static function getMask($object, array $exclude = [], array $excludeDefaults = ['_id', '_type', 'id', 'password'])
     {
         $mask = array_keys(self::getPublicVars($object));
         return array_diff($mask, $exclude, $excludeDefaults);

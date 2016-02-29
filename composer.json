@@ -21,7 +21,11 @@
         "league/monga": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.5"
+        "phpunit/phpunit": "^4.5",
+        "danielmewes/php-rql": "^2.2"
+    },
+    "suggest": {
+        "danielmewes/php-rql": "For RethinkDB Model Support"
     },
     "autoload": {
         "psr-0": {
