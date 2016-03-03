@@ -10,6 +10,7 @@
 
 namespace Tacit\Test\Model;
 
+use DateTime;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
 
@@ -36,7 +37,7 @@ class PersistentTest extends ModelTestCase
                 'text'  => "Text of MockPersistent #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
-                'date'  => new \DateTime(),
+                'date'  => new DateTime(),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => ['string #' . (($i % 3) + 1)]
             ];
@@ -71,7 +72,7 @@ class PersistentTest extends ModelTestCase
             '_id'      => 99999,
             'name'     => 'an instance',
             'text'     => 'an instance\'s text',
-            'date'     => new \DateTime(),
+            'date'     => new DateTime(),
             'integer'  => 144,
             'float'    => 3.14,
             'password' => 'password'
@@ -157,7 +158,7 @@ class PersistentTest extends ModelTestCase
                     'text' => 'this is a bunch of text for a create test',
                     'integer' => 13,
                     'float' => 3.14,
-                    'date' => new \DateTime(),
+                    'date' => new DateTime(),
                     'boolean' => true,
                     'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                     'arrayOfStrings' => [
@@ -200,7 +201,7 @@ class PersistentTest extends ModelTestCase
                     'text' => 'this is a bunch of text for a create test',
                     'integer' => 13,
                     'float' => 3.14,
-                    'date' => new \DateTime(),
+                    'date' => new DateTime(),
                     'boolean' => false,
                     'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                     'arrayOfStrings' => [

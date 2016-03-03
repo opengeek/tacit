@@ -10,6 +10,8 @@
 
 namespace Tacit\Model\Exception;
 
+use Exception;
+
 /**
  * Represents a validation failure in a Tacit model.
  *
@@ -30,10 +32,10 @@ class ModelValidationException extends ModelException
      * @param string     $message The error message.
      * @param array      $messages An array of validation errors grouped by field.
      * @param int        $code The error code associated with the exception.
-     * @param \Exception $previous An optional previous Exception that caused
+     * @param Exception $previous An optional previous Exception that caused
      * this one to be thrown.
      */
-    public function __construct($message = "", array $messages = [], $code = 422, \Exception $previous = null)
+    public function __construct($message = "", array $messages = [], $code = 422, Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->validationMessages = $messages;

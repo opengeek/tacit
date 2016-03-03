@@ -11,7 +11,9 @@
 namespace Tacit\Validate;
 
 
-class RulesNotCheckedException extends \Exception
+use Exception;
+
+class RulesNotCheckedException extends Exception
 {
 
 } 

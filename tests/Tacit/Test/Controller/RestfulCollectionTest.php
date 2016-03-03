@@ -11,6 +11,8 @@
 namespace Tacit\Test\Controller;
 
 
+use DateTime;
+use Exception;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Test\Model\MockPersistent;
 use Tacit\Test\Model\MockRepository;
@@ -40,7 +42,7 @@ class RestfulCollectionTest extends ControllerTestCase
                 'text'  => "Text of MockPersistent #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
-                'date'  => new \DateTime(),
+                'date'  => new DateTime(),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => []
             ];
@@ -96,7 +98,7 @@ class RestfulCollectionTest extends ControllerTestCase
 
         } catch (RestfulException $e) {
             $this->fail($e->getMessage());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
     }
@@ -131,7 +133,7 @@ class RestfulCollectionTest extends ControllerTestCase
 
         } catch (RestfulException $e) {
             $this->fail($e->getMessage());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
     }

@@ -11,6 +11,8 @@
 namespace Tacit\Test\Model\Monga;
 
 
+use DateTime;
+use MongoDate;
 use Tacit\Model\Monga\MongaPersistent;
 
 class MongaPersistentObject extends MongaPersistent
@@ -21,7 +23,7 @@ class MongaPersistentObject extends MongaPersistent
         'text' => 'type:string',
         'integer' => 'type:integer',
         'float' => 'type:float',
-        'date' => 'classof:\\MongoDate,null',
+        'date' => 'classof:\MongoDate,null',
         'boolean' => 'type:boolean',
         'password' => 'type:string|notempty|minlen:6',
         'arrayOfStrings' => 'type:array',
@@ -40,13 +42,13 @@ class MongaPersistentObject extends MongaPersistent
     {
         switch ($key) {
             case 'date':
-                if (!$value instanceof \MongoDate) {
-                    if ($value instanceof \DateTime) {
-                        $value = new \MongoDate($value->getTimestamp());
+                if (!$value instanceof MongoDate) {
+                    if ($value instanceof DateTime) {
+                        $value = new MongoDate($value->getTimestamp());
                     } elseif (is_string($value)) {
-                        $value = new \MongoDate(strtotime($value));
+                        $value = new MongoDate(strtotime($value));
                     } elseif (is_int($value)) {
-                        $value = new \MongoDate($value);
+                        $value = new MongoDate($value);
                     }
                 }
                 break;

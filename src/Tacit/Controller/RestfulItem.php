@@ -11,6 +11,7 @@
 namespace Tacit\Controller;
 
 
+use Exception;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
@@ -32,9 +33,8 @@ abstract class RestfulItem extends Restful
     /**
      * Delete this item from the collection.
      *
-     * @throws Exception\ServerErrorException
-     * @throws Exception\NotFoundException
-     * @throws Exception\BadRequestException
+     * @throws ServerErrorException
+     * @throws NotFoundException
      */
     public function delete()
     {
@@ -50,7 +50,7 @@ abstract class RestfulItem extends Restful
 
         try {
             $removed = $item->remove();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error deleting resource.', $e->getMessage());
         }
 
@@ -64,8 +64,7 @@ abstract class RestfulItem extends Restful
     /**
      * GET a representation of an item from the collection.
      *
-     * @throws Exception\NotFoundException
-     * @throws Exception\BadRequestException
+     * @throws NotFoundException
      */
     public function get()
     {
@@ -89,10 +88,9 @@ abstract class RestfulItem extends Restful
     /**
      * PATCH only the properties of this item specified in the request entity.
      *
-     * @throws Exception\ServerErrorException
-     * @throws Exception\NotFoundException
-     * @throws Exception\UnacceptableEntityException
-     * @throws Exception\BadRequestException
+     * @throws ServerErrorException
+     * @throws NotFoundException
+     * @throws UnacceptableEntityException
      */
     public function patch()
     {
@@ -118,7 +116,7 @@ abstract class RestfulItem extends Restful
             $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error patching resource', $e->getMessage(), null, $e);
         }
 
@@ -161,7 +159,7 @@ abstract class RestfulItem extends Restful
             $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error updating resource', $e->getMessage(), null, $e);
         }
 

@@ -11,7 +11,9 @@
 namespace Tacit\Model\Exception;
 
 
-class ModelException extends \Exception
+use Exception;
+
+class ModelException extends Exception
 {
 
 } 

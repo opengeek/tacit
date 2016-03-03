@@ -11,6 +11,8 @@
 namespace Tacit\Test\Controller\Monga;
 
 
+use MongoId;
+
 class RestfulItem extends \Tacit\Controller\RestfulItem
 {
     protected static $collectionName = 'monga_persistent';
@@ -28,7 +30,7 @@ class RestfulItem extends \Tacit\Controller\RestfulItem
     protected function criteria(array $args) {
         $keys = static::keys();
         if (($idx = array_search('_id', $keys)) !== false) {
-            $args[$idx] = new \MongoId($args[$idx]);
+            $args[$idx] = new MongoId($args[$idx]);
         }
         return parent::criteria($args);
     }

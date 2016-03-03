@@ -10,6 +10,7 @@
 
 namespace Tacit\Test\Model\Monga;
 
+use MongoDate;
 use Tacit\Model\Exception\ModelValidationException;
 
 /**
@@ -90,7 +91,7 @@ class MongaPersistentTest extends MongaTestCase
                 'text' => 'this is a bunch of text for a create test',
                 'integer' => 13,
                 'float' => 3.14,
-                'date' => new \MongoDate(),
+                'date' => new MongoDate(),
                 'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                 'arrayOfStrings' => [
                     'string #1',
@@ -103,7 +104,7 @@ class MongaPersistentTest extends MongaTestCase
                 'text' => 'this is a bunch more text for another create test',
                 'integer' => 200999,
                 'float' => 3.145673241,
-                'date' => new \MongoDate(),
+                'date' => new MongoDate(),
                 'boolean' => false,
                 'password' => sha1(uniqid(md5(mt_rand(0,999999999)), true)),
                 'arrayOfStrings' => [

@@ -11,7 +11,9 @@
 namespace Tacit\Validate;
 
 
-class ValidationFailedException extends \Exception
+use Exception;
+
+class ValidationFailedException extends Exception
 {
 
 } 

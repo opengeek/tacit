@@ -11,6 +11,7 @@
 namespace Tacit\Test\Controller\Monga;
 
 
+use DateTime;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Model\Monga\MongaCollection;
 use Tacit\Test\Model\Monga\MongaPersistentObject;
@@ -33,7 +34,7 @@ class RestfulItemTest extends ControllerTestCase
                 'text'  => "Text of MockPersistent #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
-                'date'  => new \DateTime(),
+                'date'  => new DateTime(),
                 'boolean' => (bool)rand(0,1),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => []
@@ -170,7 +171,7 @@ class RestfulItemTest extends ControllerTestCase
                     'text'  => "Text of MockPersistent #1",
                     'integer'   => 1,
                     'float' => 1.1,
-                    'date'  => (new \DateTime("@" . time()))->format(DATE_ISO8601),
+                    'date'  => (new DateTime("@" . time()))->format(DATE_ISO8601),
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
                 ]
@@ -181,7 +182,7 @@ class RestfulItemTest extends ControllerTestCase
                     'text'  => "Text of MockPersistent #2",
                     'integer'   => 2,
                     'float' => 2.2,
-                    'date'  => (new \DateTime("@" . time()))->format(DATE_ISO8601),
+                    'date'  => (new DateTime("@" . time()))->format(DATE_ISO8601),
                     'boolean' => false,
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']

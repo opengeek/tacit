@@ -11,6 +11,7 @@
 namespace Tacit\Test\Controller;
 
 
+use Exception;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\RestfulCollection;
 
@@ -59,7 +60,7 @@ class MockRestfulCollection extends RestfulCollection
             if ($collection && $limit > 0) {
                 $collection = array_slice($collection, $offset, $limit);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
 

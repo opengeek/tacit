@@ -10,6 +10,7 @@
 
 namespace Tacit\Test\Model;
 
+use DateTime;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
 
@@ -36,7 +37,7 @@ class CollectionTest extends ModelTestCase
                 'text'  => "Text of MockPersistent #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
-                'date'  => new \DateTime(),
+                'date'  => new DateTime(),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => ['string #' . (($i % 3) + 1)]
             ];

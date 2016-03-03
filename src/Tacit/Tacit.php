@@ -11,6 +11,7 @@
 namespace Tacit;
 
 
+use Exception;
 use Slim\Slim;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\RestfulException;
@@ -59,7 +60,7 @@ class Tacit extends Slim
 
         $this->add(new ContentTypes());
 
-        $this->error(function (\Exception $e) {
+        $this->error(function (Exception $e) {
             $resource = [
                 'status' => 500,
                 'code' => $e->getCode(),

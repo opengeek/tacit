@@ -11,6 +11,7 @@
 namespace Tacit\Model;
 
 
+use Exception;
 use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
@@ -90,9 +91,9 @@ abstract class Persistent
      * @param array      $data The data to create the Persistent object with.
      * @param Repository $repository A specific Repository to persist the object in.
      *
-     * @throws Exception\ModelInsertException
-     * @throws \Exception
-     * @throws Exception\ModelValidationException
+     * @throws ModelInsertException
+     * @throws Exception
+     * @throws ModelValidationException
      * @return Persistent|null
      */
     public static function create(array $data = array(), Repository $repository = null)
@@ -104,7 +105,7 @@ abstract class Persistent
             $result = $instance->save();
         } catch (ModelValidationException $e) {
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModelInsertException("Error creating item in collection " . static::collectionName(), $e->getCode(), $e);
         }
         if (false === $result) {
@@ -380,7 +381,7 @@ abstract class Persistent
     /**
      * Save this model to the Repository.
      *
-     * @throws Exception\ModelException
+     * @throws ModelException
      * @return bool
      */
     public function save()
@@ -390,7 +391,7 @@ abstract class Persistent
                 return $this->insert();
             } catch (ModelException $e) {
                 throw $e;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelException('Error creating item in collection: ' . $e->getMessage(), $e->getCode(), $e);
             }
         } elseif (!empty($this->_dirty)) {
@@ -398,7 +399,7 @@ abstract class Persistent
                 return $this->patch();
             } catch (ModelException $e) {
                 throw $e;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelException('Error updating item in collection: ' . $e->getMessage(), $e->getCode(), $e);
             }
         }

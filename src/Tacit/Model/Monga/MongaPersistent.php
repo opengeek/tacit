@@ -11,6 +11,7 @@
 namespace Tacit\Model\Monga;
 
 
+use MongoId;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Persistent;
 
@@ -21,7 +22,7 @@ abstract class MongaPersistent extends Persistent
     /**
      * The unique identifier for a Mongo model item.
      *
-     * @var \MongoId
+     * @var MongoId
      */
     public $_id;
 
@@ -48,7 +49,7 @@ abstract class MongaPersistent extends Persistent
             throw new ModelValidationException('model validation failed for new item in collection ' . static::$collectionName, $validated);
         }
         $saved = static::collection($this->getRepository())->insert($this->toArray(MongaCollection::getMask($this, [], [$this->getKeyField()]), false), ['w' => 1]);
-        if ($saved instanceof \MongoId) {
+        if ($saved instanceof MongoId) {
             $this->{$this->getKeyField()} = $saved;
             return true;
         }

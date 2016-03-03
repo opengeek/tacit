@@ -11,6 +11,8 @@
 namespace Tacit\Test\Controller;
 
 
+use DateTime;
+use Exception;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Model\Collection;
 use Tacit\Test\Model\MockPersistent;
@@ -41,7 +43,7 @@ class RestfulItemTest extends ControllerTestCase
                 'text'  => "Text of MockPersistent #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
-                'date'  => new \DateTime(),
+                'date'  => new DateTime(),
                 'password' => 'abcdefg',
                 'arrayOfStrings' => []
             ];
@@ -157,7 +159,7 @@ class RestfulItemTest extends ControllerTestCase
 
         } catch (RestfulException $e) {
             $this->fail($e->getMessage());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
     }
@@ -194,7 +196,7 @@ class RestfulItemTest extends ControllerTestCase
                     'text'  => "Text of MockPersistent #1",
                     'integer'   => 1,
                     'float' => 1.1,
-                    'date'  => (new \DateTime())->format(DATE_ISO8601),
+                    'date'  => (new DateTime())->format(DATE_ISO8601),
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
                 ],
@@ -203,7 +205,7 @@ class RestfulItemTest extends ControllerTestCase
                     'text'  => "Text of MockPersistent #2",
                     'integer'   => 2,
                     'float' => 2.2,
-                    'date'  => (new \DateTime())->format(DATE_ISO8601),
+                    'date'  => (new DateTime())->format(DATE_ISO8601),
                     'boolean' => false,
                     'password' => 'uvwxyz',
                     'arrayOfStrings' => ['abc','def','ghi','jkl','mno']

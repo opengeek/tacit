@@ -14,7 +14,7 @@ namespace Tacit\Operations;
 use Exception;
 use Tacit\Controller\Restful;
 
-class OperationalException extends \Exception
+class OperationalException extends Exception
 {
     /** @var string */
     protected $description;

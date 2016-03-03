@@ -11,6 +11,7 @@
 namespace Tacit\Controller;
 
 
+use Exception;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelValidationException;
@@ -38,7 +39,7 @@ abstract class RestfulCollection extends Restful
     /**
      * GET a representation of a pageable and sortable collection.
      *
-     * @throws Exception\ServerErrorException
+     * @throws ServerErrorException
      */
     public function get()
     {
@@ -62,7 +63,7 @@ abstract class RestfulCollection extends Restful
                 }
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
             }, [], $this->app->container->get('repository'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
 
@@ -72,8 +73,8 @@ abstract class RestfulCollection extends Restful
     /**
      * POST a new representation of an item into the collection.
      *
-     * @throws Exception\ServerErrorException
-     * @throws Exception\UnacceptableEntityException
+     * @throws ServerErrorException
+     * @throws UnacceptableEntityException
      */
     public function post()
     {
@@ -90,7 +91,7 @@ abstract class RestfulCollection extends Restful
             $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
 

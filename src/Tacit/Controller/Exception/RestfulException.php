@@ -10,6 +10,7 @@
 
 namespace Tacit\Controller\Exception;
 
+use Exception;
 use Tacit\Controller\Restful;
 
 /**
@@ -17,7 +18,7 @@ use Tacit\Controller\Restful;
  *
  * @package Tacit\Controller\Exception
  */
-class RestfulException extends \Exception
+class RestfulException extends Exception
 {
     protected $code;
     protected $message = '';
