@@ -201,7 +201,7 @@ class Collection extends \Tacit\Model\Collection
         $result = $this->peer;
         if ($query !== null) {
             if ($query instanceof \Closure) {
-                $query = $query();
+                $query = $query($this->peer);
             }
             if (is_array($query)) {
                 $query = $this->peer->filter($query);
