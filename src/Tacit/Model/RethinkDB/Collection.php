@@ -11,7 +11,6 @@
 namespace Tacit\Model\RethinkDB;
 
 
-use DateTime;
 use r\Cursor;
 use r\Queries\Tables\Table;
 use r\ValuedQuery\ValuedQuery;
@@ -69,7 +68,7 @@ class Collection extends \Tacit\Model\Collection
      */
     public function count($query)
     {
-        $this->peer->count($query);
+        $this->peer->count($this->sequence($query));
     }
 
     /**
@@ -82,8 +81,8 @@ class Collection extends \Tacit\Model\Collection
      */
     public function distinct($field, $query = null)
     {
-        $obj = $query !== null ? $this->peer->filter($query) : $this->peer;
-        return $obj->distinct(['index' => $field])->run($this->connection->getHandle());
+        $result = $this->sequence($query);
+        return $result->distinct(['index' => $field])->run($this->connection->getHandle());
     }
 
     /**
@@ -106,7 +105,7 @@ class Collection extends \Tacit\Model\Collection
      */
     public function find($query, $fields = [])
     {
-        $result = $this->peer->filter($query);
+        $result = $this->sequence($query);
         if (!empty($fields)) {
             $result = $result->pluck($fields);
         }
@@ -123,7 +122,7 @@ class Collection extends \Tacit\Model\Collection
      */
     public function findOne($query, $fields = [])
     {
-        $result = $this->peer->filter($query);
+        $result = $this->sequence($query);
         if (!empty($fields)) {
             $result = $result->pluck($fields);
         }
@@ -163,8 +162,7 @@ class Collection extends \Tacit\Model\Collection
      */
     public function remove($query)
     {
-        $obj = $query !== null ? $this->peer->filter($query) : $this->peer;
-        $result = $obj->delete()->run($this->connection->getHandle());
+        $result = $this->sequence($query)->delete()->run($this->connection->getHandle());
         return $result->offsetExists('deleted') && $result->offsetGet('errors') == 0 ? $result->offsetGet('deleted') : false;
     }
 
@@ -190,8 +188,26 @@ class Collection extends \Tacit\Model\Collection
      */
     public function update($query, $data, $options = [])
     {
-        $obj = $query !== null ? $this->peer->filter($query) : $this->peer;
-        $result = $obj->update($data, $options)->run($this->connection->getHandle());
+        $result = $this->sequence($query)->update($data, $options)->run($this->connection->getHandle());
         return $result->offsetExists('replaced') && $result->offsetGet('errors') == 0 ? $result->offsetGet('replaced') : false;
+    }
+
+    /**
+     * @param $query
+     * @return ValuedQuery
+     */
+    private function sequence($query)
+    {
+        $result = $this->peer;
+        if ($query !== null) {
+            if ($query instanceof \Closure) {
+                $query = $query();
+            }
+            if (is_array($query)) {
+                $query = $this->peer->filter($query);
+            }
+            $result = $query;
+        }
+        return $result;
     }
 }
