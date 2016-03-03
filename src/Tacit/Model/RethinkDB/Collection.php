@@ -109,7 +109,11 @@ class Collection extends \Tacit\Model\Collection
         if (!empty($fields)) {
             $result = $result->pluck($fields);
         }
-        return $result->run($this->connection->getHandle());
+        $result = $result->run($this->connection->getHandle());
+        if ($result instanceof Cursor) {
+            $result = $result->toArray();
+        }
+        return $result;
     }
 
     /**
