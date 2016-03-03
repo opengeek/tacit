@@ -41,11 +41,11 @@ class Basic implements Authorization
      */
     public function getSignature(Tacit $app)
     {
-        $signature = ':';
+        $signature = '';
         if (isset($app->environment['PHP_AUTH_USER'])) {
-            $signature = $app->environment['PHP_AUTH_USER'] . ':';
+            $signature = $app->environment['PHP_AUTH_USER'];
             if (isset($app->environment['PHP_AUTH_PW'])) {
-                $signature .= $app->environment['PHP_AUTH_PW'];
+                $signature .= ':' . $app->environment['PHP_AUTH_PW'];
             }
         }
         return $signature;
