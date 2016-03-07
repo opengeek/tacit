@@ -51,11 +51,11 @@ abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestC
         $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../../identities.php');
         require __DIR__ . '/../../../../routes.php';
 
-        \r\dbCreate('tacit_test')->run($this->fixture->getConnection()->getHandle());
+        $this->fixture->create(['exceptions' => false]);
     }
 
     protected function tearDown()
     {
-        \r\dbDrop('tacit_test')->run($this->fixture->getConnection()->getHandle());
+        $this->fixture->destroy(['exceptions' => false]);
     }
 }

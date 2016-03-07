@@ -11,6 +11,7 @@
 namespace Tacit\Test\Model;
 
 use Tacit\Model\Collection;
+use Tacit\Model\Exception\RepositoryException;
 use Tacit\Model\Repository;
 
 /**
@@ -47,5 +48,34 @@ class MockRepository extends Repository
     public function collection($name)
     {
         return new MockCollection($name, $this->connection);
+    }
+
+    /**
+     * Create the Repository container (aka database).
+     *
+     * This method MUST throw exceptions by default and MUST provide an option for
+     * disabling exceptions, i.e. ['exceptions' => false].
+     *
+     * @param array $options An array of options for creating the container.
+     *
+     * @throws RepositoryException If container creation fails and exceptions are
+     * not disabled.
+     */
+    public function create(array $options = [])
+    {
+
+    }
+
+    /**
+     * Destroy the Repository container (aka database).
+     *
+     * @param array $options An array of options for container destruction.
+     *
+     * @throws RepositoryException If container destruction fails and exceptions
+     * are not disabled.
+     */
+    public function destroy(array $options = [])
+    {
+        
     }
 }

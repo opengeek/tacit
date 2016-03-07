@@ -33,7 +33,7 @@ abstract class MongaTestCase extends TestCase
                 'startTime' => microtime(true)
             ],
             'connection' => [
-                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
+                'class' => 'Tacit\Model\Monga\MongaRepository',
                 'server' => 'localhost',
                 'options' => array('connect' => false),
                 'repository' => 'tacit_test'
@@ -42,5 +42,12 @@ abstract class MongaTestCase extends TestCase
         $tacit->setName('test_monga');
 
         $this->fixture = $tacit->container->get('repository');
+
+        $this->fixture->create(['exceptions' => false]);
+    }
+
+    protected function tearDown()
+    {
+        $this->fixture->destroy(['exceptions' => false]);
     }
 }

@@ -11,6 +11,9 @@
 namespace Tacit\Model\RethinkDB;
 
 
+use Exception;
+use Tacit\Model\Exception\RepositoryException;
+
 class Repository extends \Tacit\Model\Repository
 {
     /**
@@ -25,12 +28,14 @@ class Repository extends \Tacit\Model\Repository
      */
     public function __construct(array $configuration = array())
     {
-        $server = isset($configuration['server']) ? $configuration['server'] : '127.0.0.1';
-        $port   = isset($configuration['port']) ? $configuration['port'] : null;
+        parent::__construct($configuration);
+
+        $server = $this->option('server', '127.0.0.1');
+        $port   = $this->option('port');
 
         $this->connection = new Connection(
-            \r\connect($server, $port, $configuration['repository']),
-            \r\db($configuration['repository'])
+            \r\connect($server, $port, $this->option('repository')),
+            \r\db($this->option('repository'))
         );
     }
 
@@ -44,5 +49,27 @@ class Repository extends \Tacit\Model\Repository
     public function collection($name)
     {
         return new Collection($name, $this->connection);
+    }
+
+    public function create(array $options = [])
+    {
+        try {
+            \r\dbCreate($this->option('repository'))->run($this->connection->getHandle());
+        } catch (Exception $e) {
+            if ($this->option('exceptions', true, $options)) {
+                throw new RepositoryException("Could not create RethinkDB database {$this->option('repository')}", $e->getCode(), $e);
+            }
+        }
+    }
+
+    public function destroy(array $options = [])
+    {
+        try {
+            \r\dbDrop($this->option('repository'))->run($this->connection->getHandle());
+        } catch (Exception $e) {
+            if ($this->option('exceptions', true, $options)) {
+                throw new RepositoryException("Could not drop RethinkDB database {$this->option('repository')}", $e->getCode(), $e);
+            }
+        }
     }
 }

@@ -11,8 +11,11 @@
 namespace Tacit\Model\Monga;
 
 
+use Exception;
 use League\Monga;
+use League\Monga\Database;
 use Tacit\Model\Collection;
+use Tacit\Model\Exception\RepositoryException;
 use Tacit\Model\Repository;
 
 /**
@@ -23,9 +26,9 @@ use Tacit\Model\Repository;
 class MongaRepository extends Repository
 {
     /**
-     * The native Monga\Database instance.
+     * The native Monga Database instance.
      *
-     * @var Monga\Database
+     * @var Database
      */
     protected $connection;
 
@@ -36,6 +39,8 @@ class MongaRepository extends Repository
      */
     public function __construct(array $configuration = array())
     {
+        parent::__construct($configuration);
+
         /* for Monga, we want the "Database" object as the "native connection" */
         $this->connection = Monga::connection(
             $configuration['server'],
@@ -58,10 +63,35 @@ class MongaRepository extends Repository
     /**
      * Get the "native" Monga Database class.
      *
-     * @return Monga\Database
+     * @return Database
      */
     public function getConnection()
     {
         return parent::getConnection();
+    }
+
+    public function create(array $options = [])
+    {
+        if ($this->option('exceptions', true, $options)) {
+            $collections = $this->connection->listCollections();
+            if (!empty($collections)) {
+                throw new RepositoryException("The MongoDB database {$this->option('repository')} already exists and has existing collections");
+            }
+        }
+    }
+
+    public function destroy(array $options = [])
+    {
+        $dropped = false;
+        try {
+            $dropped = $this->connection->drop();
+        } catch (Exception $e) {
+            if ($this->option('exceptions', true, $options)) {
+                throw new RepositoryException("Could not drop MongoDB database {$this->option('repository')}", $e->getCode(), $e);
+            }
+        }
+        if ($dropped === false && $this->option('exceptions', true, $options)) {
+            throw new RepositoryException("Could not drop MongoDB database {$this->option('repository')}");
+        }
     }
 }

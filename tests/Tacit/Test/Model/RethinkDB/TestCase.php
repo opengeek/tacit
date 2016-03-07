@@ -37,16 +37,16 @@ abstract class TestCase extends \Tacit\TestCase
                 'repository' => 'tacit_test'
             ]
         ]);
-        $tacit->setName('test_tacit');
+        $tacit->setName('test_rethinkdb');
 
         /** @var Repository fixture */
         $this->fixture = $tacit->container->get('repository');
 
-        \r\dbCreate('tacit_test')->run($this->fixture->getConnection()->getHandle());
+        $this->fixture->create(['exceptions' => false]);
     }
 
     protected function tearDown()
     {
-        \r\dbDrop('tacit_test')->run($this->fixture->getConnection()->getHandle());
+        $this->fixture->destroy(['exceptions' => false]);
     }
 }
