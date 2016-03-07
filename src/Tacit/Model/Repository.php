@@ -49,7 +49,8 @@ abstract class Repository
     public static function getInstance(array $configuration = [])
     {
         if (null === static::$instance) {
-            static::$instance = new static($configuration);
+            $dbClass = $configuration['class'];
+            static::$instance = new $dbClass($configuration);
         }
         return static::$instance;
     }
