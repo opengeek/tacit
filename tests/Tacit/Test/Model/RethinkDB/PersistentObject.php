@@ -20,19 +20,20 @@ class PersistentObject extends Persistent
     protected static $validationRules = [
         'name' => 'type:string|notempty',
         'text' => 'type:string',
+        'date' => 'classof:\DateTime,null',
         'integer' => 'type:integer',
         'float' => 'type:float',
-        'date' => 'classof:\DateTime,null',
         'boolean' => 'type:boolean',
         'password' => 'type:string|notempty|minlen:6',
         'arrayOfStrings' => 'type:array',
     ];
 
+    public $id;
     public $name;
     public $text;
+    public $date;
     public $integer;
     public $float;
-    public $date;
     public $boolean = true;
     public $password;
     public $arrayOfStrings = [];

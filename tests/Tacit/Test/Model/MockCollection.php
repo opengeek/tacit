@@ -54,9 +54,9 @@ class MockCollection extends Collection
      *
      * @return int The number of items in the collection filtered by the query.
      */
-    public function count($query)
+    public function count($query = [])
     {
-        if (null === $query) return count($this->connection[$this->name]);
+        if (empty($query)) return count($this->connection[$this->name]);
         $filtered = $this->filter($this->connection[$this->name], $query);
         return count($filtered);
     }

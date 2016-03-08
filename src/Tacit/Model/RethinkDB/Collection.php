@@ -66,9 +66,9 @@ class Collection extends \Tacit\Model\Collection
      *
      * @return int The number of items in the collection filtered by the query.
      */
-    public function count($query)
+    public function count($query = [])
     {
-        $this->peer->count($this->sequence($query));
+        return $this->sequence($query)->count()->run($this->connection->getHandle());
     }
 
     /**
@@ -81,8 +81,12 @@ class Collection extends \Tacit\Model\Collection
      */
     public function distinct($field, $query = null)
     {
-        $result = $this->sequence($query);
-        return $result->distinct(['index' => $field])->run($this->connection->getHandle());
+        $result = $this->sequence($query)->distinct(['index' => $field])->run($this->connection->getHandle());
+        if ($result instanceof Cursor) {
+            $result = $result->toArray();
+        }
+
+        return $result;
     }
 
     /**
@@ -113,6 +117,7 @@ class Collection extends \Tacit\Model\Collection
         if ($result instanceof Cursor) {
             $result = $result->toArray();
         }
+
         return $result;
     }
 
@@ -207,11 +212,14 @@ class Collection extends \Tacit\Model\Collection
             if ($query instanceof \Closure) {
                 $query = $query($this->peer);
             }
-            if (is_array($query)) {
+            if (is_array($query) && !empty($query)) {
                 $query = $this->peer->filter($query);
             }
-            $result = $query;
+            if (!empty($query)) {
+                $result = $query;
+            }
         }
+
         return $result;
     }
 }

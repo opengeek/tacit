@@ -74,7 +74,7 @@ class MongaCollection extends Collection
      *
      * @return int The number of items in the collection filtered by the query.
      */
-    public function count($query)
+    public function count($query = [])
     {
         return $this->peer->count($query);
     }

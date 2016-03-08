@@ -8,33 +8,32 @@
  * file that was distributed with this source code.
  */
 
-namespace Tacit\Test\Model;
+namespace Tacit\Test\Model\RethinkDB;
 
 use DateTime;
-use Tacit\Model\Collection;
-use Tacit\Model\Exception\ModelValidationException;
+use Tacit\Model\RethinkDB\Collection;
 
 /**
  * Tests for Tacit\Model\Collection.
  *
  * @package Tacit\Test\Model
  */
-class CollectionTest extends ModelTestCase
+class CollectionTest extends TestCase
 {
     /**
      * Get fixture data starting with the specified index.
      *
      * @param int $idx The starting index value.
      *
-     * @return array An array of associative arrays representing MockPersistent data.
+     * @return array An array of associative arrays representing PersistentObject data.
      */
     protected static function fixtureData($idx = 1)
     {
         $data = [];
         for ($i = $idx; $i <= 10; $i++) {
             $data[] = [
-                'name'  => "MockPersistent #{$i}",
-                'text'  => "Text of MockPersistent #{$i}",
+                'name'  => "PersistentObject #{$i}",
+                'text'  => "Text of PersistentObject #{$i}",
                 'integer'   => $i,
                 'float' => (float)"{$i}.{$i}",
                 'date'  => new DateTime(),
@@ -49,14 +48,23 @@ class CollectionTest extends ModelTestCase
     {
         parent::setUp();
 
+        /* make sure we start with a clean collection container */
+        \r\tableCreate(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
+
+        \r\table(PersistentObject::collectionName())->indexCreateMulti('arrayOfStrings')->run($this->fixture->getConnection()->getHandle());
+        \r\table(PersistentObject::collectionName())->indexWait('arrayOfStrings')->run($this->fixture->getConnection()->getHandle());
+
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($item, $this->fixture);
+            PersistentObject::create($item, $this->fixture);
         }
     }
 
     public function tearDown()
     {
-        MockPersistent::collection($this->fixture)->truncate();
+        /* remove all the collection items after the test */
+        \r\tableDrop(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
+
+        parent::tearDown();
     }
 
     /**
@@ -64,12 +72,12 @@ class CollectionTest extends ModelTestCase
      */
     public function testGetPublicVarsFromObject()
     {
-        $object = MockPersistent::findOne([], [], $this->fixture);
+        $object = PersistentObject::findOne([], [], $this->fixture);
 
-        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
+        $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
             [
-                '_id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'
+                'id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'
             ],
             array_keys(Collection::getPublicVars($object))
         );
@@ -81,8 +89,8 @@ class CollectionTest extends ModelTestCase
     public function testGetPublicVarsFromClass()
     {
         $this->assertEquals(
-            ['_id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'],
-            array_keys(Collection::getPublicVars('Tacit\Test\Model\MockPersistent'))
+            ['id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'],
+            array_keys(Collection::getPublicVars('Tacit\Test\Model\RethinkDB\PersistentObject'))
         );
     }
 
@@ -96,9 +104,9 @@ class CollectionTest extends ModelTestCase
      */
     public function testGetMaskFromObject(array $expected, array $exclude)
     {
-        $object = MockPersistent::findOne([], [], $this->fixture);
+        $object = PersistentObject::findOne([], [], $this->fixture);
 
-        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
+        $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
             $expected,
             array_values(Collection::getMask($object, $exclude))
@@ -135,7 +143,7 @@ class CollectionTest extends ModelTestCase
     {
         $this->assertEquals(
             $expected,
-            array_values(Collection::getMask('Tacit\Test\Model\MockPersistent', $exclude))
+            array_values(Collection::getMask('Tacit\Test\Model\RethinkDB\PersistentObject', $exclude))
         );
     }
 
@@ -162,7 +170,7 @@ class CollectionTest extends ModelTestCase
      */
     public function testCount()
     {
-        $all = MockPersistent::collection($this->fixture)->count();
+        $all = PersistentObject::collection($this->fixture)->count();
         $this->assertEquals(10, $all);
     }
 
@@ -171,6 +179,6 @@ class CollectionTest extends ModelTestCase
      */
     public function testDistinct()
     {
-        $this->assertEquals(['string #1','string #2','string #3'], MockPersistent::collection($this->fixture)->distinct('arrayOfStrings'));
+        $this->assertEquals(['string #1','string #2','string #3'], PersistentObject::collection($this->fixture)->distinct('arrayOfStrings'));
     }
 }

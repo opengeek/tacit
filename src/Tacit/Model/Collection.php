@@ -111,7 +111,7 @@ abstract class Collection
      *
      * @return int The number of items in the collection filtered by the query.
      */
-    abstract public function count($query);
+    abstract public function count($query = []);
 
     /**
      * Get an array of distinct values from an array field in the model.

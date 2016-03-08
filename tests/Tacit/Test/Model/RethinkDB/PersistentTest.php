@@ -26,6 +26,9 @@ class PersistentTest extends TestCase
 
         /* make sure we start with a clean collection container */
         \r\tableCreate(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
+
+        \r\table(PersistentObject::collectionName())->indexCreateMulti('arrayOfStrings')->run($this->fixture->getConnection()->getHandle());
+        \r\table(PersistentObject::collectionName())->indexWait('arrayOfStrings')->run($this->fixture->getConnection()->getHandle());
     }
 
     public function tearDown()
