@@ -11,6 +11,8 @@
 namespace Tacit\Model\RethinkDB;
 
 
+use ArrayObject;
+use DateTime;
 use Tacit\Model\Exception\ModelValidationException;
 
 class Persistent extends \Tacit\Model\Persistent
@@ -21,6 +23,17 @@ class Persistent extends \Tacit\Model\Persistent
      * @var string
      */
     public $id;
+
+    /**
+     * Hydrate this instance using the provided data and an optional mask.
+     *
+     * @param array|object $data
+     * @param bool|array $mask
+     */
+    public function hydrate($data, $mask = false)
+    {
+        parent::hydrate($this->fromArrayObject($data), $mask);
+    }
 
     /**
      * Insert this model into the repository.
@@ -34,11 +47,13 @@ class Persistent extends \Tacit\Model\Persistent
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for new item in collection ' . static::$collectionName, $validated);
         }
-        $saved = static::collection($this->getRepository())->insert($this->toArray(Collection::getMask($this, [], [$this->getKeyField()]), false));
+        $saved = static::collection($this->getRepository())->insert($this->distill($this->toArray(Collection::getMask($this, [], [$this->getKeyField()]), false)));
         if ($saved !== false) {
             $this->{$this->getKeyField()} = $saved;
+
             return true;
         }
+
         return false;
     }
 
@@ -54,6 +69,44 @@ class Persistent extends \Tacit\Model\Persistent
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for existing item in collection ' . static::$collectionName, $validated);
         }
-        return static::collection($this->getRepository())->update([$this->getKeyField() => $this->getKey()], $this->dirty(false));
+        $saved = static::collection($this->getRepository())->update([$this->getKeyField() => $this->getKey()], $this->distill($this->dirty(false)));
+        if ($saved === false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function fromArrayObject($data)
+    {
+        if ($data instanceof ArrayObject) {
+            $data = $data->getArrayCopy();
+        }
+        if (is_array($data)) {
+            foreach ($data as $key => &$value) {
+                if ($value instanceof ArrayObject) {
+                    $value = $this->fromArrayObject($value);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    private function distill($data)
+    {
+        if (is_object($data) || is_array($data)) {
+            if (!$data instanceof DateTime && !$data instanceof ArrayObject) {
+                $data = is_object($data) ? new ArrayObject($data) : $data;
+
+                foreach ($data as $key => &$value) {
+                    if (is_object($value) || is_array($value)) {
+                        $value = $this->distill($value);
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 }
