@@ -13,6 +13,7 @@ namespace Tacit\Model\RethinkDB;
 
 use ArrayObject;
 use DateTime;
+use DateTimeZone;
 use Tacit\Model\Exception\ModelValidationException;
 
 class Persistent extends \Tacit\Model\Persistent
@@ -77,7 +78,7 @@ class Persistent extends \Tacit\Model\Persistent
         return true;
     }
 
-    private function fromArrayObject($data)
+    protected function fromArrayObject($data)
     {
         if ($data instanceof ArrayObject) {
             $data = $data->getArrayCopy();
@@ -93,7 +94,7 @@ class Persistent extends \Tacit\Model\Persistent
         return $data;
     }
 
-    private function distill($data)
+    protected function distill($data)
     {
         if (is_object($data) || is_array($data)) {
             if (!$data instanceof DateTime && !$data instanceof ArrayObject) {
@@ -104,6 +105,8 @@ class Persistent extends \Tacit\Model\Persistent
                         $value = $this->distill($value);
                     }
                 }
+            } elseif ($data instanceof DateTime && $data->getTimezone()->getName() !== 'UTC') {
+                $data->setTimezone(new DateTimeZone('UTC'));
             }
         }
 
