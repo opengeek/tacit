@@ -150,7 +150,8 @@ abstract class Persistent
                 /** @var Persistent $object */
                 $object = new static();
                 $object->hydrate($model);
-                $collection[$id] = $object;
+                $key = $object->getKey();
+                $collection[is_scalar($key) ? $key : $id] = $object;
             }
         }
         return $collection;
