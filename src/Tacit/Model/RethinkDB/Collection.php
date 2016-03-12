@@ -11,6 +11,8 @@
 namespace Tacit\Model\RethinkDB;
 
 
+use DateTime;
+use DateTimeZone;
 use r\Cursor;
 use r\Queries\Tables\Table;
 use r\ValuedQuery\ValuedQuery;
@@ -52,7 +54,8 @@ class Collection extends \Tacit\Model\Collection
             $class = get_class($var);
             switch ($class) {
                 case 'DateTime':
-                    $var = $var->format(DATE_ISO8601);
+                    /** @var DateTime $var */
+                    $var = $var->setTimezone(new DateTimeZone('UTC'))->format(DATE_ISO8601);
                     break;
             }
         }
