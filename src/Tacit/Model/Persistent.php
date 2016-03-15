@@ -138,14 +138,13 @@ abstract class Persistent
      * All fields are returned if not provided.
      * @param Repository     $repository A specific Repository to search for objects in.
      *
-     * @return array[static]|null An array of Persistent objects or null.
+     * @return array[static] An array of Persistent objects, possibly empty.
      */
     public static function find($criteria = array(), array $fields = array(), Repository $repository = null)
     {
-        $collection = null;
+        $collection = array();
         $models = static::collection($repository)->find($criteria, $fields);
         if ($models) {
-            $collection = array();
             foreach ($models as $id => $model) {
                 /** @var Persistent $object */
                 $object = new static();
