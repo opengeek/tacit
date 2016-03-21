@@ -84,7 +84,11 @@ class Collection extends \Tacit\Model\Collection
      */
     public function distinct($field, $query = null)
     {
-        $result = $this->sequence($query)->distinct(['index' => $field])->run($this->connection->getHandle());
+        $result = $this->sequence(null)->distinct(['index' => $field]);
+        if (!empty($query)) {
+            $result = $result->filter($query);
+        }
+        $result = $result->run($this->connection->getHandle());
         if ($result instanceof Cursor) {
             $result = $result->toArray();
         }
