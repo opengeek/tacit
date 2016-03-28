@@ -66,9 +66,8 @@ class PersistentTest extends ModelTestCase
      */
     public function testGetMockPersistentInstance()
     {
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance());
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([]));
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', MockPersistent::instance([
+        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance([], $this->fixture));
+        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance([
             '_id'      => 99999,
             'name'     => 'an instance',
             'text'     => 'an instance\'s text',
@@ -76,7 +75,7 @@ class PersistentTest extends ModelTestCase
             'integer'  => 144,
             'float'    => 3.14,
             'password' => 'password'
-        ]));
+        ], $this->fixture));
     }
 
     /**
@@ -88,7 +87,7 @@ class PersistentTest extends ModelTestCase
     {
         $collection = MockPersistent::collection($this->fixture);
         $this->assertTrue($collection instanceof Collection);
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockCollection', $collection);
+        $this->assertInstanceOf('Tacit\Test\Model\MockCollection', $collection);
     }
 
     /**
@@ -98,7 +97,7 @@ class PersistentTest extends ModelTestCase
      */
     public function testCollectionName()
     {
-        $this->assertEquals('mock_persistent', MockPersistent::collectionName($this->fixture));
+        $this->assertEquals('mock_persistent', MockPersistent::collectionName());
     }
 
     /**
@@ -137,8 +136,8 @@ class PersistentTest extends ModelTestCase
             $object = MockPersistent::create($data, $this->fixture);
 
             $this->assertNotNull($object);
-            $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
-            $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', $object);
+            $this->assertInstanceOf('Tacit\Model\Persistent', $object);
+            $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
         } catch (ModelValidationException $e) {
             echo $e;
         }
@@ -184,8 +183,8 @@ class PersistentTest extends ModelTestCase
         $object = MockPersistent::instance($data, $this->fixture);
 
         $this->assertNotNull($object);
-        $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockPersistent', $object);
+        $this->assertInstanceOf('Tacit\Model\Persistent', $object);
+        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
     }
     /**
      * dataProvider for testInstance()

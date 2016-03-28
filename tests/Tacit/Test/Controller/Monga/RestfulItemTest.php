@@ -70,13 +70,13 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MongaPersistentObject $itemObj */
         $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/monga/collection/' . (string)$itemObj->_id,
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -102,14 +102,14 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MongaPersistentObject $itemObj */
         $itemObj = MongaPersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -139,7 +139,7 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MongaPersistentObject $itemObj */
         $itemObj = MongaPersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/monga/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
@@ -147,7 +147,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 

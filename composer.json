@@ -1,7 +1,6 @@
 {
     "name": "tacit/tacit",
     "description": "A library for RESTful RAD",
-    "minimum-stability": "dev",
     "keywords": ["REST"],
     "homepage": "http://github.com/opengeek/Tacit",
     "type": "library",
@@ -15,17 +14,18 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
-        "slim/slim": "^2.4",
-        "league/fractal": "^0.6.0",
-        "league/monga": "^1.0"
+        "php": ">=5.5",
+        "slim/slim": "^3.1",
+        "league/fractal": "^0.6.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.5",
-        "danielmewes/php-rql": "^2.2"
+        "danielmewes/php-rql": "^2.2",
+        "league/monga": "^1.0"
     },
     "suggest": {
-        "danielmewes/php-rql": "For RethinkDB Model Support"
+        "danielmewes/php-rql": "For RethinkDB Model Support",
+        "league/monga": "For Monga (MongoDB) Model Support (PHP < 7 only)"
     },
     "autoload": {
         "psr-0": {

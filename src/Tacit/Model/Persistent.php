@@ -15,7 +15,6 @@ use Exception;
 use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
-use Tacit\Tacit;
 use Tacit\Validate\Validator;
 
 /**
@@ -62,15 +61,12 @@ abstract class Persistent
     /**
      * Get the Collection from the Repository.
      *
-     * @param Repository $repository A specific Repository to get the Collection from.
+     * @param Repository $repository A Repository to get the Collection from.
      *
      * @return Collection The Collection from the Repository.
      */
-    public static function collection(Repository $repository = null)
+    public static function collection(Repository $repository)
     {
-        if (null === $repository) {
-            $repository = Tacit::getInstance()->container->get('repository');
-        }
         static::$collection = $repository->collection(static::collectionName());
         return static::$collection;
     }
@@ -140,14 +136,14 @@ abstract class Persistent
      *
      * @return array[static] An array of Persistent objects, possibly empty.
      */
-    public static function find($criteria = array(), array $fields = array(), Repository $repository = null)
+    public static function find($criteria = array(), array $fields = array(), Repository $repository)
     {
         $collection = array();
         $models = static::collection($repository)->find($criteria, $fields);
         if ($models) {
             foreach ($models as $id => $model) {
                 /** @var Persistent $object */
-                $object = new static();
+                $object = new static($repository);
                 $object->hydrate($model);
                 $key = $object->getKey();
                 $collection[is_scalar($key) ? $key : $id] = $object;
@@ -234,13 +230,9 @@ abstract class Persistent
      *
      * @return Persistent
      */
-    public function __construct(Repository $repository = null)
+    public function __construct(Repository $repository)
     {
-        if (null === $repository) {
-            $this->_repository = Tacit::getInstance()->container->get('repository');
-        } else {
-            $this->_repository = $repository;
-        }
+        $this->_repository = $repository;
     }
 
     /**

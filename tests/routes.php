@@ -8,55 +8,60 @@
  * file that was distributed with this source code.
  */
 
-$this->tacit->any('/', function () {
-    (new \Tacit\Test\Controller\MockRestful($this->tacit))->handle();
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+$this->tacit->any('/', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+    return (new \Tacit\Test\Controller\MockRestful($this))->handle($request, $response, $args);
 });
 
 $this->tacit->group('/collection', function () {
-    $this->tacit->any('/', function () {
-        (new \Tacit\Test\Controller\MockRestfulCollection($this->tacit))->handle();
-    })->name('MockRestfulCollection');
-    $this->tacit->any('/:_id', function ($_id) {
-        (new \Tacit\Test\Controller\MockRestfulItem($this->tacit))->handle($_id);
-    })->name('MockRestfulItem');
+    $this->any('', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+        return (new \Tacit\Test\Controller\MockRestfulCollection($this))->handle($request, $response, $args);
+    })->setName('MockRestfulCollection');
+    $this->any('/{_id}', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+        return (new \Tacit\Test\Controller\MockRestfulItem($this))->handle($request, $response, $args);
+    })->setName('MockRestfulItem');
 });
 
 $this->tacit->group('/monga', function () {
-    $this->tacit->group('/collection', function () {
-//        $this->tacit->any('/', function () {
-//            (new \Tacit\Test\Controller\Monga\RestfulCollection($this->tacit))->handle();
-//        })->name('MongaRestfulCollection');
-        $this->tacit->any('/:_id', function ($_id) {
-            (new \Tacit\Test\Controller\Monga\RestfulItem($this->tacit))->handle($_id);
-        })->name('MongaRestfulItem');
+    $this->group('/collection', function () {
+//        $this->any('', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+//            return (new \Tacit\Test\Controller\Monga\RestfulCollection($this))->handle($request, $response, $args);
+//        })->setName('MongaRestfulCollection');
+        $this->any('/{_id}', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+            return (new \Tacit\Test\Controller\Monga\RestfulItem($this))->handle($request, $response, $args);
+        })->setName('MongaRestfulItem');
     });
 });
 
 $this->tacit->group('/rethinkdb', function () {
-    $this->tacit->group('/collection', function () {
-//        $this->tacit->any('/', function () {
-//            (new \Tacit\Test\Controller\RethinkDB\RestfulCollection($this->tacit))->handle();
-//        })->name('RethinkDBRestfulCollection');
-        $this->tacit->any('/:id', function ($id) {
-            (new \Tacit\Test\Controller\RethinkDB\RestfulItem($this->tacit))->handle($id);
-        })->name('RethinkDBRestfulItem');
+    $this->group('/collection', function () {
+//        $this->any('', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+//            return (new \Tacit\Test\Controller\RethinkDB\RestfulCollection($this))->handle($request, $response, $args);
+//        })->setName('RethinkDBRestfulCollection');
+        $this->any('/{id}', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+            return (new \Tacit\Test\Controller\RethinkDB\RestfulItem($this))->handle($request, $response, $args);
+        })->setName('RethinkDBRestfulItem');
     });
 });
 
-$this->tacit->any('/basic-test', function () {
-    $mockRestful = new \Tacit\Test\Controller\MockRestful($this->tacit);
+$this->tacit->any('/basic-test', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+    $mockRestful = new \Tacit\Test\Controller\MockRestful($this);
     if ((new \Tacit\Authorize\Basic())->isValidRequest($mockRestful)) {
-        $mockRestful->handle();
+        return $mockRestful->handle($request, $response, $args);
     } else {
-        $this->tacit->halt(401, 'Unauthorized Error');
+        $response->getBody()->write('Unauthorized Error');
+        return $response->withStatus(401);
     }
 });
 
-$this->tacit->any('/hmac-test', function () {
-    $mockRestful = new \Tacit\Test\Controller\MockRestful($this->tacit);
+$this->tacit->any('/hmac-test', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+    $mockRestful = new \Tacit\Test\Controller\MockRestful($this);
     if ((new \Tacit\Authorize\HMAC())->isValidRequest($mockRestful)) {
-        $mockRestful->handle();
+        return $mockRestful->handle($request, $response, $args);
     } else {
-        $this->tacit->halt(401, 'Unauthorized Error');
+        $response->getBody()->write('Unauthorized Error');
+        return $response->withStatus(401);
     }
 });

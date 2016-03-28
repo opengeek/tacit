@@ -54,7 +54,7 @@ class RestfulCollectionTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->fixture = $this->tacit->container->get('repository');
+        $this->fixture = $this->tacit->getContainer()->get('repository');
         foreach (self::fixtureData() as $item) {
             MockPersistent::create($item, $this->fixture);
         }
@@ -72,17 +72,17 @@ class RestfulCollectionTest extends ControllerTestCase
      */
     public function testGet()
     {
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/',
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $result = json_decode($response->getBody(), true);
 
-            $this->assertEquals(200, $response->getStatus());
+            $this->assertEquals(200, $response->getStatusCode());
 
             $this->assertArrayHasKey('_links', $result);
             $this->assertArrayHasKey('_embedded', $result);
@@ -107,17 +107,17 @@ class RestfulCollectionTest extends ControllerTestCase
     {
         MockPersistent::collection($this->fixture)->truncate();
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/',
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $result = json_decode($response->getBody(), true);
 
-            $this->assertEquals(200, $response->getStatus());
+            $this->assertEquals(200, $response->getStatusCode());
 
             $this->assertArrayHasKey('_links', $result);
             $this->assertArrayHasKey('_embedded', $result);

@@ -16,7 +16,7 @@ $tacit = new \Tacit\Tacit(
         'mode' => 'development',
         'startTime' => microtime(true),
         'connection' => [
-            'class' => 'Tacit\\Test\\Model\\MockRepository',
+            'class' => 'Tacit\Test\Model\MockRepository',
             'server' => 'localhost',
             'options' => array('connect' => false),
             'repository' => 'tacit_test'

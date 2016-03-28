@@ -34,7 +34,7 @@ class RestfulException extends Exception
         if (null !== $property) $this->property = $property;
         if (null !== $description) $this->description = $description;
 
-        $controller->respondWithError($this);
+        $controller->respondWithError($controller->getContainer()['request'], $controller->getContainer()['response'], $this);
     }
 
     public function getDescription()

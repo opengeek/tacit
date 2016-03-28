@@ -12,11 +12,15 @@ namespace Tacit\Controller;
 
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tacit\Controller\Exception\NotFoundException;
+use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
+use Tacit\Model\RethinkDB\Persistent;
 use Tacit\Operations\OperationalException;
 
 /**
@@ -28,21 +32,25 @@ abstract class RestfulItem extends Restful
 {
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'PATCH', 'PUT', 'DELETE'];
 
-    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+    protected static $transformer = 'Tacit\Transform\PersistentTransformer';
 
     /**
      * Delete this item from the collection.
      *
-     * @throws ServerErrorException
-     * @throws NotFoundException
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function delete()
+    public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($this->criteria(func_get_args()), [], $this->app->container->get('repository'));
+        /** @var Persistent $item */
+        $item = $modelClass::findOne($this->criteria($args), [], $this->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
@@ -58,69 +66,77 @@ abstract class RestfulItem extends Restful
             throw new ServerErrorException($this, 'Error deleting resource', 'The resource could not be removed.');
         }
 
-        $this->respond(null, self::RESOURCE_TYPE_ITEM, 204);
+        return $this->respond($request, $response, null, self::RESOURCE_TYPE_ITEM, 204);
     }
 
     /**
      * GET a representation of an item from the collection.
      *
-     * @throws NotFoundException
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function get()
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria(func_get_args());
+        $criteria = $this->criteria($args);
 
-        $fields = array_filter(explode(',', $this->app->request->get('fields', '')));
-
-        /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria, $fields, $this->app->container->get('repository'));
+        $fields = array_filter(explode(',', $request->getQueryParams()['fields'] ?: ''));
+        
+        /** @var Persistent $item */
+        $item = $modelClass::findOne($criteria, $fields, $this->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
         }
 
-        $this->respondWithItem($item, new static::$transformer());
+        return $this->respondWithItem($request, $response, $item, new static::$transformer());
     }
 
     /**
      * PATCH only the properties of this item specified in the request entity.
      *
-     * @throws ServerErrorException
-     * @throws NotFoundException
-     * @throws UnacceptableEntityException
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function patch()
+    public function patch(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria(func_get_args());
+        $criteria = $this->criteria($args);
 
-        /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria, [], $this->app->container->get('repository'));
+        /** @var Persistent $item */
+        $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
         }
 
         try {
-            $data = $this->app->request->post(null, []);
+            $data = $request->getParsedBody();
             $data = $this->patchBeforeSet($data);
             
             $item->fromArray($data, Collection::getMask($item));
             $item->save();
+
+            return $this->respondWithItem($request, $response, $item, new static::$transformer());
         } catch (OperationalException $e) {
-            $e->next($this);
+            throw $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error patching resource', $e->getMessage(), null, $e);
         }
-
-        $this->respondWithItem($item, new static::$transformer());
     }
 
     /**
@@ -128,42 +144,49 @@ abstract class RestfulItem extends Restful
      *
      * NOTE: This will replace the item with the properties specified in request
      * entity. Properties not provided will be reset to default values for the item.
+     * 
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function put()
+    public function put(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria(func_get_args());
+        $criteria = $this->criteria($args);
 
-        /** @var \Tacit\Model\Persistent $item */
-        $item = $modelClass::findOne($criteria, [], $this->app->container->get('repository'));
+        /** @var Persistent $item */
+        $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException($this);
         }
 
         try {
-            /** @var \Tacit\Model\Persistent $newItem */
+            /** @var Persistent $newItem */
             $newItem = new $modelClass();
             $data = array_replace_recursive(
                 $newItem->toArray(),
-                $this->app->request->post(null, [])
+                $request->getParsedBody() ?: []
             );
             
             $data = $this->putBeforeSet($data);
             
             $item->fromArray($data, Collection::getMask($item));
             $item->save();
+
+            return $this->respondWithItem($request, $response, $item, new static::$transformer());
         } catch (OperationalException $e) {
-            $e->next($this);
+            throw $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error updating resource', $e->getMessage(), null, $e);
         }
-
-        $this->respondWithItem($item, new static::$transformer());
     }
 
     /**

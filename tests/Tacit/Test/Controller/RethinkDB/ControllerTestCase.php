@@ -26,11 +26,6 @@ abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestC
     /** @var Repository */
     protected $fixture;
 
-    protected function mockEnvironment(array $vars = ['REQUEST_METHOD' => 'GET'])
-    {
-        Environment::mock($vars);
-    }
-
     protected function setUp()
     {
         $this->tacit = new Tacit([
@@ -46,7 +41,7 @@ abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestC
             ]
         ]);
 
-        $this->fixture = $this->tacit->container->get('repository');
+        $this->fixture = $this->tacit->getContainer()->get('repository');
 
         $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../../identities.php');
         require __DIR__ . '/../../../../routes.php';

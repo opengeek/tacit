@@ -39,9 +39,7 @@ abstract class MongaTestCase extends TestCase
                 'repository' => 'tacit_test'
             ]
         ]);
-        $tacit->setName('test_monga');
-
-        $this->fixture = $tacit->container->get('repository');
+        $this->fixture = $tacit->getContainer()->get('repository');
 
         $this->fixture->create(['exceptions' => false]);
     }

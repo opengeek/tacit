@@ -26,13 +26,13 @@ class RestfulControllerBasicTest extends ControllerTestCase
         $clientKey = 'cb892ecb-6458-425c-9e3a-b3e99ec86f56';
         $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/basic-test',
             'PHP_AUTH_USER' => $clientKey,
             'PHP_AUTH_PW' => $secretKey
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -54,7 +54,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
         $clientKey = 'cb892ecb-6458-425c-9e3a-b3e99ec86f56';
         $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/basic-test',
             'REQUEST_METHOD' => 'POST',
             'PHP_AUTH_USER' => $clientKey,
@@ -63,7 +63,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
             'slim.input' => '{"target":"mocker"}'
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $this->assertEquals(
             array_intersect_assoc(

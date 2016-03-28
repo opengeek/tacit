@@ -55,7 +55,7 @@ class RestfulItemTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->fixture = $this->tacit->container->get('repository');
+        $this->fixture = $this->tacit->getContainer()->get('repository');
         foreach (self::fixtureData() as $item) {
             MockPersistent::create($item, $this->fixture);
         }
@@ -74,13 +74,13 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MockPersistent $itemObj */
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -103,14 +103,14 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MockPersistent $itemObj */
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/' . $itemObj->_id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -139,7 +139,7 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MockPersistent $itemObj */
         $itemObj = MockPersistent::findOne(['name' => $data['name']], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
@@ -147,7 +147,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -169,7 +169,7 @@ class RestfulItemTest extends ControllerTestCase
         /** @var MockPersistent $itemObj */
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
@@ -179,10 +179,11 @@ class RestfulItemTest extends ControllerTestCase
             ])
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $item = json_decode($response->getBody(), true);
 
+        $this->assertArrayHasKey('name', $item);
         $this->assertEquals('New MockPersistent #1', $item['name']);
         $this->assertNull($item['text']);
     }

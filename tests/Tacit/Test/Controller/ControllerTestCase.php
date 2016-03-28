@@ -12,9 +12,12 @@ namespace Tacit\Test\Controller;
 
 
 
-use Guzzle\Http\StaticClient;
-use Slim\Environment;
-use Tacit\Tacit;
+use Slim\Http\Body;
+use Slim\Http\Environment;
+use Slim\Http\Headers;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Http\Uri;
 use Tacit\TestCase;
 
 /**
@@ -24,9 +27,23 @@ use Tacit\TestCase;
  */
 abstract class ControllerTestCase extends TestCase
 {
+    /**
+     * @param array $vars
+     *
+     * @return array
+     */
     protected function mockEnvironment(array $vars = ['REQUEST_METHOD' => 'GET'])
     {
-        Environment::mock($vars);
+        $env = Environment::mock($vars);
+        $uri = Uri::createFromEnvironment($env);
+        $headers = Headers::createFromEnvironment($env);
+        $cookies = [];
+        $serverParams = $env->all();
+        $body = new Body(fopen('php://temp', 'r+'));
+        $req = new Request('POST', $uri, $headers, $cookies, $serverParams, $body);
+        $res = new Response();
+
+        return ['request' => $req, 'response' => $res];
     }
 
     protected function setUp()

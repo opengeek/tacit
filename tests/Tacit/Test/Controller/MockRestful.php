@@ -11,6 +11,8 @@
 namespace Tacit\Test\Controller;
 
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tacit\Controller\Restful;
 use Tacit\Transform\ArrayTransformer;
 
@@ -18,14 +20,15 @@ class MockRestful extends Restful
 {
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST'];
 
-    public function get()
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        $this->respondWithItem(['message' => 'mock me do you?'], new ArrayTransformer());
+        $this->respondWithItem($request, $response, ['message' => 'mock me do you?'], new ArrayTransformer());
     }
 
-    public function post()
+    public function post(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        $target = $this->app->request()->post('target', 'undefined');
-        $this->respondWithItem(['message' => "mock me do you {$target}?"], new ArrayTransformer());
+        $parsed = $request->getParsedBody();
+        $target = isset($parsed['target']) ? $parsed['target'] : 'undefined';
+        $this->respondWithItem($request, $response, ['message' => "mock me do you {$target}?"], new ArrayTransformer());
     }
 }

@@ -22,16 +22,6 @@ use Tacit\TestCase;
 class TacitTest extends TestCase
 {
     /**
-     * Test Tacit::getInstance()
-     */
-    public function testGetInstance()
-    {
-        $tacit = Tacit::getInstance();
-        $this->assertInstanceOf('Tacit\\Tacit', $tacit, 'Could not get a valid instance of \\Tacit\\Tacit');
-        $this->assertInstanceOf('Slim\\Slim', $tacit, 'The instance of Tacit instantiated is not an instance of \\Slim\\Slim');
-    }
-
-    /**
      * Test the Tacit constructor.
      *
      * @param array $config
@@ -41,17 +31,9 @@ class TacitTest extends TestCase
     public function testTacitConstructor($config)
     {
         $tacit = new Tacit($config);
-        $this->assertInstanceOf('Tacit\\Tacit', $tacit, 'Could not get a valid instance of \\Tacit\\Tacit');
-        $this->assertInstanceOf('Slim\\Slim', $tacit, 'The instance of Tacit instantiated is not an instance of \\Slim\\Slim');
-        $this->assertEquals(
-            [
-                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
-                'server' => 'mongodb://localhost',
-                'options' => array('connect' => false),
-                'repository' => 'test'
-            ],
-            $tacit->config('connection')
-        );
+        $this->assertInstanceOf('Tacit\Tacit', $tacit, 'Could not get a valid instance of \Tacit\Tacit');
+        $this->assertInstanceOf('Slim\App', $tacit, 'The instance of Tacit instantiated is not an instance of \Slim\App');
+        $this->assertNull($tacit->config('connection'));
     }
     public function providerTacitConstructor()
     {
@@ -63,9 +45,9 @@ class TacitTest extends TestCase
     public function testRepositoryIsOptional()
     {
         $tacit = new Tacit(['connection' => null]);
-        $this->assertInstanceOf('Tacit\\Tacit', $tacit, 'Could not get a valid instance of \\Tacit\\Tacit');
-        $this->assertInstanceOf('Slim\\Slim', $tacit, 'The instance of Tacit instantiated is not an instance of \\Slim\\Slim');
+        $this->assertInstanceOf('Tacit\Tacit', $tacit, 'Could not get a valid instance of \Tacit\Tacit');
+        $this->assertInstanceOf('Slim\App', $tacit, 'The instance of Tacit instantiated is not an instance of \Slim\App');
         $this->assertNull($tacit->config('connection'));
-        $this->assertNull($tacit->container->get('repository'));
+        $this->assertFalse($tacit->getContainer()->has('repository'));
     }
 }

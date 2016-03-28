@@ -12,9 +12,13 @@ namespace Tacit\Controller;
 
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelValidationException;
+use Tacit\Model\Persistent;
 use Tacit\Model\Query;
 use Tacit\Operations\OperationalException;
 
@@ -39,22 +43,27 @@ abstract class RestfulCollection extends Restful
     /**
      * GET a representation of a pageable and sortable collection.
      *
-     * @throws ServerErrorException
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface|void
+     * @throws RestfulException
      */
-    public function get()
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria(func_get_args());
+        $criteria = $this->criteria($args);
 
-        $limit = $this->app->request->get('limit', 25);
-        $offset = $this->app->request->get('offset', 0);
-        $orderBy = $this->app->request->get('sort', $modelClass::key());
-        $orderDir = $this->app->request->get('sort_dir', 'desc');
+        $limit = $request->getQueryParams()['limit'] ?: 25;
+        $offset = $request->getQueryParams()['offset'] ?: 0;
+        $orderBy = $request->getQueryParams()['sort'] ?: $modelClass::key();
+        $orderDir = $request->getQueryParams()['sort_dir'] ?: 'desc';
 
         try {
-            $total = $modelClass::count($criteria, $this->app->container->get('repository'));
+            $total = $modelClass::count($criteria, $this->container->get('repository'));
 
             $collection = $modelClass::find(function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
                 /** @var Query|object $query */
@@ -62,47 +71,54 @@ abstract class RestfulCollection extends Restful
                     $query->where($criterionKey, $criterion);
                 }
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
-            }, [], $this->app->container->get('repository'));
+            }, [], $this->container->get('repository'));
+
+            return $this->respondWithCollection($request, $response, $collection, $this->transformer(), ['total' => $total]);
         } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
-
-        $this->respondWithCollection($collection, $this->transformer(), ['total' => $total]);
     }
 
     /**
      * POST a new representation of an item into the collection.
      *
-     * @throws ServerErrorException
-     * @throws UnacceptableEntityException
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function post()
+    public function post(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
         try {
-            $criteria = $this->criteria(func_get_args());
-            $data = !empty($criteria) ? array_replace_recursive($this->app->request->post(null, []), $criteria) : $this->app->request->post(null, []);
+            $criteria = $this->criteria($args);
+            $data = $request->getParsedBody() ?: [];
+            $data = !empty($criteria) ? array_replace_recursive($data, $criteria) : $data;
             $data = $this->postBeforeSet($data);
             
-            $item = $modelClass::create($data, $this->app->container->get('repository'));
+            $item = $modelClass::create($data, $this->container->get('repository'));
+
+            /** @var RestfulItem $itemController */
+            $itemController = static::$itemController;
+
+            return $this->respondWithItemCreated(
+                $request,
+                $response,
+                $item,
+                $itemController::url($this->container, [$item->getKeyField() => $item->getKey()], false),
+                $this->transformer()
+            );
         } catch (OperationalException $e) {
-            $e->next($this);
+            throw $e->next($this);
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
         }
-
-        /** @var RestfulItem $itemController */
-        $itemController = static::$itemController;
-
-        $this->respondWithItemCreated(
-            $item,
-            $itemController::url($this->app, [$item->getKeyField() => $item->getKey()], false),
-            $this->transformer()
-        );
     }
 
     /**

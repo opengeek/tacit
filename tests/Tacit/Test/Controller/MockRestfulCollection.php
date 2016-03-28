@@ -12,34 +12,37 @@ namespace Tacit\Test\Controller;
 
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\RestfulCollection;
+use Tacit\Model\Persistent;
 
 class MockRestfulCollection extends RestfulCollection
 {
     protected static $collectionName = 'mock_persistent';
     protected static $itemName = 'mock_persistent';
-    protected static $modelClass = 'Tacit\\Test\\Model\\MockPersistent';
+    protected static $modelClass = 'Tacit\Test\Model\MockPersistent';
     protected static $name = 'MockRestfulCollection';
     protected static $title = 'A Mock Restful Collection';
-    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+    protected static $transformer = 'Tacit\Transform\PersistentTransformer';
 
-    public function get()
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        /** @var \Tacit\Model\Persistent $modelClass */
+        /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria(func_get_args());
+        $criteria = $this->criteria($args);
 
-        $limit = $this->app->request->get('limit', 25);
-        $offset = $this->app->request->get('offset', 0);
-        $orderBy = $this->app->request->get('sort', $modelClass::key());
-        $orderDir = $this->app->request->get('sort_dir', 'desc');
+        $limit = $request->getQueryParams()['limit'] ?: 25;
+        $offset = $request->getQueryParams()['offset'] ?: 0;
+        $orderBy = $request->getQueryParams()['sort'] ?: $modelClass::key();
+        $orderDir = $request->getQueryParams()['sort_dir'] ?: 'desc';
 
         try {
-            $total = $modelClass::count($criteria, $this->app->container->get('repository'));
+            $total = $modelClass::count($criteria, $this->container->get('repository'));
 
-            $collection = $modelClass::find($criteria, [], $this->app->container->get('repository'));
+            $collection = $modelClass::find($criteria, [], $this->container->get('repository'));
 
             if ($collection === null) {
                 $collection = [];
@@ -60,10 +63,10 @@ class MockRestfulCollection extends RestfulCollection
             if ($collection && $limit > 0) {
                 $collection = array_slice($collection, $offset, $limit);
             }
+
+            return $this->respondWithCollection($request, $response, $collection, $this->transformer(), ['total' => $total]);
         } catch (Exception $e) {
             throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
         }
-
-        $this->respondWithCollection($collection, $this->transformer(), ['total' => $total]);
     }
 }

@@ -11,99 +11,73 @@
 namespace Tacit;
 
 
-use Exception;
-use Slim\Slim;
-use Tacit\Controller\Exception\NotFoundException;
-use Tacit\Controller\Exception\RestfulException;
-use Tacit\Middleware\ContentTypes;
+use Slim\App;
+use Slim\Collection;
+use Tacit\Model\Repository;
 
 /**
- * An extension of Slim to wrap RESTful RAD server features.
+ * A wrapper for Slim to provide RESTful RAD server features.
+ *
+ * @property Repository|null $repository
  *
  * @package Tacit
  */
-class Tacit extends Slim
+class Tacit extends App
 {
     /**
      * Construct a new instance of Tacit.
      *
-     * @param string|array|null $configuration An array or file that returns an
+     * @param string|array|Container|null $configuration An array or file that returns an
      * array when included.
      */
     public function __construct($configuration = null)
     {
         $configuration = $this->loadConfiguration($configuration);
 
-        parent::__construct($configuration);
+        $container = isset($configuration['container']) ? $configuration['container'] : null;
+        unset($configuration['container']);
 
-        $connection = $this->config('connection');
-
-        $this->configureMode('production', function () {
-            $this->config([
-                'log.enable' => true,
-                'debug' => false
-            ]);
-        });
-        $this->configureMode('development', function () {
-            $this->config([
-                'log.enable' => false,
-                'debug' => true
-            ]);
-        });
-
-        if ($connection !== null) {
-            $this->container->singleton('repository', function () use ($connection) {
-                $dbClass = $connection['class'];
-                return new $dbClass($connection);
-            });
+        if (!$container instanceof Container) {
+            $container = new Container(['settings' => $configuration]);
         }
 
-        $this->add(new ContentTypes());
+        parent::__construct($container);
 
-        $this->error(function (Exception $e) {
-            $resource = [
-                'status' => 500,
-                'code' => $e->getCode(),
-                'message' => $e->getMessage()
-            ];
-            if ($e instanceof RestfulException) {
-                if ($e instanceof NotFoundException) {
-                    $this->notFound();
-                }
-                $resource['status'] = $e->getStatus();
-                $resource['description'] = $e->getDescription();
-                $resource['property'] = $e->getProperty();
-            }
+        $connection = isset($configuration['connection'])
+            ? $configuration['connection']
+            : null;
 
-            /* @var \Slim\Http\Response $response */
-            $response = $this->response;
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setStatus($resource['status']);
-            if ($this->config('debug') === true) {
-                $resource['request_duration'] = microtime(true) - $this->config('startTime');
-            }
-            $response->setBody(json_encode($resource));
+        if ($connection !== null) {
+            $this->getContainer()['repository'] = function () use ($connection) {
+                $dbClass = $connection['class'];
+                return new $dbClass($connection);
+            };
+        }
+    }
 
-            $this->stop();
-        });
+    /**
+     * Get a configuration value from the app settings.
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @return mixed
+     */
+    public function config($key, $value = null)
+    {
+        /** @var Collection $settings */
+        $settings = $this->getContainer()['settings'];
 
-        $this->notFound(function () {
-            $resource = [
-                'status' => 404,
-                'message' => 'Resource not found'
-            ];
+        if ($value !== null) {
+            $settings->set($key, $value);
 
-            /* @var \Slim\Http\Response $response */
-            $response = $this->response;
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setStatus(404);
-            if ($this->config('debug') === true) {
-                $resource['request_duration'] = microtime(true) - $this->config('startTime');
-            }
-            $response->setBody(json_encode($resource));
+            return true;
+        }
+        if ($settings->has($key)) {
 
-            $this->stop();
-        });
+            return $settings->get($key);
+        }
+
+        return null;
     }
 
     /**
@@ -130,20 +104,6 @@ class Tacit extends Slim
             $configuration = [
                 'mode' => 'development',
                 'startTime' => microtime(true),
-                'connection' => [
-                    'class' => 'Tacit\\Model\\Monga\\MongaRepository',
-                    'server' => 'mongodb://localhost',
-                    'options' => array('connect' => false),
-                    'repository' => 'test'
-                ]
-            ];
-        }
-        if (!array_key_exists('connection', $configuration)) {
-            $configuration['connection'] = [
-                'class' => 'Tacit\\Model\\Monga\\MongaRepository',
-                'server' => 'mongodb://localhost',
-                'options' => array('connect' => false),
-                'repository' => 'test'
             ];
         }
         if (!isset($configuration['startTime'])) {
@@ -155,13 +115,14 @@ class Tacit extends Slim
     /**
      * Similar as run method, but returns Response instead of echoing it
      *
+     * @param array $mock
+     *
      * @return \Slim\Http\Response
+     * @throws \Slim\Exception\MethodNotAllowedException
+     * @throws \Slim\Exception\NotFoundException
      */
-    public function invoke()
+    public function invoke(array $mock)
     {
-        $this->middleware[0]->call();
-        $this->response()->finalize();
-
-        return $this->response();
+        return $this->__invoke($mock['request'], $mock['response']);
     }
 }

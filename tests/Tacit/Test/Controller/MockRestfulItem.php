@@ -17,10 +17,10 @@ class MockRestfulItem extends RestfulItem
 {
     protected static $collectionName = 'mock_persistent';
     protected static $itemName = 'mock_persistent';
-    protected static $modelClass = 'Tacit\\Test\\Model\\MockPersistent';
+    protected static $modelClass = 'Tacit\Test\Model\MockPersistent';
     protected static $name = 'MockRestfulItem';
     protected static $title = 'A Mock Restful Item';
-    protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+    protected static $transformer = 'Tacit\Transform\PersistentTransformer';
 
     public static function keys()
     {

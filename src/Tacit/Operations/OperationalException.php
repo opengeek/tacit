@@ -12,6 +12,7 @@ namespace Tacit\Operations;
 
 
 use Exception;
+use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Restful;
 
 class OperationalException extends Exception
@@ -23,6 +24,15 @@ class OperationalException extends Exception
     /** @var array */
     protected $property;
 
+    /**
+     * Construct a new OperationalException.
+     *
+     * @param string         $next
+     * @param string         $message
+     * @param null           $description
+     * @param null           $property
+     * @param Exception|null $previous
+     */
     public function __construct($next, $message = '', $description = null, $property = null, Exception $previous = null)
     {
         $this->next = $next;
@@ -41,8 +51,13 @@ class OperationalException extends Exception
         return $this->property;
     }
 
+    /**
+     * @param Restful $controller
+     *
+     * @return RestfulException
+     */
     public function next(Restful $controller)
     {
-        throw new $this->next($controller, $this->getMessage(), $this->getDescription(), $this->getProperty(), $this->getPrevious());
+        return new $this->next($controller, $this->getMessage(), $this->getDescription(), $this->getProperty(), $this->getPrevious());
     }
 }

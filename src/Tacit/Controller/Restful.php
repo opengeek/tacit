@@ -16,15 +16,18 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\TransformerAbstract;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Http\Response;
 use Slim\Route;
+use Slim\Router;
+use Tacit\Container;
 use Tacit\Controller\Exception\BadRequestException;
 use Tacit\Controller\Exception\MethodNotAllowedException;
-use Tacit\Controller\Exception\NotAcceptableException;
 use Tacit\Controller\Exception\NotImplementedException;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Model\Persistent;
-use Tacit\Tacit;
 use Tacit\Transform\RestfulExceptionTransformer;
 
 /**
@@ -92,14 +95,7 @@ abstract class Restful
      *
      * @var string
      */
-    protected static $transformer = '\\Tacit\\Transform\\ArrayTransformer';
-
-    /**
-     * An instance of Tacit.
-     *
-     * @var Tacit
-     */
-    protected $app;
+    protected static $transformer = '\Tacit\Transform\ArrayTransformer';
 
     /**
      * An array of refs for this controller.
@@ -109,9 +105,11 @@ abstract class Restful
     protected $refs = [];
 
     /**
-     * @var Route The route that instantiated this controller.
+     * The DI container for access to dependencies
+     *
+     * @var Container
      */
-    public $route;
+    protected $container;
 
     public static function className()
     {
@@ -155,17 +153,17 @@ abstract class Restful
     /**
      * Return a RESTful ref element for this controller.
      *
-     * @param Tacit      $app
+     * @param Container  $container
      * @param array      $routeParams
      * @param array|bool $params
      * @param string     $suffix
      *
      * @return array
      */
-    public static function ref(Tacit &$app, array $routeParams = [], $params = false, $suffix = '')
+    public static function ref(Container $container, array $routeParams = [], $params = false, $suffix = '')
     {
         return [
-            'href' => static::url($app, $routeParams, $params),
+            'href' => static::url($container, $routeParams, $params),
             'title' => static::title() . (!empty($suffix) ? " {$suffix}" : '')
         ];
     }
@@ -182,47 +180,57 @@ abstract class Restful
     /**
      * Get the URL for this Restful controller.
      *
-     * @param Tacit      $app
+     * @param Container  $container
      * @param array      $routeParams
      * @param array|bool $params
      *
      * @return string
      */
-    public static function url(Tacit &$app, array $routeParams = [], $params = [])
+    public static function url(Container $container, array $routeParams = [], $params = [])
     {
-        $url = $app->request->getUrl();
-        $url .= $app->urlFor(static::name(), $routeParams);
-        if (false !== $params) {
-            $currentRoute = $app->router->getCurrentRoute();
+        /** @var ServerRequestInterface $request */
+        $request = $container->get('request');
+
+        /** @var Router $router */
+        $router = $container->get('router');
+
+        $getParams = [];
+        if (false !== $params && is_array($params)) {
+            /** @var Route $currentRoute */
+            $currentRoute = $request->getAttribute('route');
+
             $getParams = $currentRoute && $currentRoute->getName() !== static::name()
-                ? $app->request->get()
+                ? $request->getQueryParams()
                 : [];
-            $getParams = array_merge($getParams, is_array($params) ? $params : []);
-            if (!empty($getParams)) {
-                $url .= '?';
-                $qs = array();
-                foreach ($getParams as $qKey => $qValue) {
-                    $qs[] = urlencode($qKey) . "=" . urlencode($qValue);
-                }
-                $url .= implode('&', $qs);
-            }
+            $getParams = array_merge($getParams, $params);
         }
-        return $url;
+
+        return $router->pathFor(static::name(), $routeParams, $getParams);
     }
 
     /**
      * Construct a new instance of the Restful controller.
      *
-     * @param Tacit $app
+     * @param Container $container
      */
-    public function __construct(Tacit &$app)
+    public function __construct(Container $container)
     {
-        $this->app =& $app;
-        $this->route = $this->app->router->getCurrentRoute();
+        $this->container = $container;
         $this->fractal = new Manager();
-        $scopeParameter = $this->app->config('embedded_scopes_param') ? $this->app->config('embedded_scopes_param') : 'zoom';
-        $this->fractal->setRequestedScopes(explode(',', $this->app->request->get($scopeParameter)));
-        $this->app->container->set('controller', $this);
+        $scopeParameter = isset($this->container->settings['embedded_scopes_param']) ? $this->container->settings['embedded_scopes_param'] : 'zoom';
+        if (isset($this->container->request->getQueryParams()[$scopeParameter])) {
+            $this->fractal->setRequestedScopes(explode(',', $this->container->request->getQueryParams()[$scopeParameter]));
+        }
+    }
+
+    /**
+     * Get the DI container for this controller.
+     *
+     * @return Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**
@@ -238,10 +246,14 @@ abstract class Restful
     /**
      * Handle a DELETE request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function delete()
+    public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
         throw new NotImplementedException($this);
     }
@@ -249,44 +261,52 @@ abstract class Restful
     /**
      * Handle a GET request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function get()
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
         throw new NotImplementedException($this);
-    }
-
-    public function getApp()
-    {
-        return $this->app;
     }
 
     /**
      * Route to the appropriate HTTP method.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function handle()
+    public function handle(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        $this->checkMethod();
-        $method = strtoupper($this->app->request->getMethod());
+        $this->checkMethod($request);
+
+        $method = $request->getMethod();
         if (method_exists($this, $method)) {
-            call_user_func_array([$this, $method], func_get_args());
+            return $this->{$method}($request, $response, $args);
         }
-        throw new NotAcceptableException($this);
+        throw new NotImplementedException($this);
     }
 
     /**
      * Handle a HEAD request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function head()
+    public function head(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        $this->get();
+        return $this->get($request, $response, $args);
     }
 
     /**
@@ -303,25 +323,31 @@ abstract class Restful
     /**
      * Handle an OPTIONS request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function options()
+    public function options(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        $this->app->response->headers->set('Content-Type', static::$responseType);
-        $this->app->response->setStatus(200);
-        $this->app->response->headers->set('Allow', implode(',', static::$allowedMethods));
-
-        $this->app->stop();
+        return $response->withHeader('Content-Type', static::$responseType)
+            ->withHeader('Allow', implode(',', static::$allowedMethods))
+            ->withStatus(200);
     }
 
     /**
      * Handle a PATCH request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function patch()
+    public function patch(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
         throw new NotImplementedException($this);
     }
@@ -329,10 +355,14 @@ abstract class Restful
     /**
      * Handle a POST request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function post()
+    public function post(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
         throw new NotImplementedException($this);
     }
@@ -340,10 +370,14 @@ abstract class Restful
     /**
      * Handle a PUT request.
      *
-     * @throws Exception\RestfulException
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     *
+     * @return ResponseInterface
+     * @throws RestfulException
      */
-    public function put()
+    public function put(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
         throw new NotImplementedException($this);
     }
@@ -374,12 +408,17 @@ abstract class Restful
     /**
      * Respond with a RestfulException.
      *
-     * @param RestfulException $exception
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param RestfulException       $exception
+     *
+     * @return ResponseInterface
      */
-    public function respondWithError(RestfulException $exception)
+    public function respondWithError(ServerRequestInterface $request, ResponseInterface $response, RestfulException $exception)
     {
         $item = new Item($exception, new RestfulExceptionTransformer());
-        $this->respond($item, self::RESOURCE_TYPE_ERROR, $exception->getStatus());
+
+        return $this->respond($request, $response, $item, self::RESOURCE_TYPE_ERROR, $exception->getStatus());
     }
 
     /**
@@ -396,6 +435,7 @@ abstract class Restful
         if (is_string($transformerClass) && class_exists($transformerClass)) {
             static::$transformer = $transformerClass;
         }
+
         return new static::$transformer;
     }
 
@@ -417,6 +457,7 @@ abstract class Restful
         foreach ($keys as $key) {
             $criteria[$key] = array_shift($args);
         }
+
         return $criteria;
     }
 
@@ -436,41 +477,58 @@ abstract class Restful
     /**
      * Respond with a Collection.
      *
-     * @param array[Persistent]   $collection A collection to transform and  respond with.
-     * @param TransformerAbstract $transformer The transformer to apply to the items in the collection.
-     * @param array               $meta An array of metadata associated with the collection.
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array[Persistent]      $collection  A collection to transform and  respond with.
+     * @param TransformerAbstract    $transformer The transformer to apply to the items in the collection.
+     * @param array                  $meta        An array of metadata associated with the collection.
+     *
+     * @return ResponseInterface
      */
-    protected function respondWithCollection($collection, TransformerAbstract $transformer, array $meta = [])
+    protected function respondWithCollection(ServerRequestInterface $request, ResponseInterface $response, $collection, TransformerAbstract $transformer, array $meta = [])
     {
         if (!isset($meta['total'])) $meta['total'] = count($collection);
         if (!isset($meta['collectionName'])) $meta['collectionName'] = static::$collectionName;
         $resource = new Collection($collection, $transformer);
-        $this->respond($resource, self::RESOURCE_TYPE_COLLECTION, 200, $meta);
+
+        return $this->respond($request, $response, $resource, self::RESOURCE_TYPE_COLLECTION, 200, $meta);
     }
 
     /**
      * Respond with an Item.
      *
-     * @param array|Persistent    $item A resource item to transform and respond with.
-     * @param TransformerAbstract $transformer The transformer to apply to the item.
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array|Persistent       $item        A resource item to transform and respond with.
+     * @param TransformerAbstract    $transformer The transformer to apply to the item.
+     *
+     * @return ResponseInterface
      */
-    protected function respondWithItem($item, TransformerAbstract $transformer)
+    protected function respondWithItem(ServerRequestInterface $request, ResponseInterface $response, $item, TransformerAbstract $transformer)
     {
         $resource = new Item($item, $transformer);
-        $this->respond($resource, self::RESOURCE_TYPE_ITEM);
+
+        return $this->respond($request, $response, $resource, self::RESOURCE_TYPE_ITEM);
     }
 
     /**
      * Respond to the successful creation of an Item.
      *
-     * @param Persistent          $item
-     * @param string              $location
-     * @param TransformerAbstract $transformer
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param Persistent             $item
+     * @param string                 $location
+     * @param TransformerAbstract    $transformer
+     *
+     * @return ResponseInterface
      */
-    protected function respondWithItemCreated($item, $location, TransformerAbstract $transformer)
+    protected function respondWithItemCreated(ServerRequestInterface $request, ResponseInterface $response, $item, $location, TransformerAbstract $transformer)
     {
         $resource = new Item($item, $transformer);
-        $this->respond(
+
+        return $this->respond(
+            $request,
+            $response,
             $resource,
             self::RESOURCE_TYPE_ITEM,
             201,
@@ -481,14 +539,16 @@ abstract class Restful
     /**
      * Respond to the request with a resource.
      *
-     * @param ResourceInterface $resource A fractal resource.
-     * @param int   $type The type of resource to respond with.
-     * @param int   $status The HTTP status code to respond with.
-     * @param array $meta An optional array of metadata for the response.
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param ResourceInterface      $resource A fractal resource.
+     * @param int                    $type     The type of resource to respond with.
+     * @param int                    $status   The HTTP status code to respond with.
+     * @param array                  $meta     An optional array of metadata for the response.
      *
-     * @return void
+     * @return ResponseInterface
      */
-    protected function respond($resource, $type = self::RESOURCE_TYPE_ITEM, $status = 200, $meta = array())
+    protected function respond(ServerRequestInterface $request, ResponseInterface $response, $resource, $type = self::RESOURCE_TYPE_ITEM, $status = 200, $meta = array())
     {
         $bodyRaw = null;
         if ($resource !== null && $status !== 204) {
@@ -506,13 +566,13 @@ abstract class Restful
                     $total = $meta['total'];
                     $limit = isset($meta['limit']) && (int)$meta['limit'] > 0
                         ? (int)$meta['limit']
-                        : (int)$this->app->request->get('limit', 25);
-                    $offset = isset($meta['offset']) ? (int)$meta['offset'] : (int)$this->app->request->get('offset', 0);
+                        : (int)$request->getQueryParams()['limit'] ?: 25;
+                    $offset = isset($meta['offset']) ? (int)$meta['offset'] : (int)$request->getQueryParams()['offset'] ?: 0;
                     if ($total > $offset) {
-                        $links['first'] = static::ref($this->app, $this->route->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
-                        $links['prev'] = ($offset > 0) ? static::ref($this->app, $this->route->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
-                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->app, $this->route->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
-                        $links['last'] = static::ref($this->app, $this->route->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
+                        $links['first'] = static::ref($this->container, $request->getAttribute('route')->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
+                        $links['prev'] = ($offset > 0) ? static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
+                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
+                        $links['last'] = static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
                     $bodyRaw['_links'] = $this->refs(array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
@@ -527,33 +587,34 @@ abstract class Restful
             }
         }
 
-        /* @var \Slim\Http\Response $response */
-        $response = $this->app->response;
-        $response->headers->set('Content-Type', static::$responseType);
+        /** @var Response $response */
+        $response = $response->withHeader('Content-Type', static::$responseType);
         if (isset($meta['headers']) && is_array($meta['headers'])) {
             foreach ($meta['headers'] as $headerKey => $headerValue) {
-                $response->headers->set($headerKey, $headerValue);
+                $response = $response->withHeader($headerKey, $headerValue);
             }
         }
-        $response->setStatus($status);
+        $response->withStatus($status);
         if ($bodyRaw !== null && $status !== 204) {
-            if ($this->app->config('debug') === true) {
-                $bodyRaw['execution_time'] = microtime(true) - $this->app->config('startTime');
+            if ($this->container->get('settings')['debug'] === true) {
+                $bodyRaw['execution_time'] = microtime(true) - $this->container->get('settings')['startTime'];
             }
-            $response->setBody($this->encode($bodyRaw));
+            $response->write($this->encode($bodyRaw));
         }
 
-        $this->app->stop();
+        return $response;
     }
 
     /**
      * Check if the current method is allowed on this controller.
      *
-     * @throws Exception\MethodNotAllowedException
+     * @param ServerRequestInterface $request
+     *
+     * @throws MethodNotAllowedException
      */
-    protected function checkMethod()
+    protected function checkMethod(ServerRequestInterface $request)
     {
-        if (!in_array($this->app->request->getMethod(), static::$allowedMethods)) {
+        if (!in_array($request->getMethod(), static::$allowedMethods)) {
             throw new MethodNotAllowedException($this);
         }
     }
@@ -565,17 +626,12 @@ abstract class Restful
      *
      * @return string The current route's URL.
      */
-    protected function self(array $params = array())
+    protected function self(array $params = [])
     {
-        $request = $this->app->request();
-        $url = $request->getUrl();
-        $url .= $request->getRootUri();
-        $url .= $request->getResourceUri();
-        $getParams = $request->get();
-        $getParams = array_replace_recursive($getParams, $params);
-        if (!empty($getParams)) {
-            $url .= '?' . http_build_query($getParams);
-        }
-        return $url;
+        /** @var ServerRequestInterface $request */
+        $request = $this->container->get('request');
+        $getParams = array_replace_recursive($request->getQueryParams(), $params);
+
+        return $request->getUri()->withQuery(http_build_query($getParams));
     }
 }

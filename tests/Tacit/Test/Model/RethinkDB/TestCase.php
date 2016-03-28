@@ -26,10 +26,8 @@ abstract class TestCase extends \Tacit\TestCase
     protected function setUp()
     {
         $tacit = new Tacit([
-            'app' => [
-                'mode' => 'development',
-                'startTime' => microtime(true)
-            ],
+            'mode' => 'development',
+            'startTime' => microtime(true),
             'connection' => [
                 'class' => 'Tacit\Model\RethinkDB\Repository',
                 'server' => '127.0.0.1',
@@ -37,10 +35,9 @@ abstract class TestCase extends \Tacit\TestCase
                 'repository' => 'tacit_test'
             ]
         ]);
-        $tacit->setName('test_rethinkdb');
 
         /** @var Repository fixture */
-        $this->fixture = $tacit->container->get('repository');
+        $this->fixture = $tacit->getContainer()->get('repository');
 
         $this->fixture->create(['exceptions' => false]);
     }

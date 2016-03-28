@@ -72,13 +72,13 @@ class RestfulItemTest extends ControllerTestCase
         /** @var PersistentObject $itemObj */
         $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/rethinkdb/collection/' . (string)$itemObj->id,
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -104,14 +104,14 @@ class RestfulItemTest extends ControllerTestCase
         /** @var PersistentObject $itemObj */
         $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/rethinkdb/collection/' . $itemObj->id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 
@@ -141,7 +141,7 @@ class RestfulItemTest extends ControllerTestCase
         /** @var PersistentObject $itemObj */
         $itemObj = PersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/rethinkdb/collection/' . $itemObj->id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
@@ -149,7 +149,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke();
+            $response = $this->tacit->invoke($mock);
 
             $item = json_decode($response->getBody(), true);
 

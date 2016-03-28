@@ -24,11 +24,11 @@ class RestfulControllerTest extends ControllerTestCase
      */
     public function testGet()
     {
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/'
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -48,14 +48,14 @@ class RestfulControllerTest extends ControllerTestCase
     {
         $bodyRaw = ['message' => 'mock me do you mocker?'];
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => '{"target":"mocker"}'
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -75,14 +75,14 @@ class RestfulControllerTest extends ControllerTestCase
     {
         $bodyRaw = ['message' => 'mock me do you mocker?'];
 
-        $this->mockEnvironment([
+        $mock = $this->mockEnvironment([
             'PATH_INFO' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
             'slim.input' => 'target=mocker'
         ]);
 
-        $response = $this->tacit->invoke();
+        $response = $this->tacit->invoke($mock);
 
         $this->assertEquals(
             array_intersect_assoc(
