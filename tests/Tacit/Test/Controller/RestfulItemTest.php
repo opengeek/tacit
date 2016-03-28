@@ -75,7 +75,7 @@ class RestfulItemTest extends ControllerTestCase
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'GET',
         ]);
 

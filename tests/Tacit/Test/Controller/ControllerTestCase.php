@@ -40,7 +40,7 @@ abstract class ControllerTestCase extends TestCase
         $cookies = [];
         $serverParams = $env->all();
         $body = new Body(fopen('php://temp', 'r+'));
-        $req = new Request('POST', $uri, $headers, $cookies, $serverParams, $body);
+        $req = new Request($vars['REQUEST_METHOD'], $uri, $headers, $cookies, $serverParams, $body);
         $res = new Response();
 
         return ['request' => $req, 'response' => $res];

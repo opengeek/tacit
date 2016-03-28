@@ -19,7 +19,7 @@ $this->tacit->group('/collection', function () {
     $this->any('', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
         return (new \Tacit\Test\Controller\MockRestfulCollection($this))->handle($request, $response, $args);
     })->setName('MockRestfulCollection');
-    $this->any('/{_id}', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
+    $this->any('/{id}', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
         return (new \Tacit\Test\Controller\MockRestfulItem($this))->handle($request, $response, $args);
     })->setName('MockRestfulItem');
 });
