@@ -34,10 +34,11 @@ class MockRestfulCollection extends RestfulCollection
 
         $criteria = $this->criteria($args);
 
-        $limit = $request->getQueryParams()['limit'] ?: 25;
-        $offset = $request->getQueryParams()['offset'] ?: 0;
-        $orderBy = $request->getQueryParams()['sort'] ?: $modelClass::key();
-        $orderDir = $request->getQueryParams()['sort_dir'] ?: 'desc';
+        $params = $request->getQueryParams();
+        $limit = isset($params['limit']) ? $params['limit'] : 25;
+        $offset = isset($params['offset']) ? $params['offset'] : 0;
+        $orderBy = isset($params['sort']) ? $params['sort'] : $modelClass::key();
+        $orderDir = isset($params['sort_dir']) ? $params['sort_dir'] : 'desc';
 
         try {
             $total = $modelClass::count($criteria, $this->container->get('repository'));

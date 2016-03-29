@@ -25,7 +25,7 @@ class RestfulControllerTest extends ControllerTestCase
     public function testGet()
     {
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/'
+            'REQUEST_URI' => '/'
         ]);
 
         $response = $this->tacit->invoke($mock);
@@ -49,7 +49,7 @@ class RestfulControllerTest extends ControllerTestCase
         $bodyRaw = ['message' => 'mock me do you mocker?'];
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/',
+            'REQUEST_URI' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => '{"target":"mocker"}'
@@ -76,7 +76,7 @@ class RestfulControllerTest extends ControllerTestCase
         $bodyRaw = ['message' => 'mock me do you mocker?'];
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/',
+            'REQUEST_URI' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
             'slim.input' => 'target=mocker'

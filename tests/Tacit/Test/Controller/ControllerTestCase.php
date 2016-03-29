@@ -32,14 +32,19 @@ abstract class ControllerTestCase extends TestCase
      *
      * @return array
      */
-    protected function mockEnvironment(array $vars = ['REQUEST_METHOD' => 'GET'])
+    protected function mockEnvironment(array $vars = [])
     {
+        $vars = array_replace(['REQUEST_METHOD' => 'GET'], $vars);
+
         $env = Environment::mock($vars);
         $uri = Uri::createFromEnvironment($env);
         $headers = Headers::createFromEnvironment($env);
         $cookies = [];
         $serverParams = $env->all();
         $body = new Body(fopen('php://temp', 'r+'));
+        if (isset($vars['slim.input'])) {
+            $body->write($vars['slim.input']);
+        }
         $req = new Request($vars['REQUEST_METHOD'], $uri, $headers, $cookies, $serverParams, $body);
         $res = new Response();
 

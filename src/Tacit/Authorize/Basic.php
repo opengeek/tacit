@@ -11,10 +11,11 @@
 namespace Tacit\Authorize;
 
 
+use Psr\Http\Message\ServerRequestInterface;
 use Tacit\Controller\Exception\ForbiddenException;
+use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Controller\Restful;
-use Tacit\Tacit;
 
 class Basic implements Authorization
 {
@@ -23,11 +24,11 @@ class Basic implements Authorization
     /**
      * Get the input data from the request to be used for validation.
      *
-     * @param \Tacit\Tacit $app
+     * @param ServerRequestInterface $request
      *
      * @return string A string representation of the input data elements.
      */
-    public function getInput(Tacit $app)
+    public function getInput(ServerRequestInterface $request)
     {
         return '';
     }
@@ -35,34 +36,38 @@ class Basic implements Authorization
     /**
      * Get the signature provided by the client for validation.
      *
-     * @param Tacit $app
+     * @param ServerRequestInterface $request
      *
      * @return string The signature.
      */
-    public function getSignature(Tacit $app)
+    public function getSignature(ServerRequestInterface $request)
     {
         $signature = '';
-        if (isset($app->environment['PHP_AUTH_USER'])) {
-            $signature = $app->environment['PHP_AUTH_USER'];
-            if (isset($app->environment['PHP_AUTH_PW'])) {
-                $signature .= ':' . $app->environment['PHP_AUTH_PW'];
+
+        if ($request->hasHeader('PHP_AUTH_USER')) {
+            $signature = $request->getHeader('PHP_AUTH_USER')[0];
+            if ($request->hasHeader('PHP_AUTH_PW')) {
+                $signature .= ':' . $request->getHeader('PHP_AUTH_PW')[0];
             }
         }
+
         return $signature;
     }
 
     /**
      * Determine if the client has authorization to make the request.
      *
-     * @param Restful $controller
+     * @param Restful                $controller
+     * @param ServerRequestInterface $request
      *
-     * @throws ForbiddenException
-     * @throws UnauthorizedException
      * @return bool Returns true if the client has authorization to make the request.
+     * @throws RestfulException If the request is not valid.
+     * @throws ForbiddenException If provided credentials do not grant authority to access the resource.
+     * @throws UnauthorizedException If no credentials are provided and the resource requires them for access.
      */
-    public function isValidRequest(Restful $controller)
+    public function isValidRequest(Restful $controller, ServerRequestInterface $request)
     {
-        $signature = $this->getSignature($controller->getApp());
+        $signature = $this->getSignature($request);
         if (empty($signature)) {
             throw new UnauthorizedException(
                 $controller,
@@ -81,7 +86,7 @@ class Basic implements Authorization
 
         list($username, $password) = $exploded;
 
-        $secret = $this->getSecretKey($controller->getApp(), $username);
+        $secret = $this->getSecretKey($controller->getContainer(), $username);
 
         if ($password !== $secret) {
             throw new ForbiddenException(

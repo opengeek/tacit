@@ -86,8 +86,10 @@ abstract class RestfulItem extends Restful
 
         $criteria = $this->criteria($args);
 
-        $fields = array_filter(explode(',', $request->getQueryParams()['fields'] ?: ''));
-        
+
+        $fields = isset($request->getQueryParams()['fields']) ? $request->getQueryParams()['fields'] : '';
+        $fields = array_filter(explode(',', $fields));
+
         /** @var Persistent $item */
         $item = $modelClass::findOne($criteria, $fields, $this->container->get('repository'));
 
@@ -168,7 +170,7 @@ abstract class RestfulItem extends Restful
 
         try {
             /** @var Persistent $newItem */
-            $newItem = new $modelClass();
+            $newItem = new $modelClass($this->container->get('repository'));
             $data = array_replace_recursive(
                 $newItem->toArray(),
                 $request->getParsedBody() ?: []

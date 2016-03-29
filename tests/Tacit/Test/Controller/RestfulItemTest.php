@@ -104,7 +104,7 @@ class RestfulItemTest extends ControllerTestCase
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'QUERY_STRING' => 'fields=name,text',
             'REQUEST_METHOD' => 'GET',
         ]);
@@ -140,7 +140,7 @@ class RestfulItemTest extends ControllerTestCase
         $itemObj = MockPersistent::findOne(['name' => $data['name']], [], $this->fixture);
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => json_encode($data)
@@ -170,7 +170,7 @@ class RestfulItemTest extends ControllerTestCase
         $itemObj = MockPersistent::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/' . $itemObj->_id,
+            'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
             'slim.input' => json_encode([

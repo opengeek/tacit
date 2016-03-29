@@ -73,7 +73,7 @@ class RestfulCollectionTest extends ControllerTestCase
     public function testGet()
     {
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/',
+            'REQUEST_URI' => '/collection/',
             'REQUEST_METHOD' => 'GET',
         ]);
 
@@ -108,7 +108,7 @@ class RestfulCollectionTest extends ControllerTestCase
         MockPersistent::collection($this->fixture)->truncate();
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/collection/',
+            'REQUEST_URI' => '/collection/',
             'REQUEST_METHOD' => 'GET',
         ]);
 

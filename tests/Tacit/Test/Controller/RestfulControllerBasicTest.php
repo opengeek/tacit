@@ -11,8 +11,6 @@
 namespace Tacit\Test\Controller;
 
 
-use Tacit\Tacit;
-
 class RestfulControllerBasicTest extends ControllerTestCase
 {
     /**
@@ -27,7 +25,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
         $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/basic-test',
+            'REQUEST_URI' => '/basic-test',
             'PHP_AUTH_USER' => $clientKey,
             'PHP_AUTH_PW' => $secretKey
         ]);
@@ -55,7 +53,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
         $secretKey = '4M2U1KSlv0jmqLAgs118fq4dugd534eP';
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/basic-test',
+            'REQUEST_URI' => '/basic-test',
             'REQUEST_METHOD' => 'POST',
             'PHP_AUTH_USER' => $clientKey,
             'PHP_AUTH_PW' => $secretKey,

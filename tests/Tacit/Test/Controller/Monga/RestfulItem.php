@@ -28,9 +28,8 @@ class RestfulItem extends \Tacit\Controller\RestfulItem
     }
 
     protected function criteria(array $args) {
-        $keys = static::keys();
-        if (($idx = array_search('_id', $keys)) !== false) {
-            $args[$idx] = new MongoId($args[$idx]);
+        if (isset($args['_id'])) {
+            $args['_id'] = new MongoId($args['_id']);
         }
         return parent::criteria($args);
     }

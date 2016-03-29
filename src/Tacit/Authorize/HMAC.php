@@ -11,12 +11,12 @@
 namespace Tacit\Authorize;
 
 
-use Slim\Http\Request;
-use Slim\Slim;
+use Psr\Http\Message\ServerRequestInterface;
+use Tacit\Controller\Exception\ForbiddenException;
 use Tacit\Controller\Exception\ResourceConflictException;
+use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
 use Tacit\Controller\Restful;
-use Tacit\Tacit;
 
 class HMAC implements Authorization
 {
@@ -25,44 +25,47 @@ class HMAC implements Authorization
     /**
      * Get the input data from the request to be used for validation.
      *
-     * @param \Tacit\Tacit $app
+     * @param ServerRequestInterface $request
      *
      * @return string A string representation of the input data elements.
      */
-    public function getInput(Tacit $app)
+    public function getInput(ServerRequestInterface $request)
     {
         return implode("\n", [
-            $app->request->getMethod(),
-            md5($app->environment['slim.input_original']),
-            $app->request->headers('Content-Type'),
-            $app->request->getResourceUri()
+            $request->getMethod(),
+            md5((string)$request->getBody()),
+            $request->getHeaderLine('Content-Type'),
+            $request->getUri()->getPath()
         ]);
     }
 
     /**
      * Get the signature provided by the client for validation.
      *
-     * @param Tacit $app
+     * @param ServerRequestInterface $request
      *
      * @return string The signature.
      */
-    public function getSignature(Tacit $app)
+    public function getSignature(ServerRequestInterface $request)
     {
-        return $app->request->headers('Signature-HMAC');
+        return $request->getHeaderLine('Signature-HMAC');
     }
 
     /**
      * Determine if the client has authorization to make the request.
      *
-     * @param Restful $controller
+     * @param Restful                $controller
+     * @param ServerRequestInterface $request
      *
-     * @throws \Tacit\Controller\Exception\UnauthorizedException
-     * @throws \Tacit\Controller\Exception\ResourceConflictException
      * @return bool Returns true if the client has authorization to make the request.
+     * @throws RestfulException If the request is not valid.
+     * @throws ResourceConflictException If the request has expired and is no longer valid.
+     * @throws ForbiddenException If provided credentials do not grant authority to access the resource.
+     * @throws UnauthorizedException If no credentials are provided and the resource requires them for access.
      */
-    public function isValidRequest(Restful $controller)
+    public function isValidRequest(Restful $controller, ServerRequestInterface $request)
     {
-        $signature = $this->getSignature($controller->getApp());
+        $signature = $this->getSignature($request);
         if (empty($signature)) {
             throw new UnauthorizedException(
                 $controller,
@@ -95,9 +98,9 @@ class HMAC implements Authorization
             );
         }
 
-        $secret = $this->getSecretKey($controller->getApp(), $clientKey);
+        $secret = $this->getSecretKey($controller->getContainer(), $clientKey);
 
-        $fingerprint = $this->getInput($controller->getApp());
+        $fingerprint = $this->getInput($request);
         $test = hash_hmac('sha1', $fingerprint, $secret);
 
         if ($test !== $rawHash) {

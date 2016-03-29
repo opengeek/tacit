@@ -32,7 +32,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
 
         $mock = $this->mockEnvironment([
             'REQUEST_METHOD' => 'GET',
-            'PATH_INFO' => '/hmac-test',
+            'REQUEST_URI' => '/hmac-test',
             'CONTENT_TYPE' => 'application/json',
             'Http_Content-MD5' => md5(''),
             'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
@@ -67,7 +67,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
         ]);
 
         $mock = $this->mockEnvironment([
-            'PATH_INFO' => '/hmac-test',
+            'REQUEST_URI' => '/hmac-test',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/json',
             'Http_Content-MD5' => md5(''),

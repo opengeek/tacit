@@ -453,12 +453,8 @@ abstract class Restful
         if (count($keys) !== count($args)) {
             throw new BadRequestException($this, null, "Wrong number of arguments for this resource", static::keys());
         }
-        $criteria = static::defaultCriteria();
-        foreach ($keys as $key) {
-            $criteria[$key] = array_shift($args);
-        }
 
-        return $criteria;
+        return array_replace_recursive(static::defaultCriteria(), $args);
     }
 
     /**
@@ -566,13 +562,19 @@ abstract class Restful
                     $total = $meta['total'];
                     $limit = isset($meta['limit']) && (int)$meta['limit'] > 0
                         ? (int)$meta['limit']
-                        : (int)$request->getQueryParams()['limit'] ?: 25;
-                    $offset = isset($meta['offset']) ? (int)$meta['offset'] : (int)$request->getQueryParams()['offset'] ?: 0;
+                        : isset($request->getQueryParams()['limit'])
+                            ? (int)$request->getQueryParams()['limit']
+                            : 25;
+                    $offset = isset($meta['offset'])
+                        ? (int)$meta['offset'] :
+                        isset($request->getQueryParams()['offset'])
+                            ? (int)$request->getQueryParams()['offset']
+                            : 0;
                     if ($total > $offset) {
-                        $links['first'] = static::ref($this->container, $request->getAttribute('route')->getParams(), $offset > 0 ? ['offset' => 0] : [], '(First)');
-                        $links['prev'] = ($offset > 0) ? static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => $offset - $limit], '(Previous)') : null;
-                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => $offset + $limit], '(Next)') : null;
-                        $links['last'] = static::ref($this->container, $request->getAttribute('route')->getParams(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
+                        $links['first'] = static::ref($this->container, $request->getAttribute('route')->getArguments(), $offset > 0 ? ['offset' => 0] : [], '(First)');
+                        $links['prev'] = ($offset > 0) ? static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => $offset - $limit], '(Previous)') : null;
+                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => $offset + $limit], '(Next)') : null;
+                        $links['last'] = static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
                     $bodyRaw['_links'] = $this->refs(array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];

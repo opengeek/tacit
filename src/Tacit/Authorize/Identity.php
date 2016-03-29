@@ -10,17 +10,16 @@
 
 namespace Tacit\Authorize;
 
-
-use Tacit\Tacit;
+use Interop\Container\ContainerInterface;
 
 trait Identity
 {
     private static $identities;
 
-    public static function identities(Tacit $app)
+    public static function identities(ContainerInterface $container)
     {
-        if (!is_array(static::$identities)) {
-            $identitiesFile = $app->config('tacit.identitiesFile');
+        if (!is_array(static::$identities) && isset($container->get('settings')['tacit.identitiesFile'])) {
+            $identitiesFile = $container->get('settings')['tacit.identitiesFile'];
             if (is_readable($identitiesFile)) {
                 static::$identities = include $identitiesFile;
             }
@@ -28,9 +27,9 @@ trait Identity
         return static::$identities;
     }
 
-    public function getSecretKey($app, $clientKey)
+    public function getSecretKey(ContainerInterface $container, $clientKey)
     {
-        $identities = static::identities($app);
+        $identities = static::identities($container);
         if (isset($identities[$clientKey])) {
             return $identities[$clientKey]['secretKey'];
         }
