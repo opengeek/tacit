@@ -18,7 +18,7 @@ class Container extends \Slim\Container
     public function __construct(array $values)
     {
         $this['errorHandler'] = function(Container $c) {
-            return new Error($c->get('settings'));
+            return new Error($c->get('settings')->all());
         };
 
         parent::__construct($values);
