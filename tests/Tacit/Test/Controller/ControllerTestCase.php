@@ -42,7 +42,9 @@ abstract class ControllerTestCase extends TestCase
         $cookies = [];
         $serverParams = $env->all();
         $body = new Body(fopen('php://temp', 'r+'));
-        if (isset($vars['slim.input'])) {
+        if (isset($vars['REQUEST_BODY'])) {
+            $body->write($vars['REQUEST_BODY']);
+        } elseif (isset($vars['slim.input'])) {
             $body->write($vars['slim.input']);
         }
         $req = new Request($vars['REQUEST_METHOD'], $uri, $headers, $cookies, $serverParams, $body);

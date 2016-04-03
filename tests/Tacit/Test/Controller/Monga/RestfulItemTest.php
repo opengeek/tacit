@@ -143,7 +143,7 @@ class RestfulItemTest extends ControllerTestCase
             'REQUEST_URI' => '/monga/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => json_encode($data)
+            'REQUEST_BODY' => json_encode($data)
         ]);
 
         try {

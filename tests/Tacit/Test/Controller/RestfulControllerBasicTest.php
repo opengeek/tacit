@@ -58,7 +58,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
             'PHP_AUTH_USER' => $clientKey,
             'PHP_AUTH_PW' => $secretKey,
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => '{"target":"mocker"}'
+            'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
         $response = $this->tacit->invoke($mock);

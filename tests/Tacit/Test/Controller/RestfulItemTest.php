@@ -143,7 +143,7 @@ class RestfulItemTest extends ControllerTestCase
             'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => json_encode($data)
+            'REQUEST_BODY' => json_encode($data)
         ]);
 
         try {
@@ -173,7 +173,7 @@ class RestfulItemTest extends ControllerTestCase
             'REQUEST_URI' => '/collection/' . $itemObj->_id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => json_encode([
+            'REQUEST_BODY' => json_encode([
                 'name' => 'New MockPersistent #1',
                 'password' => 'new_password'
             ])

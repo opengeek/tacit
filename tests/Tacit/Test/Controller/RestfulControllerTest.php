@@ -52,7 +52,7 @@ class RestfulControllerTest extends ControllerTestCase
             'REQUEST_URI' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => '{"target":"mocker"}'
+            'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
         $response = $this->tacit->invoke($mock);
@@ -79,7 +79,7 @@ class RestfulControllerTest extends ControllerTestCase
             'REQUEST_URI' => '/',
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
-            'slim.input' => 'target=mocker'
+            'REQUEST_BODY' => 'target=mocker'
         ]);
 
         $response = $this->tacit->invoke($mock);

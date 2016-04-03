@@ -72,7 +72,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
             'CONTENT_TYPE' => 'application/json',
             'Http_Content-MD5' => md5(''),
             'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey),
-            'slim.input' => '{"target":"mocker"}'
+            'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
         $response = $this->tacit->invoke($mock);

@@ -145,7 +145,7 @@ class RestfulItemTest extends ControllerTestCase
             'REQUEST_URI' => '/rethinkdb/collection/' . $itemObj->id,
             'REQUEST_METHOD' => 'PUT',
             'CONTENT_TYPE' => 'application/json',
-            'slim.input' => json_encode($data)
+            'REQUEST_BODY' => json_encode($data)
         ]);
 
         try {
