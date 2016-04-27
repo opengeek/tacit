@@ -53,17 +53,17 @@ abstract class RestfulItem extends Restful
         $item = $modelClass::findOne($this->criteria($args), [], $this->container->get('repository'));
 
         if (null === $item) {
-            throw new NotFoundException($this);
+            throw new NotFoundException();
         }
 
         try {
             $removed = $item->remove();
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error deleting resource.', $e->getMessage());
+            throw new ServerErrorException('Error deleting resource.', $e->getMessage());
         }
 
         if (true !== $removed) {
-            throw new ServerErrorException($this, 'Error deleting resource', 'The resource could not be removed.');
+            throw new ServerErrorException('Error deleting resource', 'The resource could not be removed.');
         }
 
         return $this->respond($request, $response, null, self::RESOURCE_TYPE_ITEM, 204);
@@ -94,7 +94,7 @@ abstract class RestfulItem extends Restful
         $item = $modelClass::findOne($criteria, $fields, $this->container->get('repository'));
 
         if (null === $item) {
-            throw new NotFoundException($this);
+            throw new NotFoundException();
         }
 
         return $this->respondWithItem($request, $response, $item, new static::$transformer());
@@ -121,7 +121,7 @@ abstract class RestfulItem extends Restful
         $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
 
         if (null === $item) {
-            throw new NotFoundException($this);
+            throw new NotFoundException();
         }
 
         try {
@@ -135,9 +135,9 @@ abstract class RestfulItem extends Restful
         } catch (OperationalException $e) {
             throw $e->next($this);
         } catch (ModelValidationException $e) {
-            throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
+            throw new UnacceptableEntityException('Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error patching resource', $e->getMessage(), null, $e);
+            throw new ServerErrorException('Error patching resource', $e->getMessage(), null, $e);
         }
     }
 
@@ -165,7 +165,7 @@ abstract class RestfulItem extends Restful
         $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
 
         if (null === $item) {
-            throw new NotFoundException($this);
+            throw new NotFoundException();
         }
 
         try {
@@ -185,9 +185,9 @@ abstract class RestfulItem extends Restful
         } catch (OperationalException $e) {
             throw $e->next($this);
         } catch (ModelValidationException $e) {
-            throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
+            throw new UnacceptableEntityException('Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error updating resource', $e->getMessage(), null, $e);
+            throw new ServerErrorException('Error updating resource', $e->getMessage(), null, $e);
         }
     }
 

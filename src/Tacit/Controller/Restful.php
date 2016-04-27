@@ -255,7 +255,7 @@ abstract class Restful
      */
     public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -270,7 +270,7 @@ abstract class Restful
      */
     public function get(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -291,7 +291,7 @@ abstract class Restful
         if (method_exists($this, $method)) {
             return $this->{$method}($request, $response, $args);
         }
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -349,7 +349,7 @@ abstract class Restful
      */
     public function patch(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -364,7 +364,7 @@ abstract class Restful
      */
     public function post(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -379,7 +379,7 @@ abstract class Restful
      */
     public function put(ServerRequestInterface $request, ResponseInterface $response, array $args = [])
     {
-        throw new NotImplementedException($this);
+        throw new NotImplementedException();
     }
 
     /**
@@ -451,7 +451,7 @@ abstract class Restful
     {
         $keys = static::keys();
         if (count($keys) !== count($args)) {
-            throw new BadRequestException($this, null, "Wrong number of arguments for this resource", static::keys());
+            throw new BadRequestException(null, "Wrong number of arguments for this resource", static::keys());
         }
 
         return array_replace_recursive(static::defaultCriteria(), $args);
@@ -617,7 +617,7 @@ abstract class Restful
     protected function checkMethod(ServerRequestInterface $request)
     {
         if (!in_array($request->getMethod(), static::$allowedMethods)) {
-            throw new MethodNotAllowedException($this);
+            throw new MethodNotAllowedException();
         }
     }
 

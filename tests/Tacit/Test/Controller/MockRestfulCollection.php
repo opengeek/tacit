@@ -67,7 +67,7 @@ class MockRestfulCollection extends RestfulCollection
 
             return $this->respondWithCollection($request, $response, $collection, $this->transformer(), ['total' => $total]);
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
+            throw new ServerErrorException('Error retrieving collection', $e->getMessage(), null, $e);
         }
     }
 }

@@ -52,12 +52,10 @@ class OperationalException extends Exception
     }
 
     /**
-     * @param Restful $controller
-     *
      * @return RestfulException
      */
-    public function next(Restful $controller)
+    public function next()
     {
-        return new $this->next($controller, $this->getMessage(), $this->getDescription(), $this->getProperty(), $this->getPrevious());
+        return new $this->next($this->getMessage(), $this->getDescription(), $this->getProperty(), $this->getPrevious());
     }
 }

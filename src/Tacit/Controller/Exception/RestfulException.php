@@ -26,15 +26,13 @@ class RestfulException extends Exception
     protected $property = '';
     protected $status = 500;
 
-    public function __construct(Restful $controller, $message = null, $description = null, $property = null, $previous = null)
+    public function __construct($message = null, $description = null, $property = null, $previous = null)
     {
         $code = (int)"{$this->status}0";
         if (null === $message) $message = $this->message;
         parent::__construct($message, $code, $previous);
         if (null !== $property) $this->property = $property;
         if (null !== $description) $this->description = $description;
-
-        $controller->respondWithError($controller->getContainer()['request'], $controller->getContainer()['response'], $this);
     }
 
     public function getDescription()

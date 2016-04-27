@@ -75,7 +75,7 @@ abstract class RestfulCollection extends Restful
 
             return $this->respondWithCollection($request, $response, $collection, $this->transformer(), ['total' => $total]);
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error retrieving collection', $e->getMessage(), null, $e);
+            throw new ServerErrorException('Error retrieving collection', $e->getMessage(), null, $e);
         }
     }
 
@@ -115,9 +115,9 @@ abstract class RestfulCollection extends Restful
         } catch (OperationalException $e) {
             throw $e->next($this);
         } catch (ModelValidationException $e) {
-            throw new UnacceptableEntityException($this, 'Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
+            throw new UnacceptableEntityException('Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
-            throw new ServerErrorException($this, 'Error creating item in collection', $e->getMessage(), null, $e);
+            throw new ServerErrorException('Error creating item in collection', $e->getMessage(), null, $e);
         }
     }
 
