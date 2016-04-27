@@ -36,6 +36,6 @@ class NotFound
         }
         $response->withBody(new Stream(fopen('php://temp', 'r+')));
 
-        return $response->withJson($resource, $resource['status'], JSON_PRETTY_PRINT);
+        return $response->withJson($resource, $resource['status'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }

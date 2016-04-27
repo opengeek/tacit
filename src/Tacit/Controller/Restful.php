@@ -462,13 +462,12 @@ abstract class Restful
      * Encode an array of data representing a response body.
      *
      * @param array $body An array of data representing the response body.
-     * @param mixed $options Options for the encoding process.
      *
      * @return string The encoded response body as a string.
      */
-    protected function encode($body, $options = JSON_PRETTY_PRINT)
+    protected function encode($body)
     {
-        return json_encode($body, $options);
+        return json_encode($body, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
