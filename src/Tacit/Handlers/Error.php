@@ -14,6 +14,7 @@ namespace Tacit\Handlers;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Http\Stream;
 use Tacit\Configurable;
 use Tacit\Controller\Exception\RestfulException;
 
@@ -43,9 +44,8 @@ class Error
         if ($this->getOption('debug') === true) {
             $resource['request_duration'] = microtime(true) - $this->getOption('startTime');
         }
+        $response->withBody(new Stream(fopen('php://temp', 'r+')));
 
-        return $response->withStatus($resource['status'])
-            ->withHeader('Content-Type', 'application/json')
-            ->withJson($resource);
+        return $response->withJson($resource, $resource['status'], JSON_PRETTY_PRINT);
     }
 }

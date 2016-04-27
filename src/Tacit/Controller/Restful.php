@@ -19,6 +19,7 @@ use League\Fractal\TransformerAbstract;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Response;
+use Slim\Http\Stream;
 use Slim\Route;
 use Slim\Router;
 use Tacit\Container;
@@ -590,6 +591,7 @@ abstract class Restful
         }
 
         /** @var Response $response */
+        $response = $response->withBody(new Stream(fopen('php://temp', 'r+')));
         $response = $response->withHeader('Content-Type', static::$responseType);
         if (isset($meta['headers']) && is_array($meta['headers'])) {
             foreach ($meta['headers'] as $headerKey => $headerValue) {
@@ -601,7 +603,7 @@ abstract class Restful
             if ($this->container->get('settings')['debug'] === true) {
                 $bodyRaw['execution_time'] = microtime(true) - $this->container->get('settings')['startTime'];
             }
-            $response->write($this->encode($bodyRaw));
+            $response->getBody()->write($this->encode($bodyRaw));
         }
 
         return $response;

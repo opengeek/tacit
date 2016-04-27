@@ -113,7 +113,7 @@ abstract class RestfulCollection extends Restful
                 $this->transformer()
             );
         } catch (OperationalException $e) {
-            throw $e->next($this);
+            throw $e->next();
         } catch (ModelValidationException $e) {
             throw new UnacceptableEntityException('Resource validation failed', $e->getMessage(), $e->getMessages(), $e);
         } catch (Exception $e) {
