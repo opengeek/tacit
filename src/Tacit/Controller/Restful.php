@@ -195,6 +195,8 @@ abstract class Restful
         /** @var Router $router */
         $router = $container->get('router');
 
+        $uri = $request->getUri();
+
         $getParams = [];
         if (false !== $params && is_array($params)) {
             /** @var Route $currentRoute */
@@ -206,7 +208,7 @@ abstract class Restful
             $getParams = array_merge($getParams, $params);
         }
 
-        return $router->pathFor(static::name(), $routeParams, $getParams);
+        return $uri->getScheme() . '://' . $uri->getHost() . $uri->getPort() . $router->pathFor(static::name(), $routeParams, $getParams);
     }
 
     /**
@@ -635,6 +637,8 @@ abstract class Restful
         $request = $this->container->get('request');
         $getParams = array_replace_recursive($request->getQueryParams(), $params);
 
-        return $request->getUri()->withQuery(http_build_query($getParams));
+        $uri = $request->getUri()->withQuery(http_build_query($getParams))->withUserInfo('');
+
+        return (string)$uri;
     }
 }
