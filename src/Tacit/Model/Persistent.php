@@ -220,7 +220,7 @@ abstract class Persistent
      */
     public static function validationRules(array $rules = [])
     {
-        return array_merge_recursive(static::$validationRules, $rules);
+        return array_replace_recursive(static::$validationRules, $rules);
     }
 
     /**
@@ -455,7 +455,7 @@ abstract class Persistent
     {
         $this->_validator = Validator::instance(static::validationRules($rules));
         $all = empty($mask);
-        $passed = $this->_validator->check($this->toArray($mask, false), $all, $this->toArray(false, false));
+        $passed = $this->_validator->check($this->toArray($mask, false), $all, $this);
         return $passed === true ? true : $this->_validator->failures();
     }
 

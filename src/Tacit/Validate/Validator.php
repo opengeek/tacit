@@ -10,6 +10,7 @@
 
 namespace Tacit\Validate;
 
+use Closure;
 use Tacit\Model\Persistent;
 
 /**
@@ -19,6 +20,13 @@ use Tacit\Model\Persistent;
  */
 class Validator
 {
+    /**
+     * An instance of the set of Closures which implement the Rules.
+     *
+     * @var Rules
+     */
+    protected $rules;
+
     /**
      * A set of rules for the this instance.
      *
@@ -72,7 +80,11 @@ class Validator
     public function check($input, $all = false, $context = [])
     {
         $data = new \ArrayIterator($input);
-        $context = new \ArrayIterator($context);
+        $contextIterator = new \ArrayIterator(
+            $context instanceof Persistent
+                ? $context->toArray(false, false)
+                : $context
+        );
         foreach ($this->ruleSet as $field => $rules) {
             if ($all || $data->offsetExists($field)) {
                 $fieldValue = $data->offsetExists($field)
@@ -82,8 +94,12 @@ class Validator
                     $ruleExploded = explode(':', $ruleDef, 2);
                     $rule = $ruleExploded[0];
                     $ruleArgs = isset($ruleExploded[1]) ? explode(',', $ruleExploded[1]) : [];
+                    $ruleClosure = $this->rules->get($rule);
+                    if (is_object($context)) {
+                        $ruleClosure = $ruleClosure->bindTo($context, $context);
+                    }
                     try {
-                        Rules::$rule($field, $fieldValue, $ruleArgs, $context);
+                        $ruleClosure($field, $fieldValue, $ruleArgs, $contextIterator);
                     } catch (ValidationFailedException $failure) {
                         $this->addFailure($field, $failure->getMessage(), $failure->getCode());
                         $this->failed = true;
@@ -141,6 +157,7 @@ class Validator
      */
     protected function __construct(array $rules)
     {
+        $this->rules = new Rules();
         $this->ruleSet = $rules;
         $this->failures = [];
     }
