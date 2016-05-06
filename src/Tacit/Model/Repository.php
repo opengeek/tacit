@@ -92,10 +92,11 @@ abstract class Repository
      * Get a specific collection container from the Repository.
      *
      * @param string $name The name of the collection to get.
+     * @param array  $options An array of options for the Collection.
      *
      * @return Collection A native collection instance wrapped by a Tacit\Model\Collection.
      */
-    abstract public function collection($name);
+    abstract public function collection($name, array $options = []);
 
     /**
      * Destroy the Repository container (aka database).

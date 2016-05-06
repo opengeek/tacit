@@ -32,6 +32,13 @@ abstract class Collection
     protected $connection;
 
     /**
+     * An array of options for configuring the collection.
+     *
+     * @var array
+     */
+    protected $options;
+
+    /**
      * The peer object responsible for interacting with the collection.
      *
      * @var object
@@ -69,13 +76,32 @@ abstract class Collection
     /**
      * Create a new instance of the Collection.
      *
-     * @param string $name The name of the collection.
+     * @param string       $name       The name of the collection.
      * @param object|array $connection A reference to the native connection for the Repository containing the collection.
+     * @param array        $options    An array of options for the collection.
      */
-    public function __construct($name, &$connection)
+    public function __construct($name, &$connection, array $options = [])
     {
         $this->name = $name;
         $this->connection =& $connection;
+        $this->options = $options;
+    }
+
+    /**
+     * Get an option value for the Collection.
+     *
+     * @param string $key The key identifying a collection configuration option.
+     * @param mixed  $default The default value to use if no option is set for the key.
+     *
+     * @return mixed The value of the option, or the value of $default if not set.
+     */
+    public function option($key, $default = null)
+    {
+        if (!isset($this->options[$key])) {
+            return $default;
+        }
+
+        return $this->options[$key];
     }
 
     /**

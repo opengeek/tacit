@@ -32,13 +32,14 @@ class Collection extends \Tacit\Model\Collection
     /**
      * Construct a new RethinkDB Collection.
      *
-     * @param string     $name
-     * @param Connection $connection
+     * @param string       $name       The name of the collection.
+     * @param object|array $connection A reference to the native connection for the Repository containing the collection.
+     * @param array        $options    An array of options for the collection.
      */
-    public function __construct($name, $connection)
+    public function __construct($name, &$connection, array $options = [])
     {
-        parent::__construct($name, $connection);
-        $this->peer = \r\table($name);
+        parent::__construct($name, $connection, $options);
+        $this->peer = \r\table($name, $this->options);
     }
 
     /**

@@ -29,17 +29,15 @@ class MongaCollection extends Collection
     protected $peer;
 
     /**
-     * Get a MongaCollection instance.
+     * Create a new MongaCollection instance.
      *
-     * @param string $name
-     * @param Database $connection
-     *
-     * @return MongaCollection
+     * @param string       $name       The name of the collection.
+     * @param object|array $connection A reference to the native connection for the Repository containing the collection.
+     * @param array        $options    An array of options for the collection.
      */
-    public function __construct($name, $connection)
+    public function __construct($name, &$connection, array $options = [])
     {
-        $this->name = $name;
-        $this->connection = $connection;
+        parent::__construct($name, $connection, $options);
         $this->peer = $connection->collection($this->name);
     }
 
