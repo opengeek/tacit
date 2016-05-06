@@ -72,7 +72,7 @@ class CollectionTest extends TestCase
      */
     public function testGetPublicVarsFromObject()
     {
-        $object = PersistentObject::findOne([], [], $this->fixture);
+        $object = PersistentObject::findOne([], [], $this->fixture, ['read_mode' => 'outdated']);
 
         $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
@@ -104,7 +104,7 @@ class CollectionTest extends TestCase
      */
     public function testGetMaskFromObject(array $expected, array $exclude)
     {
-        $object = PersistentObject::findOne([], [], $this->fixture);
+        $object = PersistentObject::findOne([], [], $this->fixture, ['read_mode' => 'outdated']);
 
         $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
@@ -170,7 +170,7 @@ class CollectionTest extends TestCase
      */
     public function testCount()
     {
-        $all = PersistentObject::collection($this->fixture)->count();
+        $all = PersistentObject::collection($this->fixture, ['read_mode' => 'outdated'])->count();
         $this->assertEquals(10, $all);
     }
 
@@ -179,6 +179,6 @@ class CollectionTest extends TestCase
      */
     public function testDistinct()
     {
-        $this->assertEquals(['string #1','string #2','string #3'], PersistentObject::collection($this->fixture)->distinct('arrayOfStrings'));
+        $this->assertEquals(['string #1','string #2','string #3'], PersistentObject::collection($this->fixture, ['read_mode' => 'outdated'])->distinct('arrayOfStrings'));
     }
 }
