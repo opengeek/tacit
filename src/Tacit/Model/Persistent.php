@@ -61,13 +61,15 @@ abstract class Persistent
     /**
      * Get the Collection from the Repository.
      *
-     * @param Repository $repository A Repository to get the Collection from.
+     * @param Repository $repository A specific Repository to get the Collection from.
+     * @param array      $options    An array of options to configure the Collection with.
      *
      * @return Collection The Collection from the Repository.
      */
-    public static function collection(Repository $repository)
+    public static function collection(Repository $repository, array $options = [])
     {
-        static::$collection = $repository->collection(static::collectionName());
+        static::$collection = $repository->collection(static::collectionName(), $options);
+
         return static::$collection;
     }
 
@@ -130,16 +132,17 @@ abstract class Persistent
      * Find objects within this Collection meeting the specified criteria.
      *
      * @param array|\Closure $criteria
-     * @param array          $fields An array of fields to be returned from the object.
+     * @param array          $fields     An array of fields to be returned from the object.
      * All fields are returned if not provided.
      * @param Repository     $repository A specific Repository to search for objects in.
+     * @param array          $options    An array of options to configure the Collection with.
      *
      * @return array[static] An array of Persistent objects, possibly empty.
      */
-    public static function find($criteria = array(), array $fields = array(), Repository $repository)
+    public static function find($criteria = array(), array $fields = array(), Repository $repository, array $options = [])
     {
         $collection = array();
-        $models = static::collection($repository)->find($criteria, $fields);
+        $models = static::collection($repository, $options)->find($criteria, $fields);
         if ($models) {
             foreach ($models as $id => $model) {
                 /** @var Persistent $object */
@@ -157,12 +160,13 @@ abstract class Persistent
      *
      * @param array|\Closure $criteria The criteria for limiting the objects to count.
      * @param Repository     $repository A specific Repository to count the objects in.
+     * @param array          $options    An array of options to configure the Collection with.
      *
      * @return int The number of objects in the Collection.
      */
-    public static function count($criteria = array(), Repository $repository = null)
+    public static function count($criteria = array(), Repository $repository = null, array $options = [])
     {
-        return static::collection($repository)->count($criteria);
+        return static::collection($repository, $options)->count($criteria);
     }
 
     /**
@@ -172,13 +176,14 @@ abstract class Persistent
      * @param array          $fields An array of fields to be returned from the object.
      * All fields are returned if not provided.
      * @param Repository     $repository A specific Repository to find the object in.
+     * @param array          $options    An array of options to configure the Collection with.
      *
      * @return Persistent|null The Persistent object meeting the criteria or null.
      */
-    public static function findOne($criteria, array $fields = array(), Repository $repository = null)
+    public static function findOne($criteria, array $fields = array(), Repository $repository = null, array $options = [])
     {
         $instance = null;
-        if ($model = static::collection($repository)->findOne($criteria, $fields)) {
+        if ($model = static::collection($repository, $options)->findOne($criteria, $fields)) {
             /** @var Persistent $instance */
             $instance = new static($repository);
             $instance->hydrate($model);
@@ -227,10 +232,11 @@ abstract class Persistent
      * Get a new instance of a Persistent object.
      *
      * @param Repository $repository A specific repository for the instance.
+     * @param array      $options    An array of options to configure the Collection with.
      *
      * @return Persistent
      */
-    public function __construct(Repository $repository)
+    public function __construct(Repository $repository, array $options = [])
     {
         $this->_repository = $repository;
     }

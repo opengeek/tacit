@@ -35,6 +35,8 @@ class MockRepository extends Repository
      */
     public function __construct(array $configuration = array())
     {
+        parent::__construct($configuration);
+
         $this->connection = [];
     }
 
@@ -42,12 +44,13 @@ class MockRepository extends Repository
      * Get a specific collection/table from the Repository.
      *
      * @param string $name The name of the collection to get.
+     * @param array  $options An array of options for the Collection.
      *
      * @return Collection A native collection instance wrapped by a Tacit\Model\Collection.
      */
-    public function collection($name)
+    public function collection($name, array $options = [])
     {
-        return new MockCollection($name, $this->connection);
+        return new MockCollection($name, $this->connection, $options);
     }
 
     /**

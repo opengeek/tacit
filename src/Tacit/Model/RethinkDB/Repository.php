@@ -43,12 +43,13 @@ class Repository extends \Tacit\Model\Repository
      * Get a specific collection container from the Repository.
      *
      * @param string $name The name of the collection to get.
+     * @param array  $options An array of options for the Collection.
      *
      * @return Collection A native collection instance wrapped by a Tacit\Model\Collection.
      */
-    public function collection($name)
+    public function collection($name, array $options = [])
     {
-        return new Collection($name, $this->connection);
+        return new Collection($name, $this->connection, $options);
     }
 
     public function create(array $options = [])

@@ -48,5 +48,6 @@ class RepositoryTest extends TestCase
     public function testGetCollection()
     {
         $this->assertInstanceOf('Tacit\Model\RethinkDB\Collection', $this->fixture->collection('test'));
+        $this->assertInstanceOf('Tacit\Model\RethinkDB\Collection', $this->fixture->collection('test', ['read_mode' => 'outdated']));
     }
 }

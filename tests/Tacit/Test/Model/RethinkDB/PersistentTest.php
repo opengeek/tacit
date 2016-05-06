@@ -59,6 +59,7 @@ class PersistentTest extends TestCase
     public function testCollection()
     {
         $this->assertInstanceOf('Tacit\Model\RethinkDB\Collection', PersistentObject::collection($this->fixture));
+        $this->assertInstanceOf('Tacit\Model\RethinkDB\Collection', PersistentObject::collection($this->fixture, ['read_mode' => 'outdated']));
     }
 
     /**

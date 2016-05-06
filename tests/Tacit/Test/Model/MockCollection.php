@@ -20,9 +20,9 @@ class MockCollection extends Collection
      */
     protected $connection;
 
-    public function __construct($name, &$connection)
+    public function __construct($name, &$connection, array $options = [])
     {
-        parent::__construct($name, $connection);
+        parent::__construct($name, $connection, $options);
     }
 
     /**
