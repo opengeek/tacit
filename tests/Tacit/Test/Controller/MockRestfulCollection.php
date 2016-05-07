@@ -32,7 +32,7 @@ class MockRestfulCollection extends RestfulCollection
         /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria($args);
+        $criteria = $this->criteria($args, $request);
 
         $params = $request->getQueryParams();
         $limit = isset($params['limit']) ? $params['limit'] : 25;

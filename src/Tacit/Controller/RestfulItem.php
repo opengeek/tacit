@@ -50,7 +50,7 @@ abstract class RestfulItem extends Restful
         $modelClass = static::$modelClass;
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->criteria($args), [], $this->container->get('repository'));
+        $item = $modelClass::findOne($this->criteria($args, $request), [], $this->container->get('repository'));
 
         if (null === $item) {
             throw new NotFoundException();
@@ -84,7 +84,7 @@ abstract class RestfulItem extends Restful
         /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria($args);
+        $criteria = $this->criteria($args, $request);
 
 
         $fields = isset($request->getQueryParams()['fields']) ? $request->getQueryParams()['fields'] : '';
@@ -115,7 +115,7 @@ abstract class RestfulItem extends Restful
         /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria($args);
+        $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
         $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
@@ -159,7 +159,7 @@ abstract class RestfulItem extends Restful
         /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria($args);
+        $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
         $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));

@@ -120,9 +120,11 @@ abstract class Restful
     /**
      * Get default criteria for this controller.
      *
+     * @param ServerRequestInterface $request
+     *
      * @return array
      */
-    public static function defaultCriteria()
+    public static function defaultCriteria(ServerRequestInterface $request)
     {
         return [];
     }
@@ -445,19 +447,20 @@ abstract class Restful
     /**
      * Get the criteria used to identify the resource associated with this controller.
      *
-     * @param array $args
+     * @param array                  $args
+     * @param ServerRequestInterface $request
      *
-     * @throws BadRequestException
      * @return array
+     * @throws BadRequestException
      */
-    protected function criteria(array $args)
+    protected function criteria(array $args, ServerRequestInterface $request)
     {
         $keys = static::keys();
         if (count($keys) !== count($args)) {
             throw new BadRequestException(null, "Wrong number of arguments for this resource", static::keys());
         }
 
-        return array_replace_recursive(static::defaultCriteria(), $args);
+        return array_replace_recursive(static::defaultCriteria($request), $args);
     }
 
     /**

@@ -12,6 +12,7 @@ namespace Tacit\Test\Controller\Monga;
 
 
 use MongoId;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RestfulItem extends \Tacit\Controller\RestfulItem
 {
@@ -27,10 +28,10 @@ class RestfulItem extends \Tacit\Controller\RestfulItem
         return ['_id'];
     }
 
-    protected function criteria(array $args) {
+    protected function criteria(array $args, ServerRequestInterface $request) {
         if (isset($args['_id'])) {
             $args['_id'] = new MongoId($args['_id']);
         }
-        return parent::criteria($args);
+        return parent::criteria($args, $request);
     }
 }

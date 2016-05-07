@@ -55,7 +55,7 @@ abstract class RestfulCollection extends Restful
         /** @var Persistent $modelClass */
         $modelClass = static::$modelClass;
 
-        $criteria = $this->criteria($args);
+        $criteria = $this->criteria($args, $request);
 
         $limit = $request->getQueryParams()['limit'] ?: 25;
         $offset = $request->getQueryParams()['offset'] ?: 0;
