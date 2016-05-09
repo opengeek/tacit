@@ -123,6 +123,6 @@ class Tacit extends App
      */
     public function invoke(array $mock)
     {
-        return $this->__invoke($mock['request'], $mock['response']);
+        return $this->process($mock['request'], $mock['response']);
     }
 }
