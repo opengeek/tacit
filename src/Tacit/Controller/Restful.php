@@ -603,7 +603,7 @@ abstract class Restful
                 $response = $response->withHeader($headerKey, $headerValue);
             }
         }
-        $response->withStatus($status);
+        $response = $response->withStatus($status);
         if ($bodyRaw !== null && $status !== 204) {
             if ($this->container->get('settings')['debug'] === true) {
                 $bodyRaw['execution_time'] = microtime(true) - $this->container->get('settings')['startTime'];
