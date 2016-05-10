@@ -95,7 +95,7 @@ abstract class RestfulCollection extends Restful
         $modelClass = static::$modelClass;
 
         try {
-            $criteria = $this->criteria($args);
+            $criteria = $this->criteria($args, $request);
             $data = $request->getParsedBody() ?: [];
             $data = !empty($criteria) ? array_replace_recursive($data, $criteria) : $data;
             $data = $this->postBeforeSet($data);
