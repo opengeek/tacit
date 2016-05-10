@@ -96,12 +96,12 @@ class Persistent extends \Tacit\Model\Persistent
 
     protected function distill($data)
     {
-        if (is_object($data) || is_array($data)) {
+        if (!($data instanceof \r\DatumConverter) && (is_object($data) || is_array($data))) {
             if (!$data instanceof DateTime && !$data instanceof ArrayObject) {
                 $data = is_object($data) ? new ArrayObject($data) : $data;
 
                 foreach ($data as $key => &$value) {
-                    if (is_object($value) || is_array($value)) {
+                    if (!($data instanceof \r\DatumConverter) && (is_object($data) || is_array($data))) {
                         $value = $this->distill($value);
                     }
                 }
