@@ -70,7 +70,6 @@ class Basic implements Authorization
         $signature = $this->getSignature($request);
         if (empty($signature)) {
             throw new UnauthorizedException(
-                $controller,
                 'Unsigned Request',
                 'No valid authorization signature was provided with the request.'
             );
@@ -78,7 +77,6 @@ class Basic implements Authorization
         $exploded = explode(':', $signature, 2);
         if (count($exploded) !== 2) {
             throw new UnauthorizedException(
-                $controller,
                 'Invalid Signature',
                 'The request contains an invalid authorization signature.'
             );
@@ -90,7 +88,6 @@ class Basic implements Authorization
 
         if ($password !== $secret) {
             throw new ForbiddenException(
-                $controller,
                 'Unauthorized Signature',
                 'The request is not properly signed and has been rejected.'
             );

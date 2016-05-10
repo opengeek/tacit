@@ -68,7 +68,6 @@ class HMAC implements Authorization
         $signature = $this->getSignature($request);
         if (empty($signature)) {
             throw new UnauthorizedException(
-                $controller,
                 'Unsigned Request',
                 'No valid authorization signature was provided with the request.',
                 ['Signature-HMAC' => $signature]
@@ -77,7 +76,6 @@ class HMAC implements Authorization
         $exploded = explode(':', $signature, 3);
         if (count($exploded) !== 3) {
             throw new UnauthorizedException(
-                $controller,
                 'Invalid Signature',
                 'The request contains an invalid authorization signature.',
                 ['Signature-HMAC' => $signature]
@@ -91,7 +89,6 @@ class HMAC implements Authorization
 
         if (time() >= $expires) {
             throw new ResourceConflictException(
-                $controller,
                 'Request Outdated',
                 'The signature indicates this request has expired and is no longer valid.',
                 ['SignatureHMAC' => $signature]
@@ -105,7 +102,6 @@ class HMAC implements Authorization
 
         if ($test !== $rawHash) {
             throw new UnauthorizedException(
-                $controller,
                 'Unauthorized Signature',
                 'The request is not properly signed and has been rejected.',
                 ['Signature-HMAC' => $signature]
