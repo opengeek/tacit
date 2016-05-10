@@ -18,8 +18,8 @@ trait Identity
 
     public static function identities(ContainerInterface $container)
     {
-        if (!is_array(static::$identities) && isset($container->get('settings')['tacit.identitiesFile'])) {
-            $identitiesFile = $container->get('settings')['tacit.identitiesFile'];
+        if (!is_array(static::$identities) && $container->get('settings')->has('tacit.identitiesFile')) {
+            $identitiesFile = $container->get('settings')->get('tacit.identitiesFile');
             if (is_readable($identitiesFile)) {
                 static::$identities = include $identitiesFile;
             }
