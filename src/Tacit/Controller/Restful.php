@@ -459,6 +459,7 @@ abstract class Restful
         if (count($keys) !== count($args)) {
             throw new BadRequestException(null, "Wrong number of arguments for this resource", static::keys());
         }
+        $args = array_combine($keys, array_values($args));
 
         return array_replace_recursive(static::defaultCriteria($request), $args);
     }
