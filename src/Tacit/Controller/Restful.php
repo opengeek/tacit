@@ -210,7 +210,7 @@ abstract class Restful
             $getParams = array_merge($getParams, $params);
         }
 
-        return $uri->getScheme() . '://' . $uri->getHost() . $uri->getPort() . $router->pathFor(static::name(), $routeParams, $getParams);
+        return $uri->getScheme() . '://' . ($uri->getHost() ?: 'localhost') . $uri->getPort() . $router->pathFor(static::name(), $routeParams, $getParams);
     }
 
     /**
