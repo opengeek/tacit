@@ -78,7 +78,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke($mock);
+            $response = $this->tacit->process($mock['request'], $mock['response']);
 
             $item = json_decode($response->getBody(), true);
 
@@ -111,7 +111,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke($mock);
+            $response = $this->tacit->process($mock['request'], $mock['response']);
 
             $item = json_decode($response->getBody(), true);
 
@@ -149,7 +149,7 @@ class RestfulItemTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke($mock);
+            $response = $this->tacit->process($mock['request'], $mock['response']);
 
             $item = json_decode($response->getBody(), true);
 

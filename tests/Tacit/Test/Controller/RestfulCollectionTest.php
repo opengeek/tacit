@@ -78,7 +78,7 @@ class RestfulCollectionTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke($mock);
+            $response = $this->tacit->process($mock['request'], $mock['response']);
 
             $result = json_decode($response->getBody(), true);
 
@@ -113,7 +113,7 @@ class RestfulCollectionTest extends ControllerTestCase
         ]);
 
         try {
-            $response = $this->tacit->invoke($mock);
+            $response = $this->tacit->process($mock['request'], $mock['response']);
 
             $result = json_decode($response->getBody(), true);
 

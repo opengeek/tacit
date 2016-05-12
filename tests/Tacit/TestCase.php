@@ -9,6 +9,7 @@
  */
 
 namespace Tacit;
+use Slim\App;
 
 /**
  * The base Tacit TestCase
@@ -17,7 +18,7 @@ namespace Tacit;
  */
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    /** @var Tacit */
+    /** @var App */
     protected $tacit;
 
     /**
@@ -49,15 +50,17 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->tacit = new Tacit([
-            'app' => [
-                'mode' => 'development',
-                'startTime' => microtime(true)
-            ],
-            'connection' => [
-                'class' => 'Tacit\Test\Model\MockRepository',
-                'server' => 'localhost',
-                'options' => array('connect' => false),
-                'repository' => 'tacit_test'
+            'settings' => [
+                'app' => [
+                    'mode' => 'development',
+                    'startTime' => microtime(true)
+                ],
+                'connection' => [
+                    'class' => 'Tacit\Test\Model\MockRepository',
+                    'server' => 'localhost',
+                    'options' => array('connect' => false),
+                    'repository' => 'tacit_test'
+                ]
             ]
         ]);
     }

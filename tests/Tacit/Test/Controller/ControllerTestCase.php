@@ -57,7 +57,7 @@ abstract class ControllerTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
+        $this->tacit->getContainer()->get('settings')->set('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
         require __DIR__ . '/../../../routes.php';
     }
 }

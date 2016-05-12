@@ -10,17 +10,40 @@
 
 namespace Tacit;
 
-
+use Slim\Collection;
 use Tacit\Handlers\Error;
+use Tacit\Model\Repository;
 
+
+/**
+ * @property-read Error $errorHandler
+ * @property-read Collection $settings
+ * @property-read Repository|null $repository
+ *
+ * @package Tacit
+ */
 class Container extends \Slim\Container
 {
     public function __construct(array $values)
     {
+        parent::__construct($values);
+
+        $this->registerCustomServices();
+    }
+    
+    protected function registerCustomServices()
+    {
         $this['errorHandler'] = function(Container $c) {
-            return new Error($c->get('settings')->all());
+            return new Error($c->settings->all());
         };
 
-        parent::__construct($values);
+        $connection = $this->settings->get('connection');
+        $this['repository'] = function () use ($connection) {
+            if ($connection === null) return null;
+            
+            $dbClass = $connection['class'];
+                
+            return new $dbClass($connection);
+        };
     }
 }

@@ -33,7 +33,7 @@ class TacitTest extends TestCase
         $tacit = new Tacit($config);
         $this->assertInstanceOf('Tacit\Tacit', $tacit, 'Could not get a valid instance of \Tacit\Tacit');
         $this->assertInstanceOf('Slim\App', $tacit, 'The instance of Tacit instantiated is not an instance of \Slim\App');
-        $this->assertNull($tacit->config('connection'));
+        $this->assertNull($tacit->getContainer()->get('settings')->get('connection'));
     }
     public function providerTacitConstructor()
     {
@@ -44,10 +44,10 @@ class TacitTest extends TestCase
 
     public function testRepositoryIsOptional()
     {
-        $tacit = new Tacit(['connection' => null]);
+        $tacit = new Tacit(['settings' => ['connection' => null]]);
         $this->assertInstanceOf('Tacit\Tacit', $tacit, 'Could not get a valid instance of \Tacit\Tacit');
         $this->assertInstanceOf('Slim\App', $tacit, 'The instance of Tacit instantiated is not an instance of \Slim\App');
-        $this->assertNull($tacit->config('connection'));
-        $this->assertFalse($tacit->getContainer()->has('repository'));
+        $this->assertNull($tacit->getContainer()->get('settings')->get('connection'));
+        $this->assertNull($tacit->getContainer()->get('repository'));
     }
 }

@@ -29,13 +29,15 @@ abstract class TestCase extends \Tacit\TestCase
     protected function setUp()
     {
         $tacit = new Tacit([
-            'mode' => 'development',
-            'startTime' => microtime(true),
-            'connection' => [
-                'class' => 'Tacit\Model\RethinkDB\Repository',
-                'server' => '127.0.0.1',
-                'options' => [],
-                'repository' => 'tacit_test'
+            'settings' => [
+                'mode' => 'development',
+                'startTime' => microtime(true),
+                'connection' => [
+                    'class' => 'Tacit\Model\RethinkDB\Repository',
+                    'server' => '127.0.0.1',
+                    'options' => [],
+                    'repository' => 'tacit_test'
+                ]
             ]
         ]);
 

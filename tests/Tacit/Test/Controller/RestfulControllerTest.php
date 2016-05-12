@@ -28,7 +28,7 @@ class RestfulControllerTest extends ControllerTestCase
             'REQUEST_URI' => '/'
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -55,7 +55,7 @@ class RestfulControllerTest extends ControllerTestCase
             'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -82,7 +82,7 @@ class RestfulControllerTest extends ControllerTestCase
             'REQUEST_BODY' => 'target=mocker'
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             array_intersect_assoc(

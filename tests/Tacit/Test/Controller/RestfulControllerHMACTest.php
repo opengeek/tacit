@@ -38,7 +38,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
             'Http_Signature-HMAC' => dechex(time()) . ':' . $clientKey . ':' . hash_hmac('sha1', $fingerprint, $secretKey)
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             $bodyRaw,
@@ -75,7 +75,7 @@ class RestfulControllerHMACTest extends ControllerTestCase
             'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             $bodyRaw,

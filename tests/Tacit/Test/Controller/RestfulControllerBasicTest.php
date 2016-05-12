@@ -30,7 +30,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
             'PHP_AUTH_PW' => $secretKey
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             array_intersect_assoc(
@@ -61,7 +61,7 @@ class RestfulControllerBasicTest extends ControllerTestCase
             'REQUEST_BODY' => '{"target":"mocker"}'
         ]);
 
-        $response = $this->tacit->invoke($mock);
+        $response = $this->tacit->process($mock['request'], $mock['response']);
 
         $this->assertEquals(
             array_intersect_assoc(

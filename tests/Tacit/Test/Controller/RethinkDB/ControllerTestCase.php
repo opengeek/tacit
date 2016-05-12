@@ -29,21 +29,23 @@ abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestC
     protected function setUp()
     {
         $this->tacit = new Tacit([
-            'app' => [
-                'mode' => 'development',
-                'startTime' => microtime(true)
-            ],
-            'connection' => [
-                'class' => 'Tacit\Model\RethinkDB\Repository',
-                'server' => 'localhost',
-                'options' => [],
-                'repository' => 'tacit_test'
+            'settings' => [
+                'app' => [
+                    'mode' => 'development',
+                    'startTime' => microtime(true)
+                ],
+                'connection' => [
+                    'class' => 'Tacit\Model\RethinkDB\Repository',
+                    'server' => 'localhost',
+                    'options' => [],
+                    'repository' => 'tacit_test'
+                ],
+                'tacit.identitiesFile' => __DIR__ . '/../../../../identities.php' 
             ]
         ]);
 
         $this->fixture = $this->tacit->getContainer()->get('repository');
 
-        $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../../identities.php');
         require __DIR__ . '/../../../../routes.php';
 
         $this->fixture->create(['exceptions' => false]);

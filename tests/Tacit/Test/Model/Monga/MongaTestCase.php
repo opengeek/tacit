@@ -31,15 +31,17 @@ abstract class MongaTestCase extends TestCase
     public function setUp()
     {
         $tacit = new Tacit([
-            'app' => [
-                'mode' => 'development',
-                'startTime' => microtime(true)
-            ],
-            'connection' => [
-                'class' => 'Tacit\Model\Monga\MongaRepository',
-                'server' => 'localhost',
-                'options' => array('connect' => false),
-                'repository' => 'tacit_test'
+            'settings' => [
+                'app' => [
+                    'mode' => 'development',
+                    'startTime' => microtime(true)
+                ],
+                'connection' => [
+                    'class' => 'Tacit\Model\Monga\MongaRepository',
+                    'server' => 'localhost',
+                    'options' => array('connect' => false),
+                    'repository' => 'tacit_test'
+                ]
             ]
         ]);
 

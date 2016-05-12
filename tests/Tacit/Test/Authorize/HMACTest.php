@@ -36,7 +36,7 @@ class HMACTest extends TestCase
      */
     public function testIdentities($expected)
     {
-        $this->tacit->config('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
+        $this->tacit->getContainer()->get('settings')->set('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
         $this->assertEquals($expected, (new HMAC())->identities($this->tacit->getContainer()));
     }
     /**
