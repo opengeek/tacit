@@ -101,7 +101,7 @@ class Persistent extends \Tacit\Model\Persistent
                 $data = is_object($data) ? new ArrayObject($data) : $data;
 
                 foreach ($data as $key => &$value) {
-                    if (!($data instanceof \r\DatumConverter) && (is_object($data) || is_array($data))) {
+                    if (!($value instanceof \r\DatumConverter) && (is_object($value) || is_array($value))) {
                         $value = $this->distill($value);
                     }
                 }
