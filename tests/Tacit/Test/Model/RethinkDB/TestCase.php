@@ -10,6 +10,7 @@
 
 namespace Tacit\Test\Model\RethinkDB;
 
+use Interop\Container\ContainerInterface;
 use Tacit\Model\RethinkDB\Repository;
 use Tacit\Tacit;
 
@@ -20,6 +21,8 @@ use Tacit\Tacit;
  */
 abstract class TestCase extends \Tacit\TestCase
 {
+    /** @var ContainerInterface */
+    protected $container;
     /** @var Repository */
     protected $fixture;
 
@@ -35,6 +38,8 @@ abstract class TestCase extends \Tacit\TestCase
                 'repository' => 'tacit_test'
             ]
         ]);
+
+        $this->container = $tacit->getContainer();
 
         /** @var Repository fixture */
         $this->fixture = $tacit->getContainer()->get('repository');

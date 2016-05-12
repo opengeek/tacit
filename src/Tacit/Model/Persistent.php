@@ -12,6 +12,7 @@ namespace Tacit\Model;
 
 
 use Exception;
+use Interop\Container\ContainerInterface;
 use Tacit\Model\Exception\ModelException;
 use Tacit\Model\Exception\ModelInsertException;
 use Tacit\Model\Exception\ModelValidationException;
@@ -40,6 +41,11 @@ abstract class Persistent
     protected static $validationRules = [];
 
     /**
+     * @var ContainerInterface A DI container containing dependencies for the model.
+     */
+    protected $_container;
+
+    /**
      * @var Repository A Repository represents a collection container or database.
      */
     protected $_repository;
@@ -49,7 +55,7 @@ abstract class Persistent
      *
      * @var array
      */
-    protected $_dirty = array();
+    protected $_dirty = [];
 
     /**
      * A Validator instance for this model item.
@@ -86,19 +92,18 @@ abstract class Persistent
     /**
      * Create an instance of this model class in the persistence provider.
      *
-     * @param array      $data The data to create the Persistent object with.
-     * @param Repository $repository A specific Repository to persist the object in.
+     * @param ContainerInterface $container A DI container with the Repository and any other model dependencies.
+     * @param array              $data      The data to create the Persistent object with.
      *
+     * @return null|Persistent
      * @throws ModelInsertException
-     * @throws Exception
      * @throws ModelValidationException
-     * @return Persistent|null
      */
-    public static function create(array $data = array(), Repository $repository = null)
+    public static function create(ContainerInterface $container, array $data = [])
     {
         try {
             /** @var Persistent $instance */
-            $instance = new static($repository);
+            $instance = new static($container);
             $instance->fromArray($data, true);
             $result = $instance->save();
         } catch (ModelValidationException $e) {
@@ -115,15 +120,15 @@ abstract class Persistent
     /**
      * Create an instance of this model class.
      *
-     * @param array      $data The data to initialize the Persistent object with.
-     * @param Repository $repository A specific Repository for ownership of the object.
+     * @param ContainerInterface $container A DI container with the Repository and any other model dependencies.
+     * @param array              $data      The data to initialize the Persistent object with.
      *
-     * @return Persistent|null An instance of the Persistent object or null.
+     * @return null|Persistent An instance of the Persistent object or null.
      */
-    public static function instance(array $data = array(), Repository $repository = null)
+    public static function instance(ContainerInterface $container, array $data = [])
     {
         /** @var Persistent $instance */
-        $instance = new static($repository);
+        $instance = new static($container);
         $instance->hydrate($data, true);
         return $instance;
     }
@@ -131,22 +136,22 @@ abstract class Persistent
     /**
      * Find objects within this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria
-     * @param array          $fields     An array of fields to be returned from the object.
-     * All fields are returned if not provided.
-     * @param Repository     $repository A specific Repository to search for objects in.
-     * @param array          $options    An array of options to configure the Collection with.
+     * @param ContainerInterface $container
+     * @param array|\Closure     $criteria
+     * @param array              $fields  An array of fields to be returned from the object.
+     *                                    All fields are returned if not provided.
+     * @param array              $options An array of options to configure the Collection with.
      *
      * @return array[static] An array of Persistent objects, possibly empty.
      */
-    public static function find($criteria = array(), array $fields = array(), Repository $repository, array $options = [])
+    public static function find(ContainerInterface $container, $criteria = [], array $fields = [], array $options = [])
     {
-        $collection = array();
-        $models = static::collection($repository, $options)->find($criteria, $fields);
+        $collection = [];
+        $models = static::collection($container->get('repository'), $options)->find($criteria, $fields);
         if ($models) {
             foreach ($models as $id => $model) {
                 /** @var Persistent $object */
-                $object = new static($repository);
+                $object = new static($container);
                 $object->hydrate($model);
                 $key = $object->getKey();
                 $collection[is_scalar($key) ? $key : $id] = $object;
@@ -158,34 +163,34 @@ abstract class Persistent
     /**
      * Count objects within this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria The criteria for limiting the objects to count.
-     * @param Repository     $repository A specific Repository to count the objects in.
-     * @param array          $options    An array of options to configure the Collection with.
+     * @param ContainerInterface $container
+     * @param array|\Closure     $criteria The criteria for limiting the objects to count.
+     * @param array              $options  An array of options to configure the Collection with.
      *
      * @return int The number of objects in the Collection.
      */
-    public static function count($criteria = array(), Repository $repository = null, array $options = [])
+    public static function count(ContainerInterface $container, $criteria = [], array $options = [])
     {
-        return static::collection($repository, $options)->count($criteria);
+        return static::collection($container->get('repository'), $options)->count($criteria);
     }
 
     /**
      * Find a single object within this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria The criteria for selecting the object from the Collection.
-     * @param array          $fields An array of fields to be returned from the object.
-     * All fields are returned if not provided.
-     * @param Repository     $repository A specific Repository to find the object in.
-     * @param array          $options    An array of options to configure the Collection with.
+     * @param ContainerInterface $container
+     * @param array|\Closure     $criteria The criteria for selecting the object from the Collection.
+     * @param array              $fields   An array of fields to be returned from the object.
+     *                                     All fields are returned if not provided.
+     * @param array              $options  An array of options to configure the Collection with.
      *
-     * @return Persistent|null The Persistent object meeting the criteria or null.
+     * @return null|Persistent The Persistent object meeting the criteria or null.
      */
-    public static function findOne($criteria, array $fields = array(), Repository $repository = null, array $options = [])
+    public static function findOne(ContainerInterface $container, $criteria, array $fields = [], array $options = [])
     {
         $instance = null;
-        if ($model = static::collection($repository, $options)->findOne($criteria, $fields)) {
+        if ($model = static::collection($container->get('repository'), $options)->findOne($criteria, $fields)) {
             /** @var Persistent $instance */
-            $instance = new static($repository);
+            $instance = new static($container);
             $instance->hydrate($model);
         }
         return $instance;
@@ -194,16 +199,16 @@ abstract class Persistent
     /**
      * Update one or more objects in this Collection meeting the specified criteria.
      *
-     * @param array|\Closure $criteria The criteria for selecting the objects to update.
-     * @param array          $fields An associative array of fields to update in the object(s).
-     * @param array          $options An array of options for the update.
-     * @param Repository     $repository A specific Repository to update the objects in.
+     * @param ContainerInterface $container
+     * @param array|\Closure     $criteria The criteria for selecting the objects to update.
+     * @param array              $fields   An associative array of fields to update in the object(s).
+     * @param array              $options  An array of options for the update.
      *
      * @return bool|int Returns the number of objects updated or false on failure.
      */
-    public static function update($criteria, array $fields, array $options = ['w' => 1], Repository $repository = null)
+    public static function update(ContainerInterface $container, $criteria, array $fields, array $options = ['w' => 1])
     {
-        return static::collection($repository)->update($criteria, $fields, $options);
+        return static::collection($container->get('repository'))->update($criteria, $fields, $options);
     }
 
     /**
@@ -231,14 +236,29 @@ abstract class Persistent
     /**
      * Get a new instance of a Persistent object.
      *
-     * @param Repository $repository A specific repository for the instance.
-     * @param array      $options    An array of options to configure the Collection with.
+     * @param ContainerInterface $container A DI container of dependencies for the model.
+     * @param array              $options   An array of options to configure the Collection with.
      *
-     * @return Persistent
+     * @throws ModelException If no valid Repository is available from the DI container.
      */
-    public function __construct(Repository $repository, array $options = [])
+    public function __construct(ContainerInterface $container, array $options = [])
     {
-        $this->_repository = $repository;
+        $this->_container = $container;
+
+        if (!$container->has('repository')) {
+            throw new ModelException('A repository is required to instantiate a Model class');
+        }
+        $this->setRepository($container->get('repository'));
+    }
+
+    /**
+     * Get the DI container available for this Persistent instance.
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->_container;
     }
 
     /**
@@ -290,7 +310,7 @@ abstract class Persistent
             }
         }
         if ($this->isNew()) {
-            $this->_dirty = array();
+            $this->_dirty = [];
         }
     }
 
@@ -352,7 +372,7 @@ abstract class Persistent
             }
         }
         if (!$this->isNew()) {
-            $this->_dirty = array();
+            $this->_dirty = [];
         }
     }
 
@@ -429,7 +449,7 @@ abstract class Persistent
         if ($mask === true) {
             $mask = array_keys($vars);
         }
-        $array = array();
+        $array = [];
         if (is_array($mask) && !empty($mask)) {
             foreach ($mask as $key) {
                 if (array_key_exists($key, $vars)) {

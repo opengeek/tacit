@@ -56,7 +56,7 @@ class RestfulCollectionTest extends ControllerTestCase
 
         $this->fixture = $this->tacit->getContainer()->get('repository');
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($item, $this->fixture);
+            MockPersistent::create($this->tacit->getContainer(), $item);
         }
     }
 

@@ -50,7 +50,7 @@ abstract class RestfulItem extends Restful
         $modelClass = static::$modelClass;
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->criteria($args, $request), [], $this->container->get('repository'));
+        $item = $modelClass::findOne($this->getContainer(), $this->criteria($args, $request), []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -91,7 +91,7 @@ abstract class RestfulItem extends Restful
         $fields = array_filter(explode(',', $fields));
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($criteria, $fields, $this->container->get('repository'));
+        $item = $modelClass::findOne($this->getContainer(), $criteria, $fields);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -118,7 +118,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
+        $item = $modelClass::findOne($this->getContainer(), $criteria, []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -162,7 +162,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($criteria, [], $this->container->get('repository'));
+        $item = $modelClass::findOne($this->getContainer(), $criteria, []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -170,7 +170,7 @@ abstract class RestfulItem extends Restful
 
         try {
             /** @var Persistent $newItem */
-            $newItem = new $modelClass($this->container->get('repository'));
+            $newItem = new $modelClass($this->getContainer());
             $data = array_replace_recursive(
                 $newItem->toArray(),
                 $request->getParsedBody() ?: []

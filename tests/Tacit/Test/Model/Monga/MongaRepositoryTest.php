@@ -25,7 +25,7 @@ class MongaRepositoryTest extends MongaTestCase
      */
     public function testGetInstance()
     {
-        $this->assertInstanceOf('Tacit\\Model\\Repository', $this->fixture);
+        $this->assertInstanceOf('Tacit\Model\Repository', $this->fixture);
     }
 
     /**
@@ -36,7 +36,7 @@ class MongaRepositoryTest extends MongaTestCase
      */
     public function testGetConnection()
     {
-        $this->assertInstanceOf('League\\Monga\\Database', $this->fixture->getConnection());
+        $this->assertInstanceOf('League\Monga\Database', $this->fixture->getConnection());
     }
 
     /**
@@ -47,6 +47,6 @@ class MongaRepositoryTest extends MongaTestCase
      */
     public function testGetCollection()
     {
-        $this->assertInstanceOf('Tacit\\Model\\Monga\\MongaCollection', $this->fixture->collection('test'));
+        $this->assertInstanceOf('Tacit\Model\Monga\MongaCollection', $this->fixture->collection('test'));
     }
 }

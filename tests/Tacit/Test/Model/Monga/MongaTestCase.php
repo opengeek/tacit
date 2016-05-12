@@ -11,6 +11,7 @@
 namespace Tacit\Test\Model\Monga;
 
 
+use Interop\Container\ContainerInterface;
 use Tacit\Model\Monga\MongaRepository;
 use Tacit\Tacit;
 use Tacit\TestCase;
@@ -22,6 +23,8 @@ use Tacit\TestCase;
  */
 abstract class MongaTestCase extends TestCase
 {
+    /** @var ContainerInterface */
+    protected $container;
     /** @var MongaRepository */
     protected $fixture;
 
@@ -39,6 +42,9 @@ abstract class MongaTestCase extends TestCase
                 'repository' => 'tacit_test'
             ]
         ]);
+
+        $this->container = $tacit->getContainer();
+
         $this->fixture = $tacit->getContainer()->get('repository');
 
         $this->fixture->create(['exceptions' => false]);

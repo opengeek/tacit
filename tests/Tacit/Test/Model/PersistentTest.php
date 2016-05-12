@@ -50,7 +50,7 @@ class PersistentTest extends ModelTestCase
         parent::setUp();
 
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($item, $this->fixture);
+            MockPersistent::create($this->tacit->getContainer(), $item);
         }
     }
 
@@ -66,16 +66,16 @@ class PersistentTest extends ModelTestCase
      */
     public function testGetMockPersistentInstance()
     {
-        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance([], $this->fixture));
-        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance([
-            '_id'      => 99999,
-            'name'     => 'an instance',
-            'text'     => 'an instance\'s text',
-            'date'     => new DateTime(),
-            'integer'  => 144,
-            'float'    => 3.14,
+        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance($this->tacit->getContainer(), []));
+        $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', MockPersistent::instance($this->tacit->getContainer(), [
+            '_id' => 99999,
+            'name' => 'an instance',
+            'text' => 'an instance\'s text',
+            'date' => new DateTime(),
+            'integer' => 144,
+            'float' => 3.14,
             'password' => 'password'
-        ], $this->fixture));
+        ]));
     }
 
     /**
@@ -111,7 +111,7 @@ class PersistentTest extends ModelTestCase
      */
     public function testCount($expected, $criteria)
     {
-        $this->assertEquals($expected, MockPersistent::count($criteria, $this->fixture));
+        $this->assertEquals($expected, MockPersistent::count($this->tacit->getContainer(), $criteria));
     }
     public function providerCount()
     {
@@ -133,7 +133,7 @@ class PersistentTest extends ModelTestCase
     public function testCreate($data)
     {
         try {
-            $object = MockPersistent::create($data, $this->fixture);
+            $object = MockPersistent::create($this->tacit->getContainer(), $data);
 
             $this->assertNotNull($object);
             $this->assertInstanceOf('Tacit\Model\Persistent', $object);
@@ -180,7 +180,7 @@ class PersistentTest extends ModelTestCase
      */
     public function testInstance($data)
     {
-        $object = MockPersistent::instance($data, $this->fixture);
+        $object = MockPersistent::instance($this->tacit->getContainer(), $data);
 
         $this->assertNotNull($object);
         $this->assertInstanceOf('Tacit\Model\Persistent', $object);
@@ -225,7 +225,7 @@ class PersistentTest extends ModelTestCase
      */
     public function testFind($expected, $criteria, $fields)
     {
-        $collection = MockPersistent::find($criteria, [], $this->fixture);
+        $collection = MockPersistent::find($this->tacit->getContainer(), $criteria, []);
         array_walk($collection, function (&$value) use ($fields) {
             /** @var MockPersistent $value */
             $value = $value->toArray($fields);
@@ -262,7 +262,7 @@ class PersistentTest extends ModelTestCase
     public function testFindOne($expected, $criteria, $fields)
     {
         /** @var MockPersistent $object */
-        $object = MockPersistent::findOne($criteria, [], $this->fixture);
+        $object = MockPersistent::findOne($this->tacit->getContainer(), $criteria, []);
         $this->assertEquals($expected, $object->toArray($fields));
     }
     /**
@@ -293,7 +293,7 @@ class PersistentTest extends ModelTestCase
      */
     public function testUpdate($expected, $criteria, $data)
     {
-        $this->assertEquals($expected, MockPersistent::update($criteria, $data, [], $this->fixture));
+        $this->assertEquals($expected, MockPersistent::update($this->tacit->getContainer(), $criteria, $data, []));
     }
     public function providerUpdate()
     {

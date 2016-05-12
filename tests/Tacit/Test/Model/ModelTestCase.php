@@ -11,6 +11,7 @@
 namespace Tacit\Test\Model;
 
 
+use Interop\Container\ContainerInterface;
 use Tacit\TestCase;
 
 /**

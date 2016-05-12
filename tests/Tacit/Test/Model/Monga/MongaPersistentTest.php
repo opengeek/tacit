@@ -53,7 +53,7 @@ class MongaPersistentTest extends MongaTestCase
      */
     public function testCollection()
     {
-        $this->assertInstanceOf('Tacit\\Model\\Monga\\MongaCollection', MongaPersistentObject::collection($this->fixture));
+        $this->assertInstanceOf('Tacit\Model\Monga\MongaCollection', MongaPersistentObject::collection($this->fixture));
     }
 
     /**
@@ -68,12 +68,12 @@ class MongaPersistentTest extends MongaTestCase
     public function testCreate($data)
     {
         try {
-            $object = MongaPersistentObject::create($data, $this->fixture);
+            $object = MongaPersistentObject::create($this->container, $data);
 
             $this->assertNotNull($object);
-            $this->assertInstanceOf('Tacit\\Model\\Persistent', $object);
-            $this->assertInstanceOf('Tacit\\Model\\Monga\\MongaPersistent', $object);
-            $this->assertInstanceOf('Tacit\\Test\\Model\\Monga\\MongaPersistentObject', $object);
+            $this->assertInstanceOf('Tacit\Model\Persistent', $object);
+            $this->assertInstanceOf('Tacit\Model\Monga\MongaPersistent', $object);
+            $this->assertInstanceOf('Tacit\Test\Model\Monga\MongaPersistentObject', $object);
         } catch (ModelValidationException $e) {
             echo $e;
         }

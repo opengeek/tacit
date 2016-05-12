@@ -50,7 +50,7 @@ class RestfulItemTest extends ControllerTestCase
         \r\tableCreate(PersistentObject::collectionName())->run($this->fixture->getConnection()->getHandle());
 
         foreach (self::fixtureData() as $item) {
-            PersistentObject::create($item, $this->fixture);
+            PersistentObject::create($this->tacit->getContainer(), $item);
         }
     }
 
@@ -70,7 +70,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGet()
     {
         /** @var PersistentObject $itemObj */
-        $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        $itemObj = PersistentObject::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1']);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/rethinkdb/collection/' . (string)$itemObj->id,
@@ -102,7 +102,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGetWithFields()
     {
         /** @var PersistentObject $itemObj */
-        $itemObj = PersistentObject::findOne(['name' => 'MockPersistent #1'], [], $this->fixture);
+        $itemObj = PersistentObject::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/rethinkdb/collection/' . $itemObj->id,
@@ -139,7 +139,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testPut(array $data)
     {
         /** @var PersistentObject $itemObj */
-        $itemObj = PersistentObject::findOne(['name' => $data['name']], [], $this->fixture);
+        $itemObj = PersistentObject::findOne($this->tacit->getContainer(), ['name' => $data['name']], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/rethinkdb/collection/' . $itemObj->id,

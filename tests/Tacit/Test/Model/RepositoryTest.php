@@ -24,7 +24,7 @@ class RepositoryTest extends ModelTestCase
      */
     public function testGetInstance()
     {
-        $this->assertInstanceOf('Tacit\\Model\\Repository', $this->fixture);
+        $this->assertInstanceOf('Tacit\Model\Repository', $this->fixture);
     }
 
     /**
@@ -44,6 +44,6 @@ class RepositoryTest extends ModelTestCase
      */
     public function testGetCollection()
     {
-        $this->assertInstanceOf('Tacit\\Test\\Model\\MockCollection', $this->fixture->collection('test'));
+        $this->assertInstanceOf('Tacit\Test\Model\MockCollection', $this->fixture->collection('test'));
     }
 }

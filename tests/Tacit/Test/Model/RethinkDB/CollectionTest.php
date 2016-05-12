@@ -55,7 +55,7 @@ class CollectionTest extends TestCase
         \r\table(PersistentObject::collectionName())->indexWait('arrayOfStrings')->run($this->fixture->getConnection()->getHandle());
 
         foreach (self::fixtureData() as $item) {
-            PersistentObject::create($item, $this->fixture);
+            PersistentObject::create($this->container, $item);
         }
     }
 
@@ -72,7 +72,7 @@ class CollectionTest extends TestCase
      */
     public function testGetPublicVarsFromObject()
     {
-        $object = PersistentObject::findOne([], [], $this->fixture, ['read_mode' => 'outdated']);
+        $object = PersistentObject::findOne($this->container, [], [], ['read_mode' => 'outdated']);
 
         $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
@@ -104,7 +104,7 @@ class CollectionTest extends TestCase
      */
     public function testGetMaskFromObject(array $expected, array $exclude)
     {
-        $object = PersistentObject::findOne([], [], $this->fixture, ['read_mode' => 'outdated']);
+        $object = PersistentObject::findOne($this->container, [], [], ['read_mode' => 'outdated']);
 
         $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(

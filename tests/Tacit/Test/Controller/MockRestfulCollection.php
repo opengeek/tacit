@@ -41,9 +41,9 @@ class MockRestfulCollection extends RestfulCollection
         $orderDir = isset($params['sort_dir']) ? $params['sort_dir'] : 'desc';
 
         try {
-            $total = $modelClass::count($criteria, $this->container->get('repository'));
+            $total = $modelClass::count($this->getContainer(), $criteria);
 
-            $collection = $modelClass::find($criteria, [], $this->container->get('repository'));
+            $collection = $modelClass::find($this->getContainer(), $criteria, []);
 
             if ($collection === null) {
                 $collection = [];

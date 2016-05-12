@@ -63,15 +63,15 @@ abstract class RestfulCollection extends Restful
         $orderDir = $request->getQueryParams()['sort_dir'] ?: 'desc';
 
         try {
-            $total = $modelClass::count($criteria, $this->container->get('repository'));
+            $total = $modelClass::count($this->getContainer(), $criteria);
 
-            $collection = $modelClass::find(function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
+            $collection = $modelClass::find($this->getContainer(), function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
                 /** @var Query|object $query */
                 foreach ($criteria as $criterionKey => $criterion) {
                     $query->where($criterionKey, $criterion);
                 }
                 $query->orderBy($orderBy, $orderDir)->skip($offset)->limit($limit);
-            }, [], $this->container->get('repository'));
+            }, []);
 
             return $this->respondWithCollection($request, $response, $collection, $this->transformer(), ['total' => $total]);
         } catch (Exception $e) {
@@ -100,7 +100,7 @@ abstract class RestfulCollection extends Restful
             $data = !empty($criteria) ? array_replace_recursive($data, $criteria) : $data;
             $data = $this->postBeforeSet($data);
             
-            $item = $modelClass::create($data, $this->container->get('repository'));
+            $item = $modelClass::create($this->container->get('repository'), $data);
 
             /** @var RestfulItem $itemController */
             $itemController = static::$itemController;

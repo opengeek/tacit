@@ -50,7 +50,7 @@ class CollectionTest extends ModelTestCase
         parent::setUp();
 
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($item, $this->fixture);
+            MockPersistent::create($this->tacit->getContainer(), $item);
         }
     }
 
@@ -64,7 +64,7 @@ class CollectionTest extends ModelTestCase
      */
     public function testGetPublicVarsFromObject()
     {
-        $object = MockPersistent::findOne([], [], $this->fixture);
+        $object = MockPersistent::findOne($this->tacit->getContainer(), [], []);
 
         $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
         $this->assertEquals(
@@ -96,7 +96,7 @@ class CollectionTest extends ModelTestCase
      */
     public function testGetMaskFromObject(array $expected, array $exclude)
     {
-        $object = MockPersistent::findOne([], [], $this->fixture);
+        $object = MockPersistent::findOne($this->tacit->getContainer(), [], []);
 
         $this->assertInstanceOf('Tacit\Test\Model\MockPersistent', $object);
         $this->assertEquals(
