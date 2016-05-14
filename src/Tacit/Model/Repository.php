@@ -10,6 +10,7 @@
 
 namespace Tacit\Model;
 
+use Slim\Collection;
 use Tacit\Model\Exception\RepositoryException;
 
 /**
@@ -20,11 +21,6 @@ use Tacit\Model\Exception\RepositoryException;
 abstract class Repository
 {
     /**
-     * @var static
-     */
-    private static $instance;
-
-    /**
      * A native connection object for a repository.
      *
      * @var object
@@ -34,26 +30,9 @@ abstract class Repository
     /**
      * The configuration for a repository.
      *
-     * @var array
+     * @var Collection
      */
     private $configuration;
-
-    /**
-     * Get a Repository instance (singleton).
-     *
-     * @param array $configuration An array containing the configuration necessary to
-     * get a connection to and identify a collections container within a repository.
-     *
-     * @return static
-     */
-    public static function getInstance(array $configuration = [])
-    {
-        if (null === static::$instance) {
-            $dbClass = $configuration['class'];
-            static::$instance = new $dbClass($configuration);
-        }
-        return static::$instance;
-    }
 
     /**
      * Repository constructor.
@@ -62,7 +41,7 @@ abstract class Repository
      */
     public function __construct(array $configuration = [])
     {
-        $this->configuration = $configuration;
+        $this->configuration = new Collection($configuration);
     }
 
     /**
@@ -119,9 +98,10 @@ abstract class Repository
      */
     public function option($key, $default = null, array $options = [])
     {
-        if (array_key_exists($key, $options)) {
+        if (!empty($options) && array_key_exists($key, $options)) {
             return $options[$key];
         }
-        return array_key_exists($key, $this->configuration) ? $this->configuration[$key] : $default;
+
+        return $this->configuration->get($key, $default);
     }
 }
