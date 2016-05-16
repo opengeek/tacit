@@ -57,10 +57,10 @@ abstract class RestfulCollection extends Restful
 
         $criteria = $this->criteria($args, $request);
 
-        $limit = $request->getQueryParams()['limit'] ?: 25;
-        $offset = $request->getQueryParams()['offset'] ?: 0;
-        $orderBy = $request->getQueryParams()['sort'] ?: $modelClass::key();
-        $orderDir = $request->getQueryParams()['sort_dir'] ?: 'desc';
+        $limit = isset($request->getQueryParams()['limit']) ? $request->getQueryParams()['limit'] : 25;
+        $offset = isset($request->getQueryParams()['offset']) ? $request->getQueryParams()['offset'] : 0;
+        $orderBy = isset($request->getQueryParams()['sort']) ? $request->getQueryParams()['sort'] : $modelClass::key();
+        $orderDir = isset($request->getQueryParams()['sort_dir']) ? $request->getQueryParams()['sort_dir'] : 'desc';
 
         try {
             $total = $modelClass::count($this->getContainer(), $criteria);
