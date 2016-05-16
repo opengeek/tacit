@@ -100,7 +100,7 @@ abstract class RestfulCollection extends Restful
             $data = !empty($criteria) ? array_replace_recursive($data, $criteria) : $data;
             $data = $this->postBeforeSet($data);
             
-            $item = $modelClass::create($this->container->get('repository'), $data);
+            $item = $modelClass::create($this->getContainer(), $data);
 
             /** @var RestfulItem $itemController */
             $itemController = static::$itemController;
@@ -109,7 +109,7 @@ abstract class RestfulCollection extends Restful
                 $request,
                 $response,
                 $item,
-                $itemController::url($this->container, [$item->getKeyField() => $item->getKey()], false),
+                $itemController::url($this->getContainer(), [$item->getKeyField() => $item->getKey()], false),
                 $this->transformer()
             );
         } catch (OperationalException $e) {
