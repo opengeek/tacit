@@ -13,7 +13,6 @@ namespace Tacit\Operations;
 
 use Exception;
 use Tacit\Controller\Exception\RestfulException;
-use Tacit\Controller\Restful;
 
 class OperationalException extends Exception
 {

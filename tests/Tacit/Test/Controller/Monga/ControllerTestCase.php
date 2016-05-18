@@ -20,9 +20,6 @@ use Tacit\Tacit;
  */
 abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestCase
 {
-    /** @var MongaRepository */
-    protected $fixture;
-
     protected function setUp()
     {
         $this->tacit = new Tacit([

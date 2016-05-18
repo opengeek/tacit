@@ -20,13 +20,6 @@ use Tacit\Test\Model\MockRepository;
 class RestfulCollectionTest extends ControllerTestCase
 {
     /**
-     * A MockRepository fixture for the RestfulCollection test cases.
-     *
-     * @var MockRepository
-     */
-    public $fixture;
-
-    /**
      * Get fixture data starting with the specified index.
      *
      * @param int $idx The starting index value.
@@ -54,9 +47,8 @@ class RestfulCollectionTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->fixture = $this->tacit->getContainer()->get('repository');
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($this->tacit->getContainer(), $item);
+            MockPersistent::create($this->fixture, $item);
         }
     }
 

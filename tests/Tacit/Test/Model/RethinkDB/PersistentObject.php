@@ -11,7 +11,6 @@
 namespace Tacit\Test\Model\RethinkDB;
 
 use DateTime;
-use r\Queries\Dates\Time;
 use Tacit\Model\RethinkDB\Persistent;
 
 class PersistentObject extends Persistent

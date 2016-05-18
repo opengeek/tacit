@@ -22,9 +22,9 @@ class HMACTest extends TestCase
      */
     public function testConstructor()
     {
-        $hmac = new HMAC();
-        $this->assertInstanceOf('Tacit\\Authorize\\HMAC', $hmac);
-        $this->assertInstanceOf('Tacit\\Authorize\\Authorization', $hmac);
+        $hmac = new HMAC($this->tacit->getContainer()->get('settings')->get('tacit.identitiesFile', __DIR__ . '/../../../identities.php'));
+        $this->assertInstanceOf('Tacit\Authorize\HMAC', $hmac);
+        $this->assertInstanceOf('Tacit\Authorize\Authorization', $hmac);
     }
 
     /**
@@ -36,8 +36,8 @@ class HMACTest extends TestCase
      */
     public function testIdentities($expected)
     {
-        $this->tacit->getContainer()->get('settings')->set('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
-        $this->assertEquals($expected, (new HMAC())->identities($this->tacit->getContainer()));
+        $this->assertEquals($expected, (new HMAC($this->tacit->getContainer()->get('settings')->get('tacit.identitiesFile', __DIR__ . '/../../../identities.php')))
+            ->getIdentities());
     }
     /**
      * Provider for testIdentities()

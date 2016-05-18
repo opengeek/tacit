@@ -55,9 +55,8 @@ class RestfulItemTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->fixture = $this->tacit->getContainer()->get('repository');
         foreach (self::fixtureData() as $item) {
-            MockPersistent::create($this->tacit->getContainer(), $item);
+            MockPersistent::create($this->fixture, $item);
         }
     }
 
@@ -72,7 +71,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGet()
     {
         /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
+        $itemObj = MockPersistent::findOne($this->fixture, ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/collection/' . $itemObj->_id,
@@ -101,7 +100,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGetWithFields()
     {
         /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
+        $itemObj = MockPersistent::findOne($this->fixture, ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/collection/' . $itemObj->_id,
@@ -137,7 +136,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testPut(array $data)
     {
         /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne($this->tacit->getContainer(), ['name' => $data['name']], []);
+        $itemObj = MockPersistent::findOne($this->fixture, ['name' => $data['name']], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/collection/' . $itemObj->_id,
@@ -167,7 +166,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testPartialPut()
     {
         /** @var MockPersistent $itemObj */
-        $itemObj = MockPersistent::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
+        $itemObj = MockPersistent::findOne($this->fixture, ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/collection/' . $itemObj->_id,

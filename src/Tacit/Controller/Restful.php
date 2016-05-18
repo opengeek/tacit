@@ -22,7 +22,6 @@ use Slim\Http\Response;
 use Slim\Http\Stream;
 use Slim\Route;
 use Slim\Router;
-use Tacit\Container;
 use Tacit\Controller\Exception\BadRequestException;
 use Tacit\Controller\Exception\MethodNotAllowedException;
 use Tacit\Controller\Exception\NotImplementedException;
@@ -99,18 +98,32 @@ abstract class Restful
     protected static $transformer = '\Tacit\Transform\ArrayTransformer';
 
     /**
+     * A Fractal transformer manager for this controller.
+     *
+     * @var Manager
+     */
+    protected $fractal;
+
+    /**
+     * The Router for this controller.
+     *
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * A collection of settings for this controller.
+     *
+     * @var \Slim\Collection
+     */
+    protected $settings;
+
+    /**
      * An array of refs for this controller.
      *
      * @var array
      */
     protected $refs = [];
-
-    /**
-     * The DI container for access to dependencies
-     *
-     * @var Container
-     */
-    protected $container;
 
     public static function className()
     {
@@ -156,17 +169,23 @@ abstract class Restful
     /**
      * Return a RESTful ref element for this controller.
      *
-     * @param Container  $container
-     * @param array      $routeParams
+     * @param Router $router
+     * @param ServerRequestInterface $request
+     * @param array $routeParams
      * @param array|bool $params
-     * @param string     $suffix
+     * @param string $suffix
      *
      * @return array
      */
-    public static function ref(Container $container, array $routeParams = [], $params = false, $suffix = '')
+    public static function ref(
+        Router $router,
+        ServerRequestInterface $request,
+        array $routeParams = [],
+        $params = false,
+        $suffix = '')
     {
         return [
-            'href' => static::url($container, $routeParams, $params),
+            'href' => static::url($router, $request, $routeParams, $params),
             'title' => static::title() . (!empty($suffix) ? " {$suffix}" : '')
         ];
     }
@@ -183,20 +202,15 @@ abstract class Restful
     /**
      * Get the URL for this Restful controller.
      *
-     * @param Container  $container
-     * @param array      $routeParams
-     * @param array|bool $params
+     * @param Router                 $router
+     * @param ServerRequestInterface $request
+     * @param array                  $routeParams
+     * @param array|bool             $params
      *
      * @return string
      */
-    public static function url(Container $container, array $routeParams = [], $params = [])
+    public static function url(Router $router, ServerRequestInterface $request, array $routeParams = [], $params = [])
     {
-        /** @var ServerRequestInterface $request */
-        $request = $container->get('request');
-
-        /** @var Router $router */
-        $router = $container->get('router');
-
         $uri = $request->getUri();
 
         $getParams = [];
@@ -216,26 +230,15 @@ abstract class Restful
     /**
      * Construct a new instance of the Restful controller.
      *
-     * @param Container $container
+     * @param \Slim\Collection $settings
+     * @param Router           $router
+     * @param Manager          $fractal
      */
-    public function __construct(Container $container)
+    public function __construct(\Slim\Collection $settings, Router $router, Manager $fractal)
     {
-        $this->container = $container;
-        $this->fractal = new Manager();
-        $scopeParameter = isset($this->container->settings['embedded_scopes_param']) ? $this->container->settings['embedded_scopes_param'] : 'zoom';
-        if (isset($this->container->request->getQueryParams()[$scopeParameter])) {
-            $this->fractal->setRequestedScopes(explode(',', $this->container->request->getQueryParams()[$scopeParameter]));
-        }
-    }
-
-    /**
-     * Get the DI container for this controller.
-     *
-     * @return Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
+        $this->settings = $settings;
+        $this->router   = $router;
+        $this->fractal  = $fractal;
     }
 
     /**
@@ -294,6 +297,11 @@ abstract class Restful
 
         $method = $request->getMethod();
         if (method_exists($this, $method)) {
+            $scopeParameter = $this->settings->get('embedded_scopes_param', 'zoom');
+            if (isset($request->getQueryParams()[$scopeParameter])) {
+                $this->fractal->setRequestedScopes(explode(',', $request->getQueryParams()[$scopeParameter]));
+            }
+
             return $this->{$method}($request, $response, $args);
         }
         throw new NotImplementedException();
@@ -390,18 +398,19 @@ abstract class Restful
     /**
      * Get an array of refs for this controller.
      *
-     * @param array $refs An optional array of refs to merge with those already
-     * defined for this controller.
-     * @param array $parameters An array of parameters for building the self link.
+     * @param ServerRequestInterface $request
+     * @param array                  $refs       An optional array of refs to merge with those already
+     *                                           defined for this controller.
+     * @param array                  $parameters An array of parameters for building the self link.
      *
      * @return array An array of refs for this controller.
      */
-    public function refs(array $refs = [], array $parameters = [])
+    public function refs(ServerRequestInterface $request, array $refs = [], array $parameters = [])
     {
         return array_merge(
             [
                 'self' => [
-                    'href' => $this->self($parameters),
+                    'href' => $this->self($request, $parameters),
                     'title' => static::title()
                 ]
             ],
@@ -558,7 +567,7 @@ abstract class Restful
             $scope = $this->fractal->createData($resource)->toArray();
             switch ($type) {
                 case self::RESOURCE_TYPE_ITEM:
-                    $bodyRaw['_links'] = $this->refs();
+                    $bodyRaw['_links'] = $this->refs($request);
                     foreach ($scope['data'] as $key => $value) {
                         $bodyRaw[$key] = $value;
                     }
@@ -577,12 +586,19 @@ abstract class Restful
                             ? (int)$request->getQueryParams()['offset']
                             : 0;
                     if ($total > $offset) {
-                        $links['first'] = static::ref($this->container, $request->getAttribute('route')->getArguments(), $offset > 0 ? ['offset' => 0] : [], '(First)');
-                        $links['prev'] = ($offset > 0) ? static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => $offset - $limit], '(Previous)') : null;
-                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => $offset + $limit], '(Next)') : null;
-                        $links['last'] = static::ref($this->container, $request->getAttribute('route')->getArguments(), ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
+                        $links['first'] = static::ref($this->router, $request,
+                            $request->getAttribute('route')->getArguments(), $offset > 0 ? ['offset' => 0] : [],
+                            '(First)');
+                        $links['prev'] = ($offset > 0) ? static::ref($this->router, $request,
+                            $request->getAttribute('route')->getArguments(), ['offset' => $offset - $limit],
+                            '(Previous)') : null;
+                        $links['next'] = (($offset + $limit) < $total) ? static::ref($this->router, $request,
+                            $request->getAttribute('route')->getArguments(), ['offset' => $offset + $limit], '(Next)') : null;
+                        $links['last'] = static::ref($this->router, $request,
+                            $request->getAttribute('route')->getArguments(),
+                            ['offset' => (floor(($total - 1) / $limit) * $limit)], '(Last)');
                     }
-                    $bodyRaw['_links'] = $this->refs(array_filter($links));
+                    $bodyRaw['_links'] = $this->refs($request, array_filter($links));
                     $bodyRaw['_embedded'][$meta['collectionName']] = $scope['data'];
                     $bodyRaw['total_items'] = $total;
                     $bodyRaw['returned_items'] = count($scope['data']);
@@ -605,8 +621,8 @@ abstract class Restful
         }
         $response = $response->withStatus($status);
         if ($bodyRaw !== null && $status !== 204) {
-            if ($this->container->get('settings')['debug'] === true) {
-                $bodyRaw['execution_time'] = microtime(true) - $this->container->get('settings')['startTime'];
+            if ($this->settings->get('debug', false) === true && $this->settings->has('startTime')) {
+                $bodyRaw['execution_time'] = microtime(true) - $this->settings->get('startTime');
             }
             $response->getBody()->write($this->encode($bodyRaw));
         }
@@ -631,14 +647,13 @@ abstract class Restful
     /**
      * Generate a URL for the current requested route.
      *
-     * @param array $params An array of parameters to add to the route.
+     * @param ServerRequestInterface $request
+     * @param array                  $params An array of parameters to add to the route.
      *
      * @return string The current route's URL.
      */
-    protected function self(array $params = [])
+    protected function self(ServerRequestInterface $request, array $params = [])
     {
-        /** @var ServerRequestInterface $request */
-        $request = $this->container->get('request');
         $getParams = array_replace_recursive($request->getQueryParams(), $params);
 
         $uri = $request->getUri()->withQuery(http_build_query($getParams))->withUserInfo('');

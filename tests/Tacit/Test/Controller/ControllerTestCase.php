@@ -18,6 +18,7 @@ use Slim\Http\Headers;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Uri;
+use Tacit\Model\Repository;
 use Tacit\TestCase;
 
 /**
@@ -27,6 +28,13 @@ use Tacit\TestCase;
  */
 abstract class ControllerTestCase extends TestCase
 {
+    /**
+     * A MockRepository fixture for the Model test cases.
+     *
+     * @var Repository
+     */
+    public $fixture;
+
     /**
      * @param array $vars
      *
@@ -56,6 +64,8 @@ abstract class ControllerTestCase extends TestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $this->fixture = $this->tacit->getContainer()->get('repository');
 
         $this->tacit->getContainer()->get('settings')->set('tacit.identitiesFile', __DIR__ . '/../../../identities.php');
         require __DIR__ . '/../../../routes.php';

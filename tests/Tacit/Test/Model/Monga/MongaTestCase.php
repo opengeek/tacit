@@ -23,19 +23,15 @@ use Tacit\TestCase;
  */
 abstract class MongaTestCase extends TestCase
 {
-    /** @var ContainerInterface */
-    protected $container;
     /** @var MongaRepository */
     protected $fixture;
 
     public function setUp()
     {
-        $tacit = new Tacit([
+        $this->tacit = new Tacit([
             'settings' => [
-                'app' => [
-                    'mode' => 'development',
-                    'startTime' => microtime(true)
-                ],
+                'mode' => 'development',
+                'startTime' => microtime(true),
                 'connection' => [
                     'class' => 'Tacit\Model\Monga\MongaRepository',
                     'server' => 'localhost',
@@ -45,9 +41,7 @@ abstract class MongaTestCase extends TestCase
             ]
         ]);
 
-        $this->container = $tacit->getContainer();
-
-        $this->fixture = $tacit->getContainer()->get('repository');
+        $this->fixture = $this->tacit->getContainer()->get('repository');
 
         $this->fixture->create(['exceptions' => false]);
     }

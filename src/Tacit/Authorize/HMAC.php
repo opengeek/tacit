@@ -12,11 +12,8 @@ namespace Tacit\Authorize;
 
 
 use Psr\Http\Message\ServerRequestInterface;
-use Tacit\Controller\Exception\ForbiddenException;
 use Tacit\Controller\Exception\ResourceConflictException;
-use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\UnauthorizedException;
-use Tacit\Controller\Restful;
 
 class HMAC implements Authorization
 {
@@ -54,16 +51,13 @@ class HMAC implements Authorization
     /**
      * Determine if the client has authorization to make the request.
      *
-     * @param Restful                $controller
      * @param ServerRequestInterface $request
      *
      * @return bool Returns true if the client has authorization to make the request.
-     * @throws RestfulException If the request is not valid.
      * @throws ResourceConflictException If the request has expired and is no longer valid.
-     * @throws ForbiddenException If provided credentials do not grant authority to access the resource.
      * @throws UnauthorizedException If no credentials are provided and the resource requires them for access.
      */
-    public function isValidRequest(Restful $controller, ServerRequestInterface $request)
+    public function isValidRequest(ServerRequestInterface $request)
     {
         $signature = $this->getSignature($request);
         if (empty($signature)) {
@@ -95,7 +89,7 @@ class HMAC implements Authorization
             );
         }
 
-        $secret = $this->getSecretKey($controller->getContainer(), $clientKey);
+        $secret = $this->getSecretKey($clientKey);
 
         $fingerprint = $this->getInput($request);
         $test = hash_hmac('sha1', $fingerprint, $secret);

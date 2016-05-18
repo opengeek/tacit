@@ -23,17 +23,12 @@ use Tacit\Tacit;
  */
 abstract class ControllerTestCase extends \Tacit\Test\Controller\ControllerTestCase
 {
-    /** @var Repository */
-    protected $fixture;
-
     protected function setUp()
     {
         $this->tacit = new Tacit([
             'settings' => [
-                'app' => [
-                    'mode' => 'development',
-                    'startTime' => microtime(true)
-                ],
+                'mode' => 'development',
+                'startTime' => microtime(true),
                 'connection' => [
                     'class' => 'Tacit\Model\RethinkDB\Repository',
                     'server' => 'localhost',

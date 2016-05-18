@@ -74,7 +74,7 @@ class PersistentTest extends TestCase
     public function testCreate($data)
     {
         try {
-            $object = PersistentObject::create($this->container, $data);
+            $object = PersistentObject::create($this->fixture, $data);
 
             $this->assertNotNull($object);
             $this->assertInstanceOf('Tacit\Model\Persistent', $object);

@@ -39,13 +39,9 @@ interface Authorization
     /**
      * Determine if the client has authorization to make the request.
      *
-     * @param Restful                $controller
      * @param ServerRequestInterface $request
      *
      * @return bool Returns true if the client has authorization to make the request.
-     * @throws RestfulException If the request is not valid.
-     * @throws ForbiddenException If provided credentials do not grant authority to access the resource.
-     * @throws UnauthorizedException If no credentials are provided and the resource requires them for access.
      */
-    public function isValidRequest(Restful $controller, ServerRequestInterface $request);
+    public function isValidRequest(ServerRequestInterface $request);
 }

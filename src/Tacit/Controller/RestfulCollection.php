@@ -12,14 +12,17 @@ namespace Tacit\Controller;
 
 
 use Exception;
+use League\Fractal\Manager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Router;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Exception\ModelValidationException;
 use Tacit\Model\Persistent;
 use Tacit\Model\Query;
+use Tacit\Model\Repository;
 use Tacit\Operations\OperationalException;
 
 /**
@@ -39,6 +42,27 @@ abstract class RestfulCollection extends Restful
     protected static $itemController = 'Tacit\\Controller\\RestfulItem';
 
     protected static $transformer = 'Tacit\\Transform\\PersistentTransformer';
+
+    /**
+     * Get a model Repository instance for this controller.
+     *
+     * @var Repository
+     */
+    protected $repository;
+
+    /**
+     * Construct a new instance of the Restful controller.
+     *
+     * @param \Slim\Collection $settings
+     * @param Router           $router
+     * @param Manager          $fractal
+     * @param Repository       $repository
+     */
+    public function __construct(\Slim\Collection $settings, Router $router, Manager $fractal, Repository $repository)
+    {
+        parent::__construct($settings, $router, $fractal);
+        $this->repository = $repository;
+    }
 
     /**
      * GET a representation of a pageable and sortable collection.
@@ -63,9 +87,9 @@ abstract class RestfulCollection extends Restful
         $orderDir = isset($request->getQueryParams()['sort_dir']) ? $request->getQueryParams()['sort_dir'] : 'desc';
 
         try {
-            $total = $modelClass::count($this->getContainer(), $criteria);
+            $total = $modelClass::count($this->repository, $criteria);
 
-            $collection = $modelClass::find($this->getContainer(), function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
+            $collection = $modelClass::find($this->repository, function ($query) use ($criteria, $offset, $limit, $orderBy, $orderDir) {
                 /** @var Query|object $query */
                 foreach ($criteria as $criterionKey => $criterion) {
                     $query->where($criterionKey, $criterion);
@@ -100,7 +124,7 @@ abstract class RestfulCollection extends Restful
             $data = !empty($criteria) ? array_replace_recursive($data, $criteria) : $data;
             $data = $this->postBeforeSet($data);
             
-            $item = $modelClass::create($this->getContainer(), $data);
+            $item = $modelClass::create($this->repository, $data);
 
             /** @var RestfulItem $itemController */
             $itemController = static::$itemController;
@@ -109,7 +133,7 @@ abstract class RestfulCollection extends Restful
                 $request,
                 $response,
                 $item,
-                $itemController::url($this->getContainer(), [$item->getKeyField() => $item->getKey()], false),
+                $itemController::url($this->router, $request, [$item->getKeyField() => $item->getKey()], false),
                 $this->transformer()
             );
         } catch (OperationalException $e) {

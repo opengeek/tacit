@@ -21,14 +21,12 @@ use Tacit\Tacit;
  */
 abstract class TestCase extends \Tacit\TestCase
 {
-    /** @var ContainerInterface */
-    protected $container;
     /** @var Repository */
     protected $fixture;
 
     protected function setUp()
     {
-        $tacit = new Tacit([
+        $this->tacit = new Tacit([
             'settings' => [
                 'mode' => 'development',
                 'startTime' => microtime(true),
@@ -41,10 +39,8 @@ abstract class TestCase extends \Tacit\TestCase
             ]
         ]);
 
-        $this->container = $tacit->getContainer();
-
         /** @var Repository fixture */
-        $this->fixture = $tacit->getContainer()->get('repository');
+        $this->fixture = $this->tacit->getContainer()->get('repository');
 
         $this->fixture->create(['exceptions' => false]);
     }

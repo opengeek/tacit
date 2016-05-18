@@ -48,7 +48,7 @@ class RestfulItemTest extends ControllerTestCase
         parent::setUp();
 
         foreach (self::fixtureData() as $item) {
-            MongaPersistentObject::create($this->tacit->getContainer(), $item);
+            MongaPersistentObject::create($this->fixture, $item);
         }
     }
 
@@ -68,7 +68,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGet()
     {
         /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
+        $itemObj = MongaPersistentObject::findOne($this->fixture, ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/monga/collection/' . (string)$itemObj->_id,
@@ -100,7 +100,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testGetWithFields()
     {
         /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne($this->tacit->getContainer(), ['name' => 'MockPersistent #1'], []);
+        $itemObj = MongaPersistentObject::findOne($this->fixture, ['name' => 'MockPersistent #1'], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/monga/collection/' . $itemObj->_id,
@@ -137,7 +137,7 @@ class RestfulItemTest extends ControllerTestCase
     public function testPut(array $data)
     {
         /** @var MongaPersistentObject $itemObj */
-        $itemObj = MongaPersistentObject::findOne($this->tacit->getContainer(), ['name' => $data['name']], []);
+        $itemObj = MongaPersistentObject::findOne($this->fixture, ['name' => $data['name']], []);
 
         $mock = $this->mockEnvironment([
             'REQUEST_URI' => '/monga/collection/' . $itemObj->_id,

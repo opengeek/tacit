@@ -11,18 +11,8 @@
 namespace Tacit\Operations;
 
 
-use Tacit\Tacit;
-
 trait Operational
 {
-    /** @var Tacit */
-    public    $app;
-
-    public function __construct(Tacit &$app)
-    {
-        $this->app =& $app;
-    }
-
     public function property($key, array $data = [], $default = null)
     {
         $value = $default;

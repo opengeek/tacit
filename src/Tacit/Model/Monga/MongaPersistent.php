@@ -17,7 +17,7 @@ use Tacit\Model\Persistent;
 
 abstract class MongaPersistent extends Persistent
 {
-    public static $transformer = 'Tacit\\Transform\\MongaPersistentTransformer';
+    public static $transformer = 'Tacit\Transform\MongaPersistentTransformer';
 
     /**
      * The unique identifier for a Mongo model item.

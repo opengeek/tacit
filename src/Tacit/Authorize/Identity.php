@@ -10,29 +10,50 @@
 
 namespace Tacit\Authorize;
 
-use Interop\Container\ContainerInterface;
+use InvalidArgumentException;
 
 trait Identity
 {
-    private static $identities;
+    /** @var array */
+    private $identities;
 
-    public static function identities(ContainerInterface $container)
+    /**
+     * Construct a new Identity instance.
+     *
+     * @param $identitiesFile
+     */
+    public function __construct($identitiesFile)
     {
-        if (!is_array(static::$identities) && $container->get('settings')->has('tacit.identitiesFile')) {
-            $identitiesFile = $container->get('settings')->get('tacit.identitiesFile');
-            if (is_readable($identitiesFile)) {
-                static::$identities = include $identitiesFile;
-            }
+        if (!is_readable($identitiesFile)) {
+            throw new InvalidArgumentException("No valid tacit.identitiesFile specified");
         }
-        return static::$identities;
+
+        $this->identities = require $identitiesFile;
     }
 
-    public function getSecretKey(ContainerInterface $container, $clientKey)
+    /**
+     * Get defined identities.
+     *
+     * @return array
+     */
+    public function getIdentities()
     {
-        $identities = static::identities($container);
-        if (isset($identities[$clientKey])) {
-            return $identities[$clientKey]['secretKey'];
+        return $this->identities;
+    }
+
+    /**
+     * Get the secretKey for a defined clientKey.
+     *
+     * @param string $clientKey The clientKey to find the secret for.
+     *
+     * @return string|bool The secretKey or false if a secretKey could not be found for any reason.
+     */
+    public function getSecretKey($clientKey)
+    {
+        if (isset($this->identities[$clientKey])) {
+            return $this->identities[$clientKey]['secretKey'];
         }
+
         return false;
     }
 }

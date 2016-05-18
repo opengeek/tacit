@@ -68,7 +68,7 @@ class MongaPersistentTest extends MongaTestCase
     public function testCreate($data)
     {
         try {
-            $object = MongaPersistentObject::create($this->container, $data);
+            $object = MongaPersistentObject::create($this->fixture, $data);
 
             $this->assertNotNull($object);
             $this->assertInstanceOf('Tacit\Model\Persistent', $object);

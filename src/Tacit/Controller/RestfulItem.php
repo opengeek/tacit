@@ -12,14 +12,17 @@ namespace Tacit\Controller;
 
 
 use Exception;
+use League\Fractal\Manager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Router;
 use Tacit\Controller\Exception\NotFoundException;
 use Tacit\Controller\Exception\RestfulException;
 use Tacit\Controller\Exception\ServerErrorException;
 use Tacit\Controller\Exception\UnacceptableEntityException;
 use Tacit\Model\Collection;
 use Tacit\Model\Exception\ModelValidationException;
+use Tacit\Model\Repository;
 use Tacit\Model\RethinkDB\Persistent;
 use Tacit\Operations\OperationalException;
 
@@ -33,6 +36,27 @@ abstract class RestfulItem extends Restful
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'PATCH', 'PUT', 'DELETE'];
 
     protected static $transformer = 'Tacit\Transform\PersistentTransformer';
+
+    /**
+     * Get a model Repository instance for this controller.
+     *
+     * @var Repository
+     */
+    protected $repository;
+
+    /**
+     * Construct a new instance of the Restful controller.
+     *
+     * @param \Slim\Collection $settings
+     * @param Router           $router
+     * @param Manager          $fractal
+     * @param Repository       $repository
+     */
+    public function __construct(\Slim\Collection $settings, Router $router, Manager $fractal, Repository $repository)
+    {
+        parent::__construct($settings, $router, $fractal);
+        $this->repository = $repository;
+    }
 
     /**
      * Delete this item from the collection.
@@ -50,7 +74,7 @@ abstract class RestfulItem extends Restful
         $modelClass = static::$modelClass;
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->getContainer(), $this->criteria($args, $request), []);
+        $item = $modelClass::findOne($this->repository, $this->criteria($args, $request), []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -91,7 +115,7 @@ abstract class RestfulItem extends Restful
         $fields = array_filter(explode(',', $fields));
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->getContainer(), $criteria, $fields);
+        $item = $modelClass::findOne($this->repository, $criteria, $fields);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -118,7 +142,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->getContainer(), $criteria, []);
+        $item = $modelClass::findOne($this->repository, $criteria, []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -162,7 +186,7 @@ abstract class RestfulItem extends Restful
         $criteria = $this->criteria($args, $request);
 
         /** @var Persistent $item */
-        $item = $modelClass::findOne($this->getContainer(), $criteria, []);
+        $item = $modelClass::findOne($this->repository, $criteria, []);
 
         if (null === $item) {
             throw new NotFoundException();
@@ -170,7 +194,7 @@ abstract class RestfulItem extends Restful
 
         try {
             /** @var Persistent $newItem */
-            $newItem = new $modelClass($this->getContainer());
+            $newItem = new $modelClass($this->repository);
             $data = array_replace_recursive(
                 $newItem->toArray(),
                 $request->getParsedBody() ?: []
