@@ -26,30 +26,58 @@ use Tacit\Model\Repository;
  */
 class Container extends \Slim\Container
 {
+    /**
+     * Create a new Container for your application.
+     *
+     * @param array $values The parameters or objects.
+     */
     public function __construct(array $values)
     {
         parent::__construct($values);
 
         $this->registerCustomServices();
     }
-    
+
+    /**
+     * Register custom services for this application.
+     */
     protected function registerCustomServices()
     {
         $this['errorHandler'] = function(Container $c) {
             return new Error($c->settings->all());
         };
 
-        $this['repository'] = function(Container $c) {
-            $connection = $c->settings->get('connection');
-            if ($connection === null) return null;
-            
-            $dbClass = $connection['class'];
-
-            return new $dbClass($connection);
-        };
-
         $this['fractal'] = function() {
             return new Manager();
         };
+
+        $this->registerRepository();
+    }
+
+    /**
+     * Register the Repository for this container.
+     */
+    protected function registerRepository()
+    {
+        $this['repository'] = function(Container $c) {
+            $connection = $c->settings->get('connection');
+            if ($connection === null) return null;
+
+            return $this->repositoryFactory($connection);
+        };
+    }
+
+    /**
+     * A Repository factory for your application.
+     *
+     * Override this to construct a Repository instance with all required dependencies.
+     *
+     * @param array     $connection An array of settings containing the Repository connection details.
+     *
+     * @return Repository
+     */
+    protected function repositoryFactory(array $connection)
+    {
+        return new $connection['class']($connection);
     }
 }
