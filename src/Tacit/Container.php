@@ -36,6 +36,8 @@ class Container extends \Slim\Container
         parent::__construct($values);
 
         $this->registerCustomServices();
+
+        $this->registerRepository();
     }
 
     /**
@@ -50,8 +52,6 @@ class Container extends \Slim\Container
         $this['fractal'] = function() {
             return new Manager();
         };
-
-        $this->registerRepository();
     }
 
     /**
