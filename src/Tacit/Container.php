@@ -19,6 +19,7 @@ use Tacit\Model\Repository;
 /**
  * @property-read Error $errorHandler
  * @property-read Collection $settings
+ * @property-read Manager $fractal
  * @property-read Repository|null $repository
  *
  * @package Tacit
