@@ -30,7 +30,7 @@ class AccessControlHeaders
         $response = $next($request, $response);
         $response = $response->withHeader('Access-Control-Allow-Origin', $request->getAttribute(Restful::ALLOWED_ORIGINS, ['*']))
             ->withHeader('Access-Control-Allow-Headers', 'Origin,Content-Type,Accept,Authorization')
-            ->withHeader('Access-Control-Allow-Methods', implode(',', $request->getAttribute(Restful::ALLOWED_METHODS, 'OPTIONS,HEAD,GET,POST,PUT,PATCH,DELETE')));
+            ->withHeader('Access-Control-Allow-Methods', implode(',', $request->getAttribute(Restful::ALLOWED_METHODS, ['OPTIONS','HEAD','GET','POST','PUT','PATCH','DELETE'])));
 
         return $response;
     }
