@@ -23,7 +23,7 @@ use Tacit\Container;
 class Factory
 {
     /** @var Container */
-    private $container;
+    protected $container;
 
     public function __construct(Container $container)
     {
