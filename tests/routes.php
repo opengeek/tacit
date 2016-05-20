@@ -11,15 +11,13 @@
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-$this->tacit->any('/', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
-    return (new \Tacit\Test\Controller\MockRestful($this->settings, $this->router, $this->fractal))
-        ->handle($request, $response, $args);
-});
+/** @var \Tacit\Container $c */
+$c = $this->tacit->getContainer();
+
+$this->tacit->any('/', $c->controllers->restful(\Tacit\Test\Controller\MockRestful::class));
 
 $this->tacit->group('/collection', function () {
-    $this->any('[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
-        return (new \Tacit\Test\Controller\MockRestfulCollection($this->settings, $this->router, $this->fractal, $this->repository))->handle($request, $response, $args);
-    })->setName('MockRestfulCollection');
+    $this->any('[/]', $this->getContainer()->controllers->collection(\Tacit\Test\Controller\MockRestfulCollection::class))->setName('MockRestfulCollection');
     $this->any('/{id}[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
         $args['_id'] = $args['id'];
         unset($args['id']);
@@ -30,9 +28,7 @@ $this->tacit->group('/collection', function () {
 
 $this->tacit->group('/monga', function () {
     $this->group('/collection', function () {
-//        $this->any('[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
-//            return (new \Tacit\Test\Controller\Monga\RestfulCollection($this->settings, $this->router, $this->fractal, $this->repository))->handle($request, $response, $args);
-//        })->setName('MongaRestfulCollection');
+//        $this->any('[/]', $this->getContainer()->controllers->collection(\Tacit\Test\Controller\MongaRestfulCollection::class))->setName('MongaRestfulCollection');
         $this->any('/{id}[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
             $args['_id'] = $args['id'];
             unset($args['id']);
@@ -44,12 +40,8 @@ $this->tacit->group('/monga', function () {
 
 $this->tacit->group('/rethinkdb', function () {
     $this->group('/collection', function () {
-//        $this->any('[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
-//            return (new \Tacit\Test\Controller\RethinkDB\RestfulCollection($this->settings, $this->router, $this->fractal, $this->repository))->handle($request, $response, $args);
-//        })->setName('RethinkDBRestfulCollection');
-        $this->any('/{id}[/]', function (ServerRequestInterface $request, ResponseInterface $response, array $args) {
-            return (new \Tacit\Test\Controller\RethinkDB\RestfulItem($this->settings, $this->router, $this->fractal, $this->repository))->handle($request, $response, $args);
-        })->setName('RethinkDBRestfulItem');
+//        $this->any('[/]', $this->getContainer()->controllers->collection(\Tacit\Test\Controller\RethinkDB\RestfulCollection::class))->setName('RethinkDBRestfulCollection');
+        $this->any('/{id}[/]', $this->getContainer()->controllers->collection(\Tacit\Test\Controller\RethinkDB\RestfulItem::class))->setName('RethinkDBRestfulItem');
     });
 });
 

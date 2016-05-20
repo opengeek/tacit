@@ -12,6 +12,7 @@ namespace Tacit;
 
 use League\Fractal\Manager;
 use Slim\Collection;
+use Tacit\Controller\Factory;
 use Tacit\Handlers\Error;
 use Tacit\Model\Repository;
 
@@ -20,6 +21,7 @@ use Tacit\Model\Repository;
  * @property-read Error $errorHandler
  * @property-read Collection $settings
  * @property-read Manager $fractal
+ * @property-read Factory $controllers
  * @property-read Repository|null $repository
  *
  * @package Tacit
@@ -51,6 +53,10 @@ class Container extends \Slim\Container
 
         $this['fractal'] = function() {
             return new Manager();
+        };
+
+        $this['controllers'] = function(Container $c) {
+            return new Factory($c);
         };
     }
 
