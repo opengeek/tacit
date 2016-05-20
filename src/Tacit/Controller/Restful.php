@@ -37,6 +37,9 @@ use Tacit\Transform\RestfulExceptionTransformer;
  */
 abstract class Restful
 {
+    const ALLOWED_METHODS = 'tacit.allowedMethods';
+    const ALLOWED_ORIGINS = 'tacit.allowedOrigins';
+
     const RESOURCE_TYPE_ERROR      = 0;
     const RESOURCE_TYPE_ITEM       = 1;
     const RESOURCE_TYPE_COLLECTION = 2;
@@ -47,6 +50,13 @@ abstract class Restful
      * @var array[string]
      */
     protected static $allowedMethods = ['OPTIONS', 'HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+
+    /**
+     * An array of allowed HTTP origins for the controller.
+     *
+     * @var array[string]
+     */
+    protected static $allowedOrigins = ['*'];
 
     /**
      * The plural name of the Resource represented by this Controller.
@@ -639,6 +649,7 @@ abstract class Restful
      */
     protected function checkMethod(ServerRequestInterface $request)
     {
+        $request = $request->withAttribute(static::ALLOWED_METHODS, static::$allowedMethods);
         if (!in_array($request->getMethod(), static::$allowedMethods)) {
             throw new MethodNotAllowedException();
         }
