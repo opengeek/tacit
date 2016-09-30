@@ -173,4 +173,12 @@ class CollectionTest extends ModelTestCase
     {
         $this->assertEquals(['string #1','string #2','string #3'], MockPersistent::collection($this->fixture)->distinct('arrayOfStrings'));
     }
+
+    /**
+     * Test Collection::getConnection()
+     */
+    public function testGetConnection()
+    {
+        $this->assertTrue(is_array(MockPersistent::collection($this->fixture)->getConnection()));
+    }
 }

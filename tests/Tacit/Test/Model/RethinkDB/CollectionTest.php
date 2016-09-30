@@ -181,4 +181,12 @@ class CollectionTest extends TestCase
     {
         $this->assertEquals(['string #1','string #2','string #3'], PersistentObject::collection($this->fixture, ['read_mode' => 'outdated'])->distinct('arrayOfStrings'));
     }
+
+    /**
+     * Test Collection::getConnection()
+     */
+    public function testGetConnection()
+    {
+        $this->assertInstanceOf('Tacit\Model\RethinkDB\Connection', PersistentObject::collection($this->fixture)->getConnection());
+    }
 }

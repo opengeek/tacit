@@ -88,6 +88,16 @@ abstract class Collection
     }
 
     /**
+     * Get the native connection for the Collection.
+     *
+     * @return array|object The structure or object representing the native connection to the Repository.
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Get an option value for the Collection.
      *
      * @param string $key The key identifying a collection configuration option.
