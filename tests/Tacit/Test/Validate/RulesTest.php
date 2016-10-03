@@ -48,6 +48,8 @@ class RulesTest extends ValidateTestCase
             [['field' => 'http://localhost'], ['field' => 'url'], true],
             [['field' => null], ['field' => 'url'], false],
             [['field' => null], ['field' => 'url:null'], true],
+            [['field' => 'test@domain.tld'], ['field' => 'email'], true],
+            [['field' => 'test@domain.longertld'], ['field' => 'email'], true],
         ];
     }
 
