@@ -587,9 +587,9 @@ abstract class Restful
                     $total = $meta['total'];
                     $limit = isset($meta['limit']) && (int)$meta['limit'] > 0
                         ? (int)$meta['limit']
-                        : isset($request->getQueryParams()['limit'])
+                        : (isset($request->getQueryParams()['limit'])
                             ? (int)$request->getQueryParams()['limit']
-                            : 25;
+                            : 25);
                     $offset = isset($meta['offset'])
                         ? (int)$meta['offset'] :
                         isset($request->getQueryParams()['offset'])
