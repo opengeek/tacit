@@ -592,9 +592,9 @@ abstract class Restful
                             : 25);
                     $offset = isset($meta['offset'])
                         ? (int)$meta['offset'] :
-                        isset($request->getQueryParams()['offset'])
+                        (isset($request->getQueryParams()['offset'])
                             ? (int)$request->getQueryParams()['offset']
-                            : 0;
+                            : 0);
                     if ($total > $offset) {
                         $links['first'] = static::ref($this->router, $request,
                             $request->getAttribute('route')->getArguments(), $offset > 0 ? ['offset' => 0] : [],
