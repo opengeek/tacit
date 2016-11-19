@@ -14,6 +14,7 @@ namespace Tacit\Model\RethinkDB;
 use DateTime;
 use DateTimeZone;
 use r\Cursor;
+use r\Queries\Selecting\Get;
 use r\Queries\Tables\Table;
 use r\ValuedQuery\ValuedQuery;
 
@@ -140,14 +141,22 @@ class Collection extends \Tacit\Model\Collection
     public function findOne($query, $fields = [])
     {
         $result = $this->sequence($query);
-        if (!empty($fields)) {
-            $result = $result->pluck($fields);
+        if ($result instanceof Get) {
+            if (!empty($fields)) {
+                $result = $result->pluck($fields);
+            }
+            $result = $result->run($this->connection->getHandle());
+        } else {
+            if (!empty($fields)) {
+                $result = $result->pluck($fields);
+            }
+            $result = $result->limit(1)->run($this->connection->getHandle());
         }
-        $result = $result->limit(1)->run($this->connection->getHandle());
         if ($result instanceof Cursor) {
             $result = $result->toArray();
+            $result = array_pop($result);
         }
-        return array_pop($result);
+        return $result;
     }
 
     /**
@@ -220,7 +229,9 @@ class Collection extends \Tacit\Model\Collection
             if ($query instanceof \Closure) {
                 $query = $query($this->peer);
             }
-            if (is_array($query) && !empty($query)) {
+            if (is_array($query) && isset($query['id']) && count($query) === 1) {
+                $query = $this->peer->get($query['id']);
+            } elseif (is_array($query) && !empty($query)) {
                 $query = $this->peer->filter($query);
             }
             if (!empty($query)) {
