@@ -37,7 +37,14 @@ class RestfulItemTest extends ControllerTestCase
                 'date'  => new DateTime(),
                 'boolean' => (bool)rand(0,1),
                 'password' => 'abcdefg',
-                'arrayOfStrings' => []
+                'arrayOfStrings' => [],
+                'nestedObject' => [
+                    'text' => "NestedObject of MockPersistent #{$i}",
+                    'array' => [
+                        'key1' => 'value1',
+                        'key2' => 'value2',
+                    ]
+                ]
             ];
         }
         return $data;
@@ -115,7 +122,7 @@ class RestfulItemTest extends ControllerTestCase
 
             $item = json_decode($response->getBody(), true);
 
-            $data = $itemObj->toArray(Collection::getMask($itemObj, ['integer', 'float', 'date', 'boolean', 'arrayOfStrings']));
+            $data = $itemObj->toArray(Collection::getMask($itemObj, ['integer', 'float', 'date', 'boolean', 'arrayOfStrings', 'nestedObject']));
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -154,6 +161,7 @@ class RestfulItemTest extends ControllerTestCase
             $item = json_decode($response->getBody(), true);
 
             unset($data['password']);
+            $data = PersistentObject::collection($this->fixture)->cast($data);
 
             $matches = array_uintersect_assoc($data, $item, array($this, 'compareMultidimensionalArray'));
 
@@ -175,7 +183,8 @@ class RestfulItemTest extends ControllerTestCase
                     'float' => 1.1,
                     'date'  => (new DateTime("@" . time()))->format(DATE_ISO8601),
                     'password' => 'uvwxyz',
-                    'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
+                    'arrayOfStrings' => ['abc','def','ghi','jkl','mno'],
+                    'nestedObject' => []
                 ]
             ],
             [
@@ -187,7 +196,43 @@ class RestfulItemTest extends ControllerTestCase
                     'date'  => (new DateTime("@" . time()))->format(DATE_ISO8601),
                     'boolean' => false,
                     'password' => 'uvwxyz',
-                    'arrayOfStrings' => ['abc','def','ghi','jkl','mno']
+                    'arrayOfStrings' => ['abc','def','ghi','jkl','mno'],
+                    'nestedObject' => [
+                        'text' => uniqid(),
+                        'integer' => 200,
+                        'float' => 200.2,
+                        'boolean' => false,
+                        'array' => [
+                            'key1' => 'value1',
+                            'key2' => 'value2'
+                        ]
+                    ]
+                ],
+            ],
+            [
+                [
+                    'name'  => "MockPersistent #3",
+                    'text'  => "Text of MockPersistent #3",
+                    'integer'   => 3,
+                    'float' => 3.3,
+                    'date'  => (new DateTime("@" . time()))->format(DATE_ISO8601),
+                    'boolean' => true,
+                    'password' => 'uvwxyz',
+                    'arrayOfStrings' => ['abc','def','ghi','jkl','mno','pqr','stu'],
+                    'nestedObject' => [
+                        'text' => uniqid(),
+                        'integer' => 200,
+                        'float' => 200.2,
+                        'boolean' => false,
+                        'array' => [
+                            'key1' => 'value1',
+                            'key2' => 'value2'
+                        ],
+                        'object' => (object)[
+                            'key1' => 'value1',
+                            'key2' => 'value2'
+                        ]
+                    ]
                 ],
             ]
         ];

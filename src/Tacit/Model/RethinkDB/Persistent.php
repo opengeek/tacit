@@ -70,7 +70,7 @@ class Persistent extends \Tacit\Model\Persistent
         if (true !== $validated) {
             throw new ModelValidationException('model validation failed for existing item in collection ' . static::$collectionName, $validated);
         }
-        $saved = static::collection($this->getRepository())->update([$this->getKeyField() => $this->getKey()], $this->distill($this->dirty(false)));
+        $saved = static::collection($this->getRepository())->update([$this->getKeyField() => $this->getKey()], $this->distill($this->dirty(false), true));
         if ($saved === false) {
             return false;
         }
@@ -94,7 +94,7 @@ class Persistent extends \Tacit\Model\Persistent
         return $data;
     }
 
-    protected function distill($data)
+    protected function distill($data, $literalNested = false)
     {
         if (!($data instanceof \r\DatumConverter) && (is_object($data) || is_array($data))) {
             if (!$data instanceof DateTime && !$data instanceof ArrayObject) {
@@ -102,7 +102,16 @@ class Persistent extends \Tacit\Model\Persistent
 
                 foreach ($data as $key => &$value) {
                     if (!($value instanceof \r\DatumConverter) && (is_object($value) || is_array($value))) {
-                        $value = $this->distill($value);
+                        if ($literalNested) {
+                            if (is_object($value)) {
+                                $value = get_object_vars($value);
+                            }
+                            if (is_array($value)) {
+                                $value = \r\literal($value);
+                            }
+                        } else {
+                            $value = $this->distill($value);
+                        }
                     }
                 }
             } elseif ($data instanceof DateTime && $data->getTimezone()->getName() !== 'UTC') {

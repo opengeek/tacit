@@ -74,12 +74,16 @@ class PersistentTest extends TestCase
     public function testCreate($data)
     {
         try {
+            /** @var PersistentObject $object */
             $object = PersistentObject::create($this->fixture, $data);
 
             $this->assertNotNull($object);
             $this->assertInstanceOf('Tacit\Model\Persistent', $object);
             $this->assertInstanceOf('Tacit\Model\RethinkDB\Persistent', $object);
             $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
+            if ($object->nestedObject !== null) {
+                $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\NestedObject', $object->nestedObject);
+            }
         } catch (ModelValidationException $e) {
             echo $e;
         }
@@ -117,6 +121,13 @@ class PersistentTest extends TestCase
                     'string #3',
                     'string #4',
                     'string #1'
+                ],
+                'nestedObject' => [
+                    'text' => 'nestedObject create test',
+                    'array' => [
+                        'key1' => uniqid('key1-'),
+                        'key2' => uniqid('key2-'),
+                    ]
                 ]
             ]],
         ];

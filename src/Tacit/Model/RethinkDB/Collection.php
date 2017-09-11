@@ -59,8 +59,19 @@ class Collection extends \Tacit\Model\Collection
                     /** @var DateTime $var */
                     $var = $var->setTimezone(new DateTimeZone('UTC'))->format(DATE_ISO8601);
                     break;
+                default:
+                    $var = get_object_vars($var);
+                    foreach ($var as $key => &$value) {
+                        $var[$key] = $this->cast($value);
+                    }
+                    break;
+            }
+        } elseif (is_array($var)) {
+            foreach ($var as $key => &$value) {
+                $var[$key] = $this->cast($value);
             }
         }
+
         return $var;
     }
 

@@ -12,6 +12,7 @@ namespace Tacit\Test\Model\RethinkDB;
 
 use DateTime;
 use Tacit\Model\RethinkDB\Collection;
+use Tacit\Test\Model\RethinkDB\NestedObject;
 
 /**
  * Tests for Tacit\Model\Collection.
@@ -38,7 +39,15 @@ class CollectionTest extends TestCase
                 'float' => (float)"{$i}.{$i}",
                 'date'  => new DateTime(),
                 'password' => 'abcdefg',
-                'arrayOfStrings' => ['string #' . (($i % 3) + 1)]
+                'arrayOfStrings' => ['string #' . (($i % 3) + 1)],
+                'nestedObject' =>             [
+                    'text' => "NestedObject of PersistentObject #{$i}",
+                    'integer' => $i,
+                    'array' => [
+                        'key1' => 'value1',
+                        'key2' => 'value2'
+                    ]
+                ]
             ];
         }
         return $data;
@@ -77,7 +86,7 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf('Tacit\Test\Model\RethinkDB\PersistentObject', $object);
         $this->assertEquals(
             [
-                'id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'
+                'id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings', 'nestedObject'
             ],
             array_keys(Collection::getPublicVars($object))
         );
@@ -89,7 +98,7 @@ class CollectionTest extends TestCase
     public function testGetPublicVarsFromClass()
     {
         $this->assertEquals(
-            ['id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings'],
+            ['id', 'name', 'text', 'date', 'integer', 'float', 'boolean', 'password', 'arrayOfStrings', 'nestedObject'],
             array_keys(Collection::getPublicVars('Tacit\Test\Model\RethinkDB\PersistentObject'))
         );
     }
@@ -117,15 +126,15 @@ class CollectionTest extends TestCase
     {
         return [
             [
-                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
+                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 []
             ],
             [
-                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 ['name']
             ],
             [
-                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 ['name', 'float']
             ],
         ];
@@ -151,15 +160,15 @@ class CollectionTest extends TestCase
     {
         return [
             [
-                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
+                ['name', 'text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 []
             ],
             [
-                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'float', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 ['name']
             ],
             [
-                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings'],
+                ['text', 'date', 'integer', 'boolean', 'arrayOfStrings', 'nestedObject'],
                 ['name', 'float']
             ],
         ];
