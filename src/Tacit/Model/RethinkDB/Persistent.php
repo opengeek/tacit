@@ -102,7 +102,7 @@ class Persistent extends \Tacit\Model\Persistent
 
                 foreach ($data as $key => &$value) {
                     if (!($value instanceof \r\DatumConverter) && (is_object($value) || is_array($value))) {
-                        if ($literalNested) {
+                        if ($literalNested && (!$value instanceof DateTime)) {
                             if (is_object($value)) {
                                 $value = get_object_vars($value);
                             }
