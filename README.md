@@ -1,8 +1,8 @@
 # Tacit
 
-[![Build Status](https://travis-ci.org/opengeek/tacit.svg?branch=master)](https://travis-ci.org/opengeek/tacit)
+[![Build Status](https://travis-ci.org/opengeek/tacit.svg?branch=0.7.x)](https://travis-ci.org/opengeek/tacit)
 
-Tacit is a high-performance REST server library for PHP 5.4+ built on the [Slim micro framework](http://www.slimframework.com/).
+Tacit is a high-performance REST server library for PHP 5.6+ built on the [Slim micro framework](http://www.slimframework.com/).
 
 
 ## Features
@@ -15,7 +15,7 @@ Tacit is a high-performance REST server library for PHP 5.4+ built on the [Slim 
 * Allows custom authorization implementations with flexible integration points
 * Extensible output transformers via [Fractal](https://github.com/thephpleague/fractal)
 * A flexible persistence layer
-    * Support for MongoDB provided via [Monga](https://github.com/thephpleague/monga)
+    * Support for MongoDB provided via [Monga](https://github.com/thephpleague/monga) _PHP 5.6 only_
     * Support for RethinkDB provided via [PHP-RQL](http://danielmewes.github.io/php-rql/)
     * Simple and extensible validation library tightly integrated
 
@@ -32,9 +32,10 @@ $ composer require tacit/tacit
 
 The following versions of PHP are supported by this version:
 
-* PHP 5.4
-* PHP 5.5
 * PHP 5.6
+* PHP 7.0
+* PHP 7.1
+* PHP 7.2
 
 
 ## Documentation
