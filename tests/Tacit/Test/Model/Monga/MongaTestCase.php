@@ -14,14 +14,14 @@ namespace Tacit\Test\Model\Monga;
 use Interop\Container\ContainerInterface;
 use Tacit\Model\Monga\MongaRepository;
 use Tacit\Tacit;
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
 /**
  * Base test case for Monga models (MongoDB).
  *
  * @package Tacit\Test\Model\Monga
  */
-abstract class MongaTestCase extends TestCase
+abstract class MongaTestCase extends TacitTestCase
 {
     /** @var MongaRepository */
     protected $fixture;

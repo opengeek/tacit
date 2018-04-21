@@ -10,12 +10,14 @@
 
 namespace Tacit;
 
+use PHPUnit\Framework\TestCase;
+
 /**
- * The base Tacit TestCase
+ * The base Tacit TacitTestCase
  *
  * @package Tacit
  */
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TacitTestCase extends TestCase
 {
     /** @var Tacit */
     protected $tacit;

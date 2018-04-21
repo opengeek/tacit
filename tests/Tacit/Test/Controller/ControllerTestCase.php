@@ -19,14 +19,14 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Uri;
 use Tacit\Model\Repository;
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
 /**
  * Base test cases for RESTful Controllers.
  *
  * @package Tacit\Test\Controller
  */
-abstract class ControllerTestCase extends TestCase
+abstract class ControllerTestCase extends TacitTestCase
 {
     /**
      * A MockRepository fixture for the Model test cases.

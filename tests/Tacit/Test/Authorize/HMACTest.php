@@ -13,9 +13,9 @@ namespace Tacit\Test\Authorize;
 
 use Tacit\Authorize\HMAC;
 use Tacit\Tacit;
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
-class HMACTest extends TestCase
+class HMACTest extends TacitTestCase
 {
     /**
      * Test the HMAC->__construct()

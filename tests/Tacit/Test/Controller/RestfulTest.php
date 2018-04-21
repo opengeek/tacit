@@ -11,12 +11,12 @@
 namespace Tacit\Test\Controller;
 
 
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
-class RestfulTest extends TestCase
+class RestfulTest extends TacitTestCase
 {
     public function testHandle()
     {
-
+        $this->assertTrue(true);
     }
 }

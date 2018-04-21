@@ -13,7 +13,11 @@
         >
     <testsuites>
         <testsuite name="Tacit Test Suite">
-            <directory>./tests/</directory>
+            <directory>./tests/Tacit/</directory>
+            <exclude>./tests/Tacit/Test/Model/Monga/</exclude>
+            <exclude>./tests/Tacit/Test/Controller/Monga/</exclude>
+            <directory phpVersion="7.0" phpVersionOperator="&lt;">./tests/Tacit/Test/Model/Monga/</directory>
+            <directory phpVersion="7.0" phpVersionOperator="&lt;">./tests/Tacit/Test/Controller/Monga/</directory>
         </testsuite>
     </testsuites>
 

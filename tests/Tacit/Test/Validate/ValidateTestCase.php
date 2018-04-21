@@ -11,14 +11,14 @@
 namespace Tacit\Test\Validate;
 
 
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
 /**
  * Base test cases for the Tacit\Validate package.
  *
  * @package Tacit\Test\Validate
  */
-abstract class ValidateTestCase extends TestCase
+abstract class ValidateTestCase extends TacitTestCase
 {
 
-} 
+}

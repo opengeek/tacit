@@ -12,14 +12,14 @@ namespace Tacit\Test;
 
 
 use Tacit\Tacit;
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
 /**
  * Tests for the Tacit class.
  *
  * @package Tacit\Test
  */
-class TacitTest extends TestCase
+class TacitTest extends TacitTestCase
 {
     /**
      * Test the Tacit constructor.

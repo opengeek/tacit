@@ -19,7 +19,7 @@ use Tacit\Tacit;
  *
  * @package Tacit\Test\Model\RethinkDB
  */
-abstract class TestCase extends \Tacit\TestCase
+abstract class TestCase extends \Tacit\TacitTestCase
 {
     /** @var Repository */
     protected $fixture;

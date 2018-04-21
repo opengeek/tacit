@@ -12,14 +12,14 @@ namespace Tacit\Test\Model;
 
 
 use Interop\Container\ContainerInterface;
-use Tacit\TestCase;
+use Tacit\TacitTestCase;
 
 /**
  * Base test cases for Tacit\Model.
  *
  * @package Tacit\Test\Model
  */
-abstract class ModelTestCase extends TestCase
+abstract class ModelTestCase extends TacitTestCase
 {
     /**
      * A MockRepository fixture for the Model test cases.
